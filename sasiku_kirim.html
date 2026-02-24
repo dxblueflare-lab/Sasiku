@@ -1,0 +1,1161 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sasiku Kirim - Layanan Pengiriman Barang Terpercaya</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCkUOdZ5y7hMm0yrcCQoCvLwzdM6M8s5qk&libraries=places&callback=initMap" async defer></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e6f7ff 100%);
+            min-height: 100vh;
+        }
+
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .service-card {
+            transition: all 0.3s ease;
+        }
+
+        .service-card:hover {
+            transform: scale(1.02);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .partner-logo {
+            transition: all 0.3s ease;
+        }
+
+        .partner-logo:hover {
+            transform: scale(1.1);
+        }
+
+        .tracking-step {
+            transition: all 0.3s ease;
+        }
+
+        .tracking-step.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .tracking-step.completed {
+            background: #10b981;
+            color: white;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .slide-in {
+            animation: slideIn 0.6s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-50px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .bounce {
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+            40% {transform: translateY(-10px);}
+            60% {transform: translateY(-5px);}
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(102, 126, 234, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(102, 126, 234, 0); }
+        }
+
+        .delivery-icon {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .driver-animation {
+            animation: driverMove 4s linear infinite;
+        }
+
+        @keyframes driverMove {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100vw); }
+        }
+
+        .status-indicator {
+            animation: pulseStatus 2s infinite;
+        }
+
+        @keyframes pulseStatus {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="glass-effect fixed w-full z-50 top-0 shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-3">
+                    <div class="w-12 h-12 gradient-bg rounded-2xl flex items-center justify-center">
+                        <i class="fas fa-shipping-fast text-white text-xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-blue-600">
+                            Sasiku Kirim
+                        </h1>
+                        <p class="text-xs text-gray-500">Layanan Pengiriman</p>
+                    </div>
+                </div>
+
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#" class="text-gray-700 hover:text-purple-600 font-medium transition-colors">Beranda</a>
+                    <a href="#services" class="text-gray-700 hover:text-purple-600 font-medium transition-colors">Layanan</a>
+                    <a href="#partners" class="text-gray-700 hover:text-purple-600 font-medium transition-colors">Partner</a>
+                    <a href="#track" class="text-gray-700 hover:text-purple-600 font-medium transition-colors">Lacak</a>
+                </div>
+
+                <div class="flex items-center space-x-4">
+                    <button onclick="showLoginModal()" class="text-gray-600 hover:text-purple-600 transition-colors">
+                        <i class="fas fa-user text-xl"></i>
+                    </button>
+                    <div class="relative" id="userDropdown">
+                        <button onclick="toggleUserDropdown()" class="flex items-center space-x-2 text-gray-600 hover:text-purple-600 transition-colors">
+                            <i class="fas fa-user"></i>
+                            <span id="userRoleText">Pengunjung</span>
+                            <i class="fas fa-chevron-down text-xs"></i>
+                        </button>
+                        <div id="userDropdownMenu" class="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg py-2 hidden z-50">
+                            <button onclick="showLoginModal()" class="block w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors">
+                                <i class="fas fa-sign-in-alt mr-2 text-blue-500"></i> Masuk
+                            </button>
+                            <button onclick="switchUserRole('user')" class="block w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors">
+                                <i class="fas fa-user mr-2 text-blue-500"></i> Pengguna
+                            </button>
+                            <button onclick="switchUserRole('driver')" class="block w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors">
+                                <i class="fas fa-motorcycle mr-2 text-green-500"></i> Driver
+                            </button>
+                            <button onclick="switchUserRole('guest')" class="block w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors">
+                                <i class="fas fa-sign-out-alt mr-2 text-gray-500"></i> Keluar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <div class="pt-20 pb-16 gradient-bg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12 fade-in">
+                <h1 class="text-4xl md:text-6xl font-bold text-white mb-6">
+                    Layanan Pengiriman <span class="bg-clip-text text-transparent bg-gradient-to-r from-yellow-300 to-orange-300">Tercepat</span>
+                </h1>
+                <p class="text-xl text-purple-100 mb-8 max-w-3xl mx-auto">
+                    Kirim barang ke seluruh Indonesia dengan layanan cepat, aman, dan terpercaya. 
+                    Bekerja sama dengan partner ojek online terkemuka.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <button onclick="showBookingModal()" class="btn-primary text-white font-semibold py-4 px-8 rounded-2xl text-lg flex items-center justify-center space-x-2 hover:shadow-xl transition-all">
+                        <i class="fas fa-box"></i>
+                        <span>Kirim Barang</span>
+                    </button>
+                    <button onclick="showTrackingModal()" class="bg-white/20 backdrop-blur text-white font-semibold py-4 px-8 rounded-2xl text-lg hover:bg-white/30 transition-all">
+                        <i class="fas fa-search-location mr-2"></i>
+                        Lacak Pengiriman
+                    </button>
+                </div>
+            </div>
+
+            <!-- Stats -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mt-16">
+                <div class="glass-effect rounded-2xl p-6 text-center slide-in">
+                    <div class="text-3xl font-bold text-purple-600 mb-2">50K+</div>
+                    <div class="text-gray-600">Paket Terkirim</div>
+                </div>
+                <div class="glass-effect rounded-2xl p-6 text-center slide-in" style="animation-delay: 0.1s;">
+                    <div class="text-3xl font-bold text-blue-600 mb-2">99%</div>
+                    <div class="text-gray-600">Kepuasan Pelanggan</div>
+                </div>
+                <div class="glass-effect rounded-2xl p-6 text-center slide-in" style="animation-delay: 0.2s;">
+                    <div class="text-3xl font-bold text-green-600 mb-2">24/7</div>
+                    <div class="text-gray-600">Layanan</div>
+                </div>
+                <div class="glass-effect rounded-2xl p-6 text-center slide-in" style="animation-delay: 0.3s;">
+                    <div class="text-3xl font-bold text-orange-600 mb-2">100+</div>
+                    <div class="text-gray-600">Kota Tujuan</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Services Section -->
+    <section id="services" class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">Layanan Kami</h2>
+                <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+                    Pilihan layanan pengiriman yang sesuai dengan kebutuhan Anda
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Same Day Delivery -->
+                <div class="service-card bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl p-8 border border-blue-200">
+                    <div class="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center mb-6 delivery-icon">
+                        <i class="fas fa-bolt text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-4">Same Day</h3>
+                    <p class="text-gray-600 mb-6">Pengiriman dalam hari yang sama. Ideal untuk dokumen penting dan barang urgent.</p>
+                    <ul class="space-y-2 mb-6">
+                        <li class="flex items-center text-sm">
+                            <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                            Pengiriman dalam 4-6 jam
+                        </li>
+                        <li class="flex items-center text-sm">
+                            <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                            Driver profesional
+                        </li>
+                        <li class="flex items-center text-sm">
+                            <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                            Tracking real-time
+                        </li>
+                    </ul>
+                    <button onclick="showBookingModal()" class="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold hover:bg-blue-700 transition-colors">
+                        Pesan Sekarang
+                    </button>
+                </div>
+
+                <!-- Next Day Delivery -->
+                <div class="service-card bg-gradient-to-br from-green-50 to-green-100 rounded-2xl p-8 border border-green-200">
+                    <div class="w-16 h-16 bg-green-600 rounded-2xl flex items-center justify-center mb-6 delivery-icon">
+                        <i class="fas fa-clock text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-4">Next Day</h3>
+                    <p class="text-gray-600 mb-6">Pengiriman esok hari. Solusi ekonomis untuk pengiriman antar kota.</p>
+                    <ul class="space-y-2 mb-6">
+                        <li class="flex items-center text-sm">
+                            <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                            Pengiriman 1 hari kerja
+                        </li>
+                        <li class="flex items-center text-sm">
+                            <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                            Biaya terjangkau
+                        </li>
+                        <li class="flex items-center text-sm">
+                            <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                            Asuransi barang
+                        </li>
+                    </ul>
+                    <button onclick="showBookingModal()" class="w-full bg-green-600 text-white py-3 rounded-xl font-semibold hover:bg-green-700 transition-colors">
+                        Pesan Sekarang
+                    </button>
+                </div>
+
+                <!-- Regular Delivery -->
+                <div class="service-card bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl p-8 border border-purple-200">
+                    <div class="w-16 h-16 bg-purple-600 rounded-2xl flex items-center justify-center mb-6 delivery-icon">
+                        <i class="fas fa-truck text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-4">Regular</h3>
+                    <p class="text-gray-600 mb-6">Pengiriman reguler untuk barang berukuran besar dan berat.</p>
+                    <ul class="space-y-2 mb-6">
+                        <li class="flex items-center text-sm">
+                            <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                            Untuk barang besar
+                        </li>
+                        <li class="flex items-center text-sm">
+                            <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                            Packing profesional
+                        </li>
+                        <li class="flex items-center text-sm">
+                            <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                            Door to door
+                        </li>
+                    </ul>
+                    <button onclick="showBookingModal()" class="w-full bg-purple-600 text-white py-3 rounded-xl font-semibold hover:bg-purple-700 transition-colors">
+                        Pesan Sekarang
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Partners Section -->
+    <section id="partners" class="py-20 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">Partner Pengiriman</h2>
+                <p class="text-xl text-gray-600">
+                    Bekerja sama dengan layanan ojek online terkemuka
+                </p>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 items-center">
+                <div class="partner-logo bg-white rounded-2xl p-8 text-center shadow-lg hover:shadow-xl transition-all">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Grab_logo_2020.svg/1200px-Grab_logo_2020.svg.png" alt="Grab" class="w-24 h-16 mx-auto object-contain">
+                    <p class="text-sm font-semibold mt-4">GrabExpress</p>
+                </div>
+                <div class="partner-logo bg-white rounded-2xl p-8 text-center shadow-lg hover:shadow-xl transition-all">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/Gojek_logo_%282018%29.svg/1200px-Gojek_logo_%282018%29.svg.png" alt="Gojek" class="w-24 h-16 mx-auto object-contain">
+                    <p class="text-sm font-semibold mt-4">GoSend</p>
+                </div>
+                <div class="partner-logo bg-white rounded-2xl p-8 text-center shadow-lg hover:shadow-xl transition-all">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Maxim_logo.svg/1200px-Maxim_logo.svg.png" alt="Maxim" class="w-24 h-16 mx-auto object-contain">
+                    <p class="text-sm font-semibold mt-4">Maxim Courier</p>
+                </div>
+                <div class="partner-logo bg-white rounded-2xl p-8 text-center shadow-lg hover:shadow-xl transition-all">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/Traveloka_Logo.svg/1200px-Traveloka_Logo.svg.png" alt="Traveloka" class="w-24 h-16 mx-auto object-contain">
+                    <p class="text-sm font-semibold mt-4">Traveloka Xpress</p>
+                </div>
+            </div>
+
+            <div class="mt-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-3xl p-8 text-white text-center">
+                <h3 class="text-2xl font-bold mb-4">Ingin Bergabung Sebagai Driver?</h3>
+                <p class="text-blue-100 mb-6 max-w-2xl mx-auto">
+                    Gabung dengan jaringan driver kami dan dapatkan penghasilan tambahan dengan mengantar paket setiap hari.
+                </p>
+                <button onclick="showDriverRegistration()" class="bg-white text-blue-600 font-bold py-3 px-8 rounded-xl hover:bg-gray-100 transition-colors">
+                    Daftar Sekarang
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tracking Section -->
+    <section id="track" class="py-20 bg-white">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">Lacak Pengiriman Anda</h2>
+                <p class="text-xl text-gray-600">
+                    Masukkan nomor resi untuk melacak status pengiriman barang Anda
+                </p>
+            </div>
+
+            <div class="glass-effect rounded-2xl p-8 mb-12">
+                <div class="flex flex-col md:flex-row gap-4">
+                    <input type="text" id="trackingNumber" placeholder="Masukkan nomor resi pengiriman" class="flex-1 px-6 py-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                    <button onclick="trackShipment()" class="btn-primary text-white font-semibold py-4 px-8 rounded-xl hover:shadow-xl transition-all">
+                        <i class="fas fa-search mr-2"></i> Lacak
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tracking Info -->
+            <div id="trackingInfo" class="hidden">
+                <div class="bg-gray-50 rounded-2xl p-6 mb-8">
+                    <div class="flex justify-between items-center mb-6">
+                        <div>
+                            <h3 class="text-xl font-bold text-gray-900">Resi: SK20240212001</h3>
+                            <p class="text-gray-600">Dikirim dari Jakarta ke Surabaya</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-sm text-gray-500">Status Terakhir:</p>
+                            <p class="text-lg font-bold text-green-600">Diantar Driver</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between mb-8">
+                        <div class="tracking-step active w-10 h-10 rounded-full flex items-center justify-center font-bold">1</div>
+                        <div class="flex-1 h-1 bg-gray-300 mx-4"></div>
+                        <div class="tracking-step completed w-10 h-10 rounded-full flex items-center justify-center font-bold">2</div>
+                        <div class="flex-1 h-1 bg-gray-300 mx-4"></div>
+                        <div class="tracking-step completed w-10 h-10 rounded-full flex items-center justify-center font-bold">3</div>
+                        <div class="flex-1 h-1 bg-gray-300 mx-4"></div>
+                        <div class="tracking-step w-10 h-10 rounded-full flex items-center justify-center font-bold text-gray-400">4</div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div class="text-center">
+                            <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                                <i class="fas fa-store text-blue-600"></i>
+                            </div>
+                            <p class="font-semibold">Dikemas</p>
+                            <p class="text-sm text-gray-500">12 Feb 2024, 09:30</p>
+                        </div>
+                        <div class="text-center">
+                            <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                                <i class="fas fa-warehouse text-green-600"></i>
+                            </div>
+                            <p class="font-semibold">Di Gudang</p>
+                            <p class="text-sm text-gray-500">12 Feb 2024, 11:15</p>
+                        </div>
+                        <div class="text-center">
+                            <div class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                                <i class="fas fa-motorcycle text-yellow-600"></i>
+                            </div>
+                            <p class="font-semibold">Diantar</p>
+                            <p class="text-sm text-gray-500">12 Feb 2024, 14:20</p>
+                        </div>
+                        <div class="text-center">
+                            <div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                                <i class="fas fa-home text-gray-500"></i>
+                            </div>
+                            <p class="font-semibold">Diterima</p>
+                            <p class="text-sm text-gray-500">Estimasi: 12 Feb 2024, 17:00</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="py-20 bg-gradient-to-br from-purple-50 to-blue-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">Kenapa Pilih Sasiku Kirim?</h2>
+                <p class="text-xl text-gray-600">
+                    Fitur lengkap untuk pengiriman barang yang aman dan nyaman
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div class="text-center card-hover">
+                    <div class="w-20 h-20 bg-gradient-to-br from-green-400 to-green-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-shield-alt text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Aman & Terpercaya</h3>
+                    <p class="text-gray-600">Barang Anda dilindungi asuransi dan packing profesional</p>
+                </div>
+
+                <div class="text-center card-hover">
+                    <div class="w-20 h-20 bg-gradient-to-br from-blue-400 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-bolt text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Cepat & Tepat</h3>
+                    <p class="text-gray-600">Pengiriman dalam waktu yang dijanjikan</p>
+                </div>
+
+                <div class="text-center card-hover">
+                    <div class="w-20 h-20 bg-gradient-to-br from-purple-400 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-mobile-alt text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Real-time Tracking</h3>
+                    <p class="text-gray-600">Lacak posisi barang Anda secara langsung</p>
+                </div>
+
+                <div class="text-center card-hover">
+                    <div class="w-20 h-20 bg-gradient-to-br from-orange-400 to-orange-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-headset text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">24/7 Support</h3>
+                    <p class="text-gray-600">Layanan pelanggan siap membantu kapan saja</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <div class="flex items-center space-x-3 mb-6">
+                        <div class="w-12 h-12 bg-gradient-to-r from-purple-600 to-blue-600 rounded-2xl flex items-center justify-center">
+                            <i class="fas fa-shipping-fast text-white text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold">Sasiku Kirim</h3>
+                            <p class="text-gray-400 text-sm">Layanan Pengiriman</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-400 mb-6">
+                        Platform pengiriman barang terpercaya dengan jaringan partner ojek online terluas di Indonesia.
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div>
+                    <h4 class="text-lg font-semibold mb-6">Layanan</h4>
+                    <ul class="space-y-3">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Same Day</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Next Day</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Regular</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">International</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Pickup Point</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="text-lg font-semibold mb-6">Perusahaan</h4>
+                    <ul class="space-y-3">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Tentang Kami</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Karir</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Blog</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Press</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Kontak</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="text-lg font-semibold mb-6">Kontak</h4>
+                    <ul class="space-y-3 text-gray-400">
+                        <li class="flex items-center space-x-3">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>Jakarta, Indonesia</span>
+                        </li>
+                        <li class="flex items-center space-x-3">
+                            <i class="fas fa-phone"></i>
+                            <span>+62 812-3456-7890</span>
+                        </li>
+                        <li class="flex items-center space-x-3">
+                            <i class="fas fa-envelope"></i>
+                            <span>info@sasikukirim.com</span>
+                        </li>
+                        <li class="flex items-center space-x-3">
+                            <i class="fas fa-clock"></i>
+                            <span>24/7 Support</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="border-t border-gray-800 mt-12 pt-8 text-center text-gray-400">
+                <p>&copy; 2024 Sasiku Kirim. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Booking Modal -->
+    <div id="bookingModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto animate-fade-in">
+            <div class="p-6 border-b">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-2xl font-bold">Form Pengiriman Barang</h3>
+                    <button onclick="closeBookingModal()" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-times text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="p-6">
+                <form id="bookingForm">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Nama Pengirim</label>
+                            <input type="text" required class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Telepon Pengirim</label>
+                            <input type="tel" required class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Alamat Pengirim</label>
+                            <input type="text" required class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Kota Pengirim</label>
+                            <input type="text" required class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Nama Penerima</label>
+                            <input type="text" required class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Telepon Penerima</label>
+                            <input type="tel" required class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Alamat Penerima</label>
+                            <input type="text" required class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Kota Penerima</label>
+                            <input type="text" required class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Berat Barang (kg)</label>
+                            <input type="number" min="0.1" step="0.1" required class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Dimensi (cm)</label>
+                            <div class="grid grid-cols-3 gap-2">
+                                <input type="number" placeholder="P" class="px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                                <input type="number" placeholder="L" class="px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                                <input type="number" placeholder="T" class="px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Jenis Barang</label>
+                            <select class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                                <option value="dokumen">Dokumen</option>
+                                <option value="elektronik">Elektronik</option>
+                                <option value="makanan">Makanan</option>
+                                <option value="pakaian">Pakaian</option>
+                                <option value="lainnya">Lainnya</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Layanan Pengiriman</label>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <label class="flex items-center p-4 border-2 border-gray-200 rounded-xl cursor-pointer hover:border-purple-500">
+                                <input type="radio" name="service" value="same-day" class="mr-3">
+                                <div>
+                                    <div class="font-semibold">Same Day</div>
+                                    <div class="text-sm text-gray-600">4-6 jam</div>
+                                </div>
+                            </label>
+                            <label class="flex items-center p-4 border-2 border-gray-200 rounded-xl cursor-pointer hover:border-purple-500">
+                                <input type="radio" name="service" value="next-day" class="mr-3">
+                                <div>
+                                    <div class="font-semibold">Next Day</div>
+                                    <div class="text-sm text-gray-600">1 hari kerja</div>
+                                </div>
+                            </label>
+                            <label class="flex items-center p-4 border-2 border-gray-200 rounded-xl cursor-pointer hover:border-purple-500">
+                                <input type="radio" name="service" value="regular" class="mr-3">
+                                <div>
+                                    <div class="font-semibold">Regular</div>
+                                    <div class="text-sm text-gray-600">2-3 hari</div>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Catatan Tambahan</label>
+                        <textarea class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent" rows="3" placeholder="Catatan khusus untuk driver..."></textarea>
+                    </div>
+
+                    <div class="flex justify-end space-x-4">
+                        <button type="button" onclick="closeBookingModal()" class="px-6 py-3 border border-gray-300 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors">
+                            Batal
+                        </button>
+                        <button type="submit" class="btn-primary text-white font-semibold py-3 px-8 rounded-xl hover:shadow-xl transition-all">
+                            Konfirmasi Pengiriman
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tracking Modal -->
+    <div id="trackingModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-2xl w-full animate-fade-in">
+            <div class="p-6 border-b">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-2xl font-bold">Lacak Pengiriman</h3>
+                    <button onclick="closeTrackingModal()" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-times text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="p-6">
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Nomor Resi</label>
+                    <input type="text" id="modalTrackingNumber" placeholder="Masukkan nomor resi pengiriman" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                </div>
+                <div class="flex justify-end space-x-4">
+                    <button onclick="closeTrackingModal()" class="px-6 py-3 border border-gray-300 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors">
+                        Batal
+                    </button>
+                    <button onclick="trackShipment()" class="btn-primary text-white font-semibold py-3 px-8 rounded-xl hover:shadow-xl transition-all">
+                        Lacak
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full animate-fade-in">
+            <div class="p-6 border-b">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-2xl font-bold">Masuk ke Akun</h3>
+                    <button onclick="closeLoginModal()" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-times text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="p-6">
+                <form id="loginForm" onsubmit="handleLogin(event)">
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Username</label>
+                        <input type="text" id="loginUsername" required class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent" placeholder="Masukkan username">
+                    </div>
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                        <input type="password" id="loginPassword" required class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent" placeholder="Masukkan password">
+                    </div>
+                    <button type="submit" class="w-full btn-primary text-white font-semibold py-3 rounded-xl hover:shadow-xl transition-all">
+                        Masuk
+                    </button>
+                </form>
+                <div class="mt-4 text-sm text-gray-600 bg-blue-50 p-3 rounded-lg">
+                    <p class="font-semibold mb-1">Akun Demo:</p>
+                    <p><strong>User:</strong> user / user123</p>
+                    <p><strong>Driver:</strong> driver / driver123</p>
+                </div>
+                <div class="mt-4 text-center">
+                    <p class="text-gray-600">Belum punya akun? 
+                        <button onclick="showRegisterModal()" class="text-purple-600 font-semibold hover:underline">Daftar</button>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div id="registerModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full animate-fade-in">
+            <div class="p-6 border-b">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-2xl font-bold">Daftar Akun Baru</h3>
+                    <button onclick="closeRegisterModal()" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-times text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="p-6">
+                <form id="registerForm" onsubmit="handleRegister(event)">
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                        <input type="email" id="registerEmail" required class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent" placeholder="Masukkan email">
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Username</label>
+                        <input type="text" id="registerUsername" required class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent" placeholder="Masukkan username">
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                        <input type="password" id="registerPassword" required class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent" placeholder="Masukkan password">
+                    </div>
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Konfirmasi Password</label>
+                        <input type="password" id="registerPasswordConfirm" required class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent" placeholder="Konfirmasi password">
+                    </div>
+                    <button type="submit" class="w-full btn-primary text-white font-semibold py-3 rounded-xl hover:shadow-xl transition-all">
+                        Daftar
+                    </button>
+                </form>
+                <div class="mt-4 text-center">
+                    <p class="text-gray-600">Sudah punya akun? 
+                        <button onclick="showLoginModal()" class="text-purple-600 font-semibold hover:underline">Masuk</button>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Driver Registration Modal -->
+    <div id="driverModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto animate-fade-in">
+            <div class="p-6 border-b">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-2xl font-bold">Pendaftaran Driver</h3>
+                    <button onclick="closeDriverModal()" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-times text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="p-6">
+                <form id="driverForm">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Nama Lengkap</label>
+                            <input type="text" required class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">NIK/KTP</label>
+                            <input type="text" required class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                            <input type="email" required class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Telepon</label>
+                            <input type="tel" required class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Alamat</label>
+                            <input type="text" required class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Kota Operasi</label>
+                            <input type="text" required class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Jenis Kendaraan</label>
+                            <select class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                                <option value="motor">Motor</option>
+                                <option value="mobil">Mobil</option>
+                                <option value="roda-tiga">Roda Tiga</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Tahun Kendaraan</label>
+                            <input type="number" min="2000" max="2024" required class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                        </div>
+                    </div>
+
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Dokumen</label>
+                        <div class="space-y-3">
+                            <div>
+                                <label class="block text-xs text-gray-500 mb-1">Foto KTP</label>
+                                <input type="file" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                            </div>
+                            <div>
+                                <label class="block text-xs text-gray-500 mb-1">SIM</label>
+                                <input type="file" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                            </div>
+                            <div>
+                                <label class="block text-xs text-gray-500 mb-1">STNK Kendaraan</label>
+                                <input type="file" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end space-x-4">
+                        <button type="button" onclick="closeDriverModal()" class="px-6 py-3 border border-gray-300 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors">
+                            Batal
+                        </button>
+                        <button type="submit" class="btn-primary text-white font-semibold py-3 px-8 rounded-xl hover:shadow-xl transition-all">
+                            Daftar Driver
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Authentication System
+        let isAuthenticated = false;
+        let currentUser = null;
+        let currentUserRole = 'guest';
+        let users = JSON.parse(localStorage.getItem('users')) || [
+            { id: 1, username: 'user', password: 'user123', role: 'user', email: 'user@sasikukirim.com', name: 'John Doe' },
+            { id: 2, username: 'driver', password: 'driver123', role: 'driver', email: 'driver@sasikukirim.com', name: 'Budi Driver' }
+        ];
+
+        // Show login modal
+        function showLoginModal() {
+            document.getElementById('loginModal').classList.remove('hidden');
+            document.getElementById('userDropdownMenu').classList.add('hidden');
+        }
+
+        // Close login modal
+        function closeLoginModal() {
+            document.getElementById('loginModal').classList.add('hidden');
+        }
+
+        // Show register modal
+        function showRegisterModal() {
+            closeLoginModal();
+            document.getElementById('registerModal').classList.remove('hidden');
+        }
+
+        // Close register modal
+        function closeRegisterModal() {
+            document.getElementById('registerModal').classList.add('hidden');
+        }
+
+        // Show booking modal
+        function showBookingModal() {
+            if (currentUserRole === 'guest') {
+                showToast('Akses Ditolak', 'Silakan login terlebih dahulu');
+                showLoginModal();
+                return;
+            }
+            document.getElementById('bookingModal').classList.remove('hidden');
+        }
+
+        // Close booking modal
+        function closeBookingModal() {
+            document.getElementById('bookingModal').classList.add('hidden');
+        }
+
+        // Show tracking modal
+        function showTrackingModal() {
+            document.getElementById('trackingModal').classList.remove('hidden');
+        }
+
+        // Close tracking modal
+        function closeTrackingModal() {
+            document.getElementById('trackingModal').classList.add('hidden');
+        }
+
+        // Show driver registration modal
+        function showDriverRegistration() {
+            document.getElementById('driverModal').classList.remove('hidden');
+        }
+
+        // Close driver modal
+        function closeDriverModal() {
+            document.getElementById('driverModal').classList.add('hidden');
+        }
+
+        // Toggle user dropdown
+        function toggleUserDropdown() {
+            document.getElementById('userDropdownMenu').classList.toggle('hidden');
+        }
+
+        // Switch user role
+        function switchUserRole(role) {
+            if (role === 'guest') {
+                isAuthenticated = false;
+                currentUser = null;
+                currentUserRole = 'guest';
+                document.getElementById('userRoleText').textContent = 'Pengunjung';
+                document.querySelector('#userDropdown .fa-user').className = 'fas fa-user';
+                showToast('Berhasil Keluar', 'Anda telah keluar dari akun');
+            } else {
+                currentUserRole = role;
+                document.getElementById('userRoleText').textContent = role === 'driver' ? 'Driver' : 'Pengguna';
+                document.querySelector('#userDropdown .fa-user').className = role === 'driver' ? 'fas fa-motorcycle' : 'fas fa-user';
+                showToast('Berhasil Login', `Anda sekarang sebagai ${role === 'driver' ? 'Driver' : 'Pengguna'}`);
+            }
+            document.getElementById('userDropdownMenu').classList.add('hidden');
+        }
+
+        // Handle login
+        function handleLogin(event) {
+            event.preventDefault();
+            
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            const user = users.find(u => u.username === username && u.password === password);
+            
+            if (user) {
+                isAuthenticated = true;
+                currentUser = user;
+                currentUserRole = user.role;
+                
+                document.getElementById('userRoleText').textContent = user.role === 'driver' ? 'Driver' : 'Pengguna';
+                document.querySelector('#userDropdown .fa-user').className = user.role === 'driver' ? 'fas fa-motorcycle' : 'fas fa-user';
+                
+                closeLoginModal();
+                showToast('Berhasil Masuk!', `Selamat datang, ${user.name || user.username}!`);
+            } else {
+                showToast('Gagal Masuk', 'Username atau password salah');
+            }
+        }
+
+        // Handle registration
+        function handleRegister(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('registerEmail').value;
+            const username = document.getElementById('registerUsername').value;
+            const password = document.getElementById('registerPassword').value;
+            const confirmPassword = document.getElementById('registerPasswordConfirm').value;
+            
+            if (password !== confirmPassword) {
+                showToast('Gagal Daftar', 'Password tidak cocok');
+                return;
+            }
+            
+            if (users.some(u => u.username === username)) {
+                showToast('Gagal Daftar', 'Username sudah terdaftar');
+                return;
+            }
+            
+            const newUser = {
+                id: users.length + 1,
+                username: username,
+                password: password,
+                role: 'user',
+                email: email,
+                name: username
+            };
+            
+            users.push(newUser);
+            localStorage.setItem('users', JSON.stringify(users));
+            
+            showToast('Berhasil Daftar', 'Akun berhasil dibuat, silakan login');
+            closeRegisterModal();
+            showLoginModal();
+        }
+
+        // Track shipment
+        function trackShipment() {
+            const trackingNumber = document.getElementById('trackingNumber').value || document.getElementById('modalTrackingNumber').value;
+            
+            if (!trackingNumber) {
+                showToast('Error', 'Silakan masukkan nomor resi');
+                return;
+            }
+            
+            // Show tracking info
+            document.getElementById('trackingInfo').classList.remove('hidden');
+            
+            // Update tracking number in display
+            document.querySelector('#trackingInfo h3').textContent = `Resi: ${trackingNumber}`;
+            
+            showToast('Melacak Pengiriman', `Mencari informasi untuk resi ${trackingNumber}`);
+            
+            // Close modal if opened from modal
+            if (!document.getElementById('trackingModal').classList.contains('hidden')) {
+                closeTrackingModal();
+            }
+        }
+
+        // Show toast notification
+        function showToast(title, message) {
+            // Create toast element
+            let toast = document.getElementById('toastNotification');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'toastNotification';
+                toast.className = 'fixed top-4 right-4 bg-white rounded-xl shadow-lg p-4 max-w-sm z-50 border-l-4 border-green-500';
+                toast.innerHTML = `
+                    <div class="flex items-start space-x-3">
+                        <i class="fas fa-check-circle text-green-500 mt-0.5"></i>
+                        <div>
+                            <h4 class="font-semibold text-gray-900">${title}</h4>
+                            <p class="text-gray-600 text-sm">${message}</p>
+                        </div>
+                        <button onclick="this.parentElement.parentElement.remove()" class="text-gray-400 hover:text-gray-600">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                `;
+                document.body.appendChild(toast);
+            } else {
+                toast.querySelector('h4').textContent = title;
+                toast.querySelector('p').textContent = message;
+                toast.classList.remove('hidden');
+            }
+            
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                if (toast && toast.parentElement) {
+                    toast.remove();
+                }
+            }, 5000);
+        }
+
+        // Initialize Google Maps
+        function initMap() {
+            // This function will be called when Google Maps API loads
+            console.log('Google Maps loaded');
+        }
+
+        // Close modals when clicking outside
+        window.onclick = function(event) {
+            const modals = ['bookingModal', 'trackingModal', 'loginModal', 'registerModal', 'driverModal'];
+            modals.forEach(modalId => {
+                const modal = document.getElementById(modalId);
+                if (event.target === modal) {
+                    modal.classList.add('hidden');
+                }
+            });
+            
+            const dropdown = document.getElementById('userDropdownMenu');
+            const dropdownBtn = document.getElementById('userDropdown');
+            if (dropdown && !dropdownBtn.contains(event.target)) {
+                dropdown.classList.add('hidden');
+            }
+        }
+
+        // Form submission handlers
+        document.addEventListener('DOMContentLoaded', function() {
+            // Booking form submission
+            const bookingForm = document.getElementById('bookingForm');
+            if (bookingForm) {
+                bookingForm.onsubmit = function(e) {
+                    e.preventDefault();
+                    showToast('Pengiriman Dibuat', 'Pesanan pengiriman Anda telah dibuat dan akan segera diproses');
+                    closeBookingModal();
+                };
+            }
+
+            // Driver form submission
+            const driverForm = document.getElementById('driverForm');
+            if (driverForm) {
+                driverForm.onsubmit = function(e) {
+                    e.preventDefault();
+                    showToast('Pendaftaran Berhasil', 'Permohonan Anda telah dikirim dan akan segera diproses');
+                    closeDriverModal();
+                };
+            }
+        });
+    </script>
+</body>
+</html>

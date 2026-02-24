@@ -1,0 +1,2136 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sasiku - Pesan Hotel Impian Anda</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCkUOdZ5y7hMm0yrcCQoCvLwzdM6M8s5qk&libraries=places&callback=initAutocomplete" async defer></script>
+    <style>
+        * { font-family: 'Poppins', sans-serif; }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .hotel-card {
+            transition: all 0.3s ease;
+        }
+        
+        .hotel-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+        
+        .payment-method {
+            transition: all 0.2s ease;
+            border: 2px solid transparent;
+        }
+        
+        .payment-method:hover {
+            transform: scale(1.02);
+        }
+        
+        .payment-method.selected {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+        
+        .step-indicator {
+            transition: all 0.3s ease;
+        }
+        
+        .step-indicator.active {
+            background: #667eea;
+            color: white;
+        }
+        
+        .step-line {
+            transition: all 0.3s ease;
+        }
+        
+        .step-line.completed {
+            background: #667eea;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .animate-slide-in {
+            animation: slideIn 0.5s ease-out;
+        }
+        
+        .price-tag {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .floating-badge {
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        /* Map Styles */
+        .map-container {
+            position: relative;
+            overflow: hidden;
+            border-radius: 1rem;
+        }
+        
+        .map-marker {
+            position: absolute;
+            transform: translate(-50%, -100%);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+        
+        .map-marker:hover {
+            transform: translate(-50%, -100%) scale(1.2);
+            z-index: 20;
+        }
+        
+        .map-marker.active {
+            transform: translate(-50%, -100%) scale(1.3);
+            z-index: 30;
+        }
+        
+        .marker-pin {
+            width: 40px;
+            height: 40px;
+            border-radius: 50% 50% 50% 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            position: relative;
+            transform: rotate(-45deg);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        
+        .marker-pin::after {
+            content: '';
+            width: 24px;
+            height: 24px;
+            margin: 8px 0 0 8px;
+            background: #fff;
+            position: absolute;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .marker-icon {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(45deg);
+            color: #667eea;
+            font-size: 14px;
+            font-weight: bold;
+            z-index: 10;
+        }
+        
+        .marker-price {
+            position: absolute;
+            top: -35px;
+            left: 50%;
+            transform: translateX(-50%) rotate(45deg);
+            background: white;
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: bold;
+            color: #667eea;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            white-space: nowrap;
+        }
+        
+        /* Star Rating Filter */
+        .star-filter {
+            transition: all 0.3s ease;
+        }
+        
+        .star-filter:hover {
+            transform: translateY(-2px);
+        }
+        
+        .star-filter.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: transparent;
+        }
+        
+        .star-filter.active .star-icon {
+            color: #ffd700;
+        }
+        
+        /* Review Styles */
+        .review-card {
+            transition: all 0.3s ease;
+        }
+        
+        .review-card:hover {
+            background: #f8fafc;
+        }
+        
+        .rating-bar {
+            transition: width 0.5s ease;
+        }
+        
+        .progress-ring {
+            transform: rotate(-90deg);
+        }
+        
+        .progress-ring-circle {
+            transition: stroke-dashoffset 0.5s ease;
+        }
+        
+        /* Price Range Slider */
+        .price-range-slider {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 6px;
+            border-radius: 5px;
+            background: #e5e7eb;
+            outline: none;
+        }
+        
+        .price-range-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(102, 126, 234, 0.4);
+        }
+        
+        .review-photo {
+            transition: transform 0.3s ease;
+        }
+        
+        .review-photo:hover {
+            transform: scale(1.05);
+        }
+        
+        /* Scrollbar styling */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #c7c7c7;
+            border-radius: 10px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #a0a0a0;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+
+    <!-- Navigation -->
+    <nav class="glass-effect fixed w-full z-50 top-0">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 flex items-center gap-2">
+                        <div class="w-10 h-10 gradient-bg rounded-xl flex items-center justify-center">
+                            <i class="fas fa-hotel text-white text-xl"></i>
+                        </div>
+                        <span class="font-bold text-2xl bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-blue-600">
+                            Sasiku
+                        </span>
+                    </div>
+                </div>
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#" class="text-gray-700 hover:text-purple-600 font-medium">Beranda</a>
+                    <a href="#" class="text-gray-700 hover:text-purple-600 font-medium">Hotel</a>
+                    <a href="#" class="text-gray-700 hover:text-purple-600 font-medium">Promo</a>
+                    <a href="#" class="text-gray-700 hover:text-purple-600 font-medium">Bantuan</a>
+                </div>
+                <div class="flex items-center gap-4">
+                    <button class="text-gray-600 hover:text-purple-600">
+                        <i class="fas fa-search text-xl"></i>
+                    </button>
+                    <button class="text-gray-600 hover:text-purple-600 relative">
+                        <i class="fas fa-bell text-xl"></i>
+                        <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">3</span>
+                    </button>
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-r from-purple-400 to-blue-400 flex items-center justify-center text-white font-semibold cursor-pointer">
+                        AD
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <div class="gradient-bg pt-24 pb-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-8 animate-slide-in">
+                <h1 class="text-4xl md:text-5xl font-bold text-white mb-4">
+                    Temukan Penginapan Terbaik
+                </h1>
+                <p class="text-purple-100 text-lg">Pesan hotel dengan harga terbaik, review jujur, dan lokasi strategis</p>
+            </div>
+            
+            <!-- Search Box -->
+            <div class="glass-effect rounded-2xl p-6 max-w-4xl mx-auto shadow-2xl">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div class="relative">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Lokasi</label>
+                        <div class="relative">
+                            <i class="fas fa-map-marker-alt absolute left-3 top-3 text-gray-400"></i>
+                            <input type="text" id="searchLocation" placeholder="Mau ke mana?" class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Check-in</label>
+                        <input type="date" id="checkInInput" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Check-out</label>
+                        <input type="date" id="checkOutInput" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                    </div>
+                    <div class="flex items-end">
+                        <button onclick="searchHotels()" class="w-full btn-primary text-white font-semibold py-2 px-6 rounded-lg flex items-center justify-center gap-2">
+                            <i class="fas fa-search"></i> Cari Hotel
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- Advanced Filter Section -->
+        <div class="bg-white rounded-2xl shadow-lg p-6 mb-8">
+            <div class="flex flex-col lg:flex-row gap-6">
+                
+                <!-- Star Rating Filter -->
+                <div class="flex-1">
+                    <h4 class="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                        <i class="fas fa-star text-yellow-400"></i>
+                        Filter Bintang
+                    </h4>
+                    <div class="flex flex-wrap gap-2">
+                        <button onclick="filterByStar(0)" class="star-filter active px-4 py-2 border-2 border-gray-200 rounded-full text-sm font-medium flex items-center gap-1" id="star-all">
+                            Semua
+                        </button>
+                        <button onclick="filterByStar(5)" class="star-filter px-4 py-2 border-2 border-gray-200 rounded-full text-sm font-medium flex items-center gap-1" id="star-5">
+                            <i class="fas fa-star star-icon text-yellow-400"></i> 5
+                        </button>
+                        <button onclick="filterByStar(4)" class="star-filter px-4 py-2 border-2 border-gray-200 rounded-full text-sm font-medium flex items-center gap-1" id="star-4">
+                            <i class="fas fa-star star-icon text-yellow-400"></i> 4
+                        </button>
+                        <button onclick="filterByStar(3)" class="star-filter px-4 py-2 border-2 border-gray-200 rounded-full text-sm font-medium flex items-center gap-1" id="star-3">
+                            <i class="fas fa-star star-icon text-yellow-400"></i> 3
+                        </button>
+                        <button onclick="filterByStar(2)" class="star-filter px-4 py-2 border-2 border-gray-200 rounded-full text-sm font-medium flex items-center gap-1" id="star-2">
+                            <i class="fas fa-star star-icon text-yellow-400"></i> 2
+                        </button>
+                        <button onclick="filterByStar(1)" class="star-filter px-4 py-2 border-2 border-gray-200 rounded-full text-sm font-medium flex items-center gap-1" id="star-1">
+                            <i class="fas fa-star star-icon text-yellow-400"></i> 1
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Price Range Filter -->
+                <div class="flex-1">
+                    <h4 class="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                        <i class="fas fa-tag text-purple-600"></i>
+                        Rentang Harga
+                    </h4>
+                    <div class="px-2">
+                        <input type="range" min="100000" max="5000000" value="5000000" class="price-range-slider mb-2" id="priceRange" oninput="updatePriceLabel(this.value)">
+                        <div class="flex justify-between text-sm text-gray-600">
+                            <span>Rp 100rb</span>
+                            <span id="priceLabel" class="font-semibold text-purple-600">Rp 5.000.000</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Additional Filters -->
+                <div class="flex-1">
+                    <h4 class="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                        <i class="fas fa-sliders-h text-purple-600"></i>
+                        Filter Lainnya
+                    </h4>
+                    <div class="flex flex-wrap gap-2">
+                        <label class="flex items-center gap-2 px-3 py-2 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100">
+                            <input type="checkbox" class="rounded text-purple-600 focus:ring-purple-500" checked>
+                            <span class="text-sm">Sarapan Gratis</span>
+                        </label>
+                        <label class="flex items-center gap-2 px-3 py-2 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100">
+                            <input type="checkbox" class="rounded text-purple-600 focus:ring-purple-500">
+                            <span class="text-sm">Kolam Renang</span>
+                        </label>
+                        <label class="flex items-center gap-2 px-3 py-2 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100">
+                            <input type="checkbox" class="rounded text-purple-600 focus:ring-purple-500">
+                            <span class="text-sm">Rating 4.5+</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <!-- Hotel List & Map Section -->
+            <div class="lg:col-span-2 space-y-6">
+                
+                <!-- View Toggle -->
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-bold text-gray-900" id="resultCount">Menampilkan 6 hotel</h2>
+                    <div class="flex bg-white rounded-lg shadow p-1">
+                        <button onclick="toggleView('list')" id="btn-list" class="px-4 py-2 rounded-lg bg-purple-600 text-white text-sm font-medium transition-all">
+                            <i class="fas fa-list mr-2"></i>Daftar
+                        </button>
+                        <button onclick="toggleView('map')" id="btn-map" class="px-4 py-2 rounded-lg text-gray-600 text-sm font-medium hover:bg-gray-100 transition-all">
+                            <i class="fas fa-map-marked-alt mr-2"></i>Peta
+                        </button>
+                    </div>
+                </div>
+
+                <!-- List View -->
+                <div id="listView" class="space-y-6">
+                    <!-- Hotel Card 1 - 5 Star -->
+                    <div class="hotel-card bg-white rounded-2xl shadow-lg overflow-hidden cursor-pointer" data-stars="5" data-price="2450000" data-lat="-6.2088" data-lng="106.8456" onclick="selectHotel('hotel1')">
+                        <div class="relative">
+                            <img src="https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800" alt="Hotel" class="w-full h-64 object-cover">
+                            <div class="absolute top-4 left-4 bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-3 py-1 rounded-full text-sm font-semibold flex items-center gap-1">
+                                <i class="fas fa-crown"></i> Bintang 5
+                            </div>
+                            <div class="absolute top-4 right-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full flex items-center gap-1">
+                                <i class="fas fa-star text-yellow-400"></i>
+                                <span class="font-bold text-gray-800">4.9</span>
+                                <span class="text-gray-600 text-sm">(2.1k)</span>
+                            </div>
+                            <button class="absolute bottom-4 right-4 w-10 h-10 bg-white rounded-full flex items-center justify-center text-gray-400 hover:text-red-500 transition-colors shadow-lg">
+                                <i class="fas fa-heart"></i>
+                            </button>
+                        </div>
+                        <div class="p-6">
+                            <div class="flex justify-between items-start mb-2">
+                                <div class="flex-1">
+                                    <div class="flex items-center gap-2 mb-1">
+                                        <h3 class="text-xl font-bold text-gray-900">Grand Hyatt Jakarta</h3>
+                                        <div class="flex text-yellow-400 text-sm">
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                        </div>
+                                    </div>
+                                    <p class="text-gray-600 flex items-center gap-1 mt-1">
+                                        <i class="fas fa-map-marker-alt text-purple-600"></i>
+                                        Menteng, Jakarta Pusat
+                                        <button onclick="event.stopPropagation(); showOnMap('hotel1')" class="ml-2 text-purple-600 text-xs underline hover:no-underline">
+                                            Lihat di peta
+                                        </button>
+                                    </p>
+                                </div>
+                                <div class="text-right">
+                                    <div class="price-tag text-white px-4 py-2 rounded-xl font-bold text-lg">
+                                        Rp 2.450.000
+                                    </div>
+                                    <p class="text-gray-500 text-sm mt-1">/malam</p>
+                                </div>
+                            </div>
+                            
+                            <!-- Rating Preview -->
+                            <div class="flex items-center gap-4 mt-3 mb-3 p-3 bg-gray-50 rounded-lg">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center">
+                                        <span class="font-bold text-green-700">9.2</span>
+                                    </div>
+                                    <div>
+                                        <p class="font-semibold text-sm text-gray-900">Luar Biasa</p>
+                                        <p class="text-xs text-gray-500">2,134 review</p>
+                                    </div>
+                                </div>
+                                <div class="flex-1 border-l pl-4">
+                                    <div class="flex items-center gap-2 text-sm">
+                                        <i class="fas fa-thumbs-up text-green-500"></i>
+                                        <span class="text-gray-700">"Lokasi strategis, pelayanan excellent"</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flex gap-2 mt-4 mb-4">
+                                <span class="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-medium">
+                                    <i class="fas fa-wifi mr-1"></i> WiFi
+                                </span>
+                                <span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">
+                                    <i class="fas fa-swimming-pool mr-1"></i> Kolam
+                                </span>
+                                <span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium">
+                                    <i class="fas fa-utensils mr-1"></i> Sarapan
+                                </span>
+                                <span class="px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-xs font-medium">
+                                    <i class="fas fa-spa mr-1"></i> Spa
+                                </span>
+                            </div>
+                            <div class="flex gap-3">
+                                <button class="flex-1 btn-primary text-white font-semibold py-3 rounded-xl" onclick="event.stopPropagation(); openBookingModal('Grand Hyatt Jakarta', 2450000)">
+                                    Pesan Sekarang
+                                </button>
+                                <button onclick="event.stopPropagation(); openReviewModal('hotel1')" class="px-4 py-3 border-2 border-purple-600 text-purple-600 rounded-xl font-semibold hover:bg-purple-50">
+                                    <i class="fas fa-comments"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Hotel Card 2 - 4 Star -->
+                    <div class="hotel-card bg-white rounded-2xl shadow-lg overflow-hidden cursor-pointer" data-stars="4" data-price="1250000" data-lat="-8.4095" data-lng="115.1889" onclick="selectHotel('hotel2')">
+                        <div class="relative">
+                            <img src="https://images.unsplash.com/photo-1582719508461-905c673771fd?w=800" alt="Hotel" class="w-full h-64 object-cover">
+                            <div class="absolute top-4 left-4 bg-gradient-to-r from-blue-400 to-blue-600 text-white px-3 py-1 rounded-full text-sm font-semibold">
+                                Bintang 4
+                            </div>
+                            <div class="absolute top-4 right-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full flex items-center gap-1">
+                                <i class="fas fa-star text-yellow-400"></i>
+                                <span class="font-bold text-gray-800">4.7</span>
+                                <span class="text-gray-600 text-sm">(1.8k)</span>
+                            </div>
+                            <div class="absolute bottom-4 left-4 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-semibold floating-badge">
+                                Diskon 20%
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <div class="flex justify-between items-start mb-2">
+                                <div class="flex-1">
+                                    <div class="flex items-center gap-2 mb-1">
+                                        <h3 class="text-xl font-bold text-gray-900">Swiss-Belhotel Bali</h3>
+                                        <div class="flex text-yellow-400 text-sm">
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="far fa-star"></i>
+                                        </div>
+                                    </div>
+                                    <p class="text-gray-600 flex items-center gap-1 mt-1">
+                                        <i class="fas fa-map-marker-alt text-purple-600"></i>
+                                        Kuta, Bali
+                                        <button onclick="event.stopPropagation(); showOnMap('hotel2')" class="ml-2 text-purple-600 text-xs underline hover:no-underline">
+                                            Lihat di peta
+                                        </button>
+                                    </p>
+                                </div>
+                                <div class="text-right">
+                                    <div class="price-tag text-white px-4 py-2 rounded-xl font-bold text-lg">
+                                        Rp 1.250.000
+                                    </div>
+                                    <p class="text-gray-500 text-sm mt-1">/malam</p>
+                                </div>
+                            </div>
+
+                            <!-- Rating Preview -->
+                            <div class="flex items-center gap-4 mt-3 mb-3 p-3 bg-gray-50 rounded-lg">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center">
+                                        <span class="font-bold text-green-700">8.8</span>
+                                    </div>
+                                    <div>
+                                        <p class="font-semibold text-sm text-gray-900">Sangat Baik</p>
+                                        <p class="text-xs text-gray-500">1,847 review</p>
+                                    </div>
+                                </div>
+                                <div class="flex-1 border-l pl-4">
+                                    <div class="flex items-center gap-2 text-sm">
+                                        <i class="fas fa-thumbs-up text-green-500"></i>
+                                        <span class="text-gray-700">"Dekat pantai, worth it"</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flex gap-2 mt-4 mb-4">
+                                <span class="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-medium">
+                                    <i class="fas fa-wifi mr-1"></i> WiFi
+                                </span>
+                                <span class="px-3 py-1 bg-pink-100 text-pink-700 rounded-full text-xs font-medium">
+                                    <i class="fas fa-spa mr-1"></i> Spa
+                                </span>
+                                <span class="px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-xs font-medium">
+                                    <i class="fas fa-water mr-1"></i> Pantai
+                                </span>
+                            </div>
+                            <div class="flex gap-3">
+                                <button class="flex-1 btn-primary text-white font-semibold py-3 rounded-xl" onclick="event.stopPropagation(); openBookingModal('Swiss-Belhotel Bali', 1250000)">
+                                    Pesan Sekarang
+                                </button>
+                                <button onclick="event.stopPropagation(); openReviewModal('hotel2')" class="px-4 py-3 border-2 border-purple-600 text-purple-600 rounded-xl font-semibold hover:bg-purple-50">
+                                    <i class="fas fa-comments"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Hotel Card 3 - 3 Star -->
+                    <div class="hotel-card bg-white rounded-2xl shadow-lg overflow-hidden cursor-pointer" data-stars="3" data-price="450000" data-lat="-7.2575" data-lng="112.7521" onclick="selectHotel('hotel3')">
+                        <div class="relative">
+                            <img src="https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=800" alt="Hotel" class="w-full h-64 object-cover">
+                            <div class="absolute top-4 left-4 bg-gradient-to-r from-green-400 to-green-600 text-white px-3 py-1 rounded-full text-sm font-semibold">
+                                Bintang 3
+                            </div>
+                            <div class="absolute top-4 right-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full flex items-center gap-1">
+                                <i class="fas fa-star text-yellow-400"></i>
+                                <span class="font-bold text-gray-800">4.3</span>
+                                <span class="text-gray-600 text-sm">(856)</span>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <div class="flex justify-between items-start mb-2">
+                                <div class="flex-1">
+                                    <div class="flex items-center gap-2 mb-1">
+                                        <h3 class="text-xl font-bold text-gray-900">Hotel Neo Surabaya</h3>
+                                        <div class="flex text-yellow-400 text-sm">
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="far fa-star"></i>
+                                            <i class="far fa-star"></i>
+                                        </div>
+                                    </div>
+                                    <p class="text-gray-600 flex items-center gap-1 mt-1">
+                                        <i class="fas fa-map-marker-alt text-purple-600"></i>
+                                        Rungkut, Surabaya
+                                        <button onclick="event.stopPropagation(); showOnMap('hotel3')" class="ml-2 text-purple-600 text-xs underline hover:no-underline">
+                                            Lihat di peta
+                                        </button>
+                                    </p>
+                                </div>
+                                <div class="text-right">
+                                    <div class="price-tag text-white px-4 py-2 rounded-xl font-bold text-lg">
+                                        Rp 450.000
+                                    </div>
+                                    <p class="text-gray-500 text-sm mt-1">/malam</p>
+                                </div>
+                            </div>
+
+                            <!-- Rating Preview -->
+                            <div class="flex items-center gap-4 mt-3 mb-3 p-3 bg-gray-50 rounded-lg">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
+                                        <span class="font-bold text-blue-700">8.2</span>
+                                    </div>
+                                    <div>
+                                        <p class="font-semibold text-sm text-gray-900">Baik</p>
+                                        <p class="text-xs text-gray-500">856 review</p>
+                                    </div>
+                                </div>
+                                <div class="flex-1 border-l pl-4">
+                                    <div class="flex items-center gap-2 text-sm">
+                                        <i class="fas fa-thumbs-up text-blue-500"></i>
+                                        <span class="text-gray-700">"Budget friendly, bersih"</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flex gap-2 mt-4 mb-4">
+                                <span class="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-medium">
+                                    <i class="fas fa-wifi mr-1"></i> WiFi
+                                </span>
+                                <span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium">
+                                    <i class="fas fa-utensils mr-1"></i> Sarapan
+                                </span>
+                            </div>
+                            <div class="flex gap-3">
+                                <button class="flex-1 btn-primary text-white font-semibold py-3 rounded-xl" onclick="event.stopPropagation(); openBookingModal('Hotel Neo Surabaya', 450000)">
+                                    Pesan Sekarang
+                                </button>
+                                <button onclick="event.stopPropagation(); openReviewModal('hotel3')" class="px-4 py-3 border-2 border-purple-600 text-purple-600 rounded-xl font-semibold hover:bg-purple-50">
+                                    <i class="fas fa-comments"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Hotel Card 4 - 2 Star -->
+                    <div class="hotel-card bg-white rounded-2xl shadow-lg overflow-hidden cursor-pointer" data-stars="2" data-price="250000" data-lat="-6.9175" data-lng="107.6191" onclick="selectHotel('hotel4')">
+                        <div class="relative">
+                            <img src="https://images.unsplash.com/photo-1596436889106-be35e843f974?w=800" alt="Hotel" class="w-full h-64 object-cover">
+                            <div class="absolute top-4 left-4 bg-gradient-to-r from-gray-400 to-gray-600 text-white px-3 py-1 rounded-full text-sm font-semibold">
+                                Bintang 2
+                            </div>
+                            <div class="absolute top-4 right-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full flex items-center gap-1">
+                                <i class="fas fa-star text-yellow-400"></i>
+                                <span class="font-bold text-gray-800">4.0</span>
+                                <span class="text-gray-600 text-sm">(423)</span>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <div class="flex justify-between items-start mb-2">
+                                <div class="flex-1">
+                                    <div class="flex items-center gap-2 mb-1">
+                                        <h3 class="text-xl font-bold text-gray-900">Hotel Istana Bandung</h3>
+                                        <div class="flex text-yellow-400 text-sm">
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="far fa-star"></i>
+                                            <i class="far fa-star"></i>
+                                            <i class="far fa-star"></i>
+                                        </div>
+                                    </div>
+                                    <p class="text-gray-600 flex items-center gap-1 mt-1">
+                                        <i class="fas fa-map-marker-alt text-purple-600"></i>
+                                        Braga, Bandung
+                                        <button onclick="event.stopPropagation(); showOnMap('hotel4')" class="ml-2 text-purple-600 text-xs underline hover:no-underline">
+                                            Lihat di peta
+                                        </button>
+                                    </p>
+                                </div>
+                                <div class="text-right">
+                                    <div class="price-tag text-white px-4 py-2 rounded-xl font-bold text-lg">
+                                        Rp 250.000
+                                    </div>
+                                    <p class="text-gray-500 text-sm mt-1">/malam</p>
+                                </div>
+                            </div>
+
+                            <!-- Rating Preview -->
+                            <div class="flex items-center gap-4 mt-3 mb-3 p-3 bg-gray-50 rounded-lg">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-12 h-12 rounded-full bg-yellow-100 flex items-center justify-center">
+                                        <span class="font-bold text-yellow-700">7.5</span>
+                                    </div>
+                                    <div>
+                                        <p class="font-semibold text-sm text-gray-900">Cukup Baik</p>
+                                        <p class="text-xs text-gray-500">423 review</p>
+                                    </div>
+                                </div>
+                                <div class="flex-1 border-l pl-4">
+                                    <div class="flex items-center gap-2 text-sm">
+                                        <i class="fas fa-thumbs-up text-yellow-500"></i>
+                                        <span class="text-gray-700">"Lokasi strategis murah"</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flex gap-2 mt-4 mb-4">
+                                <span class="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-medium">
+                                    <i class="fas fa-wifi mr-1"></i> WiFi
+                                </span>
+                            </div>
+                            <div class="flex gap-3">
+                                <button class="flex-1 btn-primary text-white font-semibold py-3 rounded-xl" onclick="event.stopPropagation(); openBookingModal('Hotel Istana Bandung', 250000)">
+                                    Pesan Sekarang
+                                </button>
+                                <button onclick="event.stopPropagation(); openReviewModal('hotel4')" class="px-4 py-3 border-2 border-purple-600 text-purple-600 rounded-xl font-semibold hover:bg-purple-50">
+                                    <i class="fas fa-comments"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Hotel Card 5 - 1 Star -->
+                    <div class="hotel-card bg-white rounded-2xl shadow-lg overflow-hidden cursor-pointer" data-stars="1" data-price="150000" data-lat="-6.1754" data-lng="106.8272" onclick="selectHotel('hotel5')">
+                        <div class="relative">
+                            <img src="https://images.unsplash.com/photo-1598928506311-c55ded91a20c?w=800" alt="Hotel" class="w-full h-64 object-cover">
+                            <div class="absolute top-4 left-4 bg-gradient-to-r from-orange-400 to-orange-600 text-white px-3 py-1 rounded-full text-sm font-semibold">
+                                Bintang 1
+                            </div>
+                            <div class="absolute top-4 right-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full flex items-center gap-1">
+                                <i class="fas fa-star text-yellow-400"></i>
+                                <span class="font-bold text-gray-800">3.8</span>
+                                <span class="text-gray-600 text-sm">(312)</span>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <div class="flex justify-between items-start mb-2">
+                                <div class="flex-1">
+                                    <div class="flex items-center gap-2 mb-1">
+                                        <h3 class="text-xl font-bold text-gray-900">Wisma Transit Jakarta</h3>
+                                        <div class="flex text-yellow-400 text-sm">
+                                            <i class="fas fa-star"></i>
+                                            <i class="far fa-star"></i>
+                                            <i class="far fa-star"></i>
+                                            <i class="far fa-star"></i>
+                                            <i class="far fa-star"></i>
+                                        </div>
+                                    </div>
+                                    <p class="text-gray-600 flex items-center gap-1 mt-1">
+                                        <i class="fas fa-map-marker-alt text-purple-600"></i>
+                                        Gambir, Jakarta Pusat
+                                        <button onclick="event.stopPropagation(); showOnMap('hotel5')" class="ml-2 text-purple-600 text-xs underline hover:no-underline">
+                                            Lihat di peta
+                                        </button>
+                                    </p>
+                                </div>
+                                <div class="text-right">
+                                    <div class="price-tag text-white px-4 py-2 rounded-xl font-bold text-lg">
+                                        Rp 150.000
+                                    </div>
+                                    <p class="text-gray-500 text-sm mt-1">/malam</p>
+                                </div>
+                            </div>
+
+                            <!-- Rating Preview -->
+                            <div class="flex items-center gap-4 mt-3 mb-3 p-3 bg-gray-50 rounded-lg">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center">
+                                        <span class="font-bold text-orange-700">6.8</span>
+                                    </div>
+                                    <div>
+                                        <p class="font-semibold text-sm text-gray-900">Cukup</p>
+                                        <p class="text-xs text-gray-500">312 review</p>
+                                    </div>
+                                </div>
+                                <div class="flex-1 border-l pl-4">
+                                    <div class="flex items-center gap-2 text-sm">
+                                        <i class="fas fa-thumbs-up text-orange-500"></i>
+                                        <span class="text-gray-700">"Cocok untuk transit"</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flex gap-2 mt-4 mb-4">
+                                <span class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-medium">
+                                    <i class="fas fa-bed mr-1"></i> Basic
+                                </span>
+                            </div>
+                            <div class="flex gap-3">
+                                <button class="flex-1 btn-primary text-white font-semibold py-3 rounded-xl" onclick="event.stopPropagation(); openBookingModal('Wisma Transit Jakarta', 150000)">
+                                    Pesan Sekarang
+                                </button>
+                                <button onclick="event.stopPropagation(); openReviewModal('hotel5')" class="px-4 py-3 border-2 border-purple-600 text-purple-600 rounded-xl font-semibold hover:bg-purple-50">
+                                    <i class="fas fa-comments"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Hotel Card 6 - 5 Star -->
+                    <div class="hotel-card bg-white rounded-2xl shadow-lg overflow-hidden cursor-pointer" data-stars="5" data-price="3200000" data-lat="-8.5069" data-lng="115.2625" onclick="selectHotel('hotel6')">
+                        <div class="relative">
+                            <img src="https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=800" alt="Hotel" class="w-full h-64 object-cover">
+                            <div class="absolute top-4 left-4 bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-3 py-1 rounded-full text-sm font-semibold flex items-center gap-1">
+                                <i class="fas fa-crown"></i> Bintang 5
+                            </div>
+                            <div class="absolute top-4 right-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full flex items-center gap-1">
+                                <i class="fas fa-star text-yellow-400"></i>
+                                <span class="font-bold text-gray-800">4.8</span>
+                                <span class="text-gray-600 text-sm">(3.2k)</span>
+                            </div>
+                            <div class="absolute bottom-4 left-4 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-semibold floating-badge">
+                                Best Seller
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <div class="flex justify-between items-start mb-2">
+                                <div class="flex-1">
+                                    <div class="flex items-center gap-2 mb-1">
+                                        <h3 class="text-xl font-bold text-gray-900">Ayana Resort Bali</h3>
+                                        <div class="flex text-yellow-400 text-sm">
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                        </div>
+                                    </div>
+                                    <p class="text-gray-600 flex items-center gap-1 mt-1">
+                                        <i class="fas fa-map-marker-alt text-purple-600"></i>
+                                        Jimbaran, Bali
+                                        <button onclick="event.stopPropagation(); showOnMap('hotel6')" class="ml-2 text-purple-600 text-xs underline hover:no-underline">
+                                            Lihat di peta
+                                        </button>
+                                    </p>
+                                </div>
+                                <div class="text-right">
+                                    <div class="price-tag text-white px-4 py-2 rounded-xl font-bold text-lg">
+                                        Rp 3.200.000
+                                    </div>
+                                    <p class="text-gray-500 text-sm mt-1">/malam</p>
+                                </div>
+                            </div>
+
+                            <!-- Rating Preview -->
+                            <div class="flex items-center gap-4 mt-3 mb-3 p-3 bg-gray-50 rounded-lg">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center">
+                                        <span class="font-bold text-green-700">9.0</span>
+                                    </div>
+                                    <div>
+                                        <p class="font-semibold text-sm text-gray-900">Sempurna</p>
+                                        <p class="text-xs text-gray-500">3,247 review</p>
+                                    </div>
+                                </div>
+                                <div class="flex-1 border-l pl-4">
+                                    <div class="flex items-center gap-2 text-sm">
+                                        <i class="fas fa-thumbs-up text-green-500"></i>
+                                        <span class="text-gray-700">"View sunset terbaik!"</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flex gap-2 mt-4 mb-4">
+                                <span class="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-medium">
+                                    <i class="fas fa-wifi mr-1"></i> WiFi
+                                </span>
+                                <span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">
+                                    <i class="fas fa-swimming-pool mr-1"></i> Infinity Pool
+                                </span>
+                                <span class="px-3 py-1 bg-pink-100 text-pink-700 rounded-full text-xs font-medium">
+                                    <i class="fas fa-spa mr-1"></i> Spa
+                                </span>
+                                <span class="px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-xs font-medium">
+                                    <i class="fas fa-utensils mr-1"></i> 5 Restoran
+                                </span>
+                            </div>
+                            <div class="flex gap-3">
+                                <button class="flex-1 btn-primary text-white font-semibold py-3 rounded-xl" onclick="event.stopPropagation(); openBookingModal('Ayana Resort Bali', 3200000)">
+                                    Pesan Sekarang
+                                </button>
+                                <button onclick="event.stopPropagation(); openReviewModal('hotel6')" class="px-4 py-3 border-2 border-purple-600 text-purple-600 rounded-xl font-semibold hover:bg-purple-50">
+                                    <i class="fas fa-comments"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Map View -->
+                <div id="mapView" class="hidden">
+                    <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+                        <div id="mapContainer" class="relative h-[600px] bg-gray-100 map-container">
+                            <!-- Google Map will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Booking Summary Sidebar -->
+            <div class="lg:col-span-1">
+                <div class="sticky top-24 space-y-6">
+                    <!-- Booking Summary Card -->
+                    <div class="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
+                        <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                            <i class="fas fa-receipt text-purple-600"></i>
+                            Ringkasan Pemesanan
+                        </h3>
+                        
+                        <div id="emptyState" class="text-center py-8 text-gray-500">
+                            <i class="fas fa-hotel text-4xl mb-3 text-gray-300"></i>
+                            <p>Pilih hotel untuk melihat detail pemesanan</p>
+                        </div>
+
+                        <div id="bookingDetails" class="hidden space-y-4">
+                            <div class="border-b pb-4">
+                                <img id="selectedHotelImg" src="" class="w-full h-32 object-cover rounded-xl mb-3">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <h4 id="selectedHotelName" class="font-bold text-gray-900"></h4>
+                                    <div id="selectedHotelStars" class="flex text-yellow-400 text-xs"></div>
+                                </div>
+                                <div class="flex items-center gap-1 text-sm text-gray-600 mb-2">
+                                    <i class="fas fa-map-marker-alt text-purple-600"></i>
+                                    <span id="selectedHotelLocation"></span>
+                                </div>
+                                <div class="flex items-center gap-2 mb-2">
+                                    <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
+                                        <span id="selectedHotelRating" class="font-bold text-green-700 text-xs"></span>
+                                    </div>
+                                    <span id="selectedHotelReviewCount" class="text-xs text-gray-500"></span>
+                                </div>
+                                <p class="text-sm text-gray-600">Check-in: <span id="checkInDate">-</span></p>
+                                <p class="text-sm text-gray-600">Check-out: <span id="checkOutDate">-</span></p>
+                                <p class="text-sm text-gray-600">Malam: <span id="nightsCount">1</span></p>
+                                <p class="text-sm text-gray-600">Tamu: 2 Dewasa</p>
+                            </div>
+                            
+                            <div class="space-y-2">
+                                <div class="flex justify-between text-sm">
+                                    <span class="text-gray-600">Harga per malam</span>
+                                    <span id="pricePerNight" class="font-medium"></span>
+                                </div>
+                                <div class="flex justify-between text-sm">
+                                    <span class="text-gray-600">Pajak & Layanan (10%)</span>
+                                    <span id="taxAmount" class="font-medium"></span>
+                                </div>
+                                <div class="border-t pt-2 flex justify-between items-center">
+                                    <span class="font-bold text-gray-900">Total</span>
+                                    <span id="totalAmount" class="text-xl font-bold text-purple-600"></span>
+                                </div>
+                            </div>
+
+                            <button onclick="openPaymentModal()" class="w-full btn-primary text-white font-semibold py-3 rounded-xl mt-4">
+                                Lanjutkan Pembayaran
+                            </button>
+                            
+                            <p class="text-xs text-gray-500 text-center mt-2">
+                                <i class="fas fa-shield-alt text-green-500"></i>
+                                Pembayaran aman & terenkripsi
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Top Rated Hotels Widget -->
+                    <div class="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
+                        <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                            <i class="fas fa-trophy text-yellow-500"></i>
+                            Hotel Rating Tertinggi
+                        </h3>
+                        <div class="space-y-3">
+                            <div class="flex items-center gap-3 p-2 hover:bg-gray-50 rounded-lg cursor-pointer">
+                                <img src="https://images.unsplash.com/photo-1566073771259-6a8506099945?w=100" class="w-12 h-12 rounded-lg object-cover">
+                                <div class="flex-1">
+                                    <h4 class="font-semibold text-sm text-gray-900">Grand Hyatt</h4>
+                                    <div class="flex items-center gap-1">
+                                        <i class="fas fa-star text-yellow-400 text-xs"></i>
+                                        <span class="text-xs font-bold">4.9</span>
+                                        <span class="text-xs text-gray-500">(2.1k)</span>
+                                    </div>
+                                </div>
+                                <span class="text-sm font-bold text-purple-600">Rp 2.4jt</span>
+                            </div>
+                            <div class="flex items-center gap-3 p-2 hover:bg-gray-50 rounded-lg cursor-pointer">
+                                <img src="https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=100" class="w-12 h-12 rounded-lg object-cover">
+                                <div class="flex-1">
+                                    <h4 class="font-semibold text-sm text-gray-900">Ayana Resort</h4>
+                                    <div class="flex items-center gap-1">
+                                        <i class="fas fa-star text-yellow-400 text-xs"></i>
+                                        <span class="text-xs font-bold">4.8</span>
+                                        <span class="text-xs text-gray-500">(3.2k)</span>
+                                    </div>
+                                </div>
+                                <span class="text-sm font-bold text-purple-600">Rp 3.2jt</span>
+                            </div>
+                            <div class="flex items-center gap-3 p-2 hover:bg-gray-50 rounded-lg cursor-pointer">
+                                <img src="https://images.unsplash.com/photo-1582719508461-905c673771fd?w=100" class="w-12 h-12 rounded-lg object-cover">
+                                <div class="flex-1">
+                                    <h4 class="font-semibold text-sm text-gray-900">Swiss-Belhotel</h4>
+                                    <div class="flex items-center gap-1">
+                                        <i class="fas fa-star text-yellow-400 text-xs"></i>
+                                        <span class="text-xs font-bold">4.7</span>
+                                        <span class="text-xs text-gray-500">(1.8k)</span>
+                                    </div>
+                                </div>
+                                <span class="text-sm font-bold text-purple-600">Rp 1.2jt</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Promo Code -->
+                    <div class="bg-gradient-to-r from-purple-600 to-blue-600 rounded-2xl p-6 text-white">
+                        <h4 class="font-bold mb-2 flex items-center gap-2">
+                            <i class="fas fa-ticket-alt"></i>
+                            Punya Kode Promo?
+                        </h4>
+                        <div class="flex gap-2">
+                            <input type="text" placeholder="Masukkan kode" class="flex-1 px-4 py-2 rounded-lg text-gray-900 text-sm">
+                            <button class="bg-white text-purple-600 px-4 py-2 rounded-lg font-semibold text-sm hover:bg-gray-100">
+                                Pakai
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Review Modal -->
+    <div id="reviewModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-hidden animate-slide-in flex flex-col">
+            <div class="sticky top-0 bg-white border-b px-6 py-4 flex justify-between items-center z-10">
+                <div>
+                    <h2 class="text-xl font-bold text-gray-900" id="reviewHotelName">Ulasan Hotel</h2>
+                    <p class="text-sm text-gray-600" id="reviewHotelLocation"></p>
+                </div>
+                <button onclick="closeReviewModal()" class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200">
+                    <i class="fas fa-times text-gray-600"></i>
+                </button>
+            </div>
+
+            <div class="overflow-y-auto flex-1 custom-scrollbar">
+                <div class="p-6">
+                    <!-- Rating Summary -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                        <!-- Overall Score -->
+                        <div class="text-center p-6 bg-gradient-to-br from-purple-50 to-blue-50 rounded-2xl">
+                            <div class="relative w-24 h-24 mx-auto mb-3">
+                                <svg class="progress-ring w-24 h-24">
+                                    <circle class="text-gray-200" stroke-width="8" stroke="currentColor" fill="transparent" r="44" cx="48" cy="48"/>
+                                    <circle id="scoreCircle" class="progress-ring-circle text-purple-600" stroke-width="8" stroke-linecap="round" stroke="currentColor" fill="transparent" r="44" cx="48" cy="48" stroke-dasharray="276.46" stroke-dashoffset="27.65"/>
+                                </svg>
+                                <div class="absolute inset-0 flex items-center justify-center">
+                                    <span id="overallScore" class="text-3xl font-bold text-gray-900">9.2</span>
+                                </div>
+                            </div>
+                            <h3 id="ratingLabel" class="font-bold text-lg text-gray-900">Luar Biasa</h3>
+                            <p id="totalReviews" class="text-sm text-gray-600">2,134 review</p>
+                        </div>
+
+                        <!-- Rating Breakdown -->
+                        <div class="md:col-span-2 space-y-3">
+                            <h4 class="font-semibold text-gray-900 mb-3">Detail Penilaian</h4>
+                            <div class="space-y-2">
+                                <div class="flex items-center gap-3">
+                                    <span class="text-sm w-20">Kebersihan</span>
+                                    <div class="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
+                                        <div class="h-full bg-green-500 rounded-full rating-bar" style="width: 95%"></div>
+                                    </div>
+                                    <span class="text-sm font-semibold w-8">9.5</span>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <span class="text-sm w-20">Kenyamanan</span>
+                                    <div class="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
+                                        <div class="h-full bg-green-500 rounded-full rating-bar" style="width: 92%"></div>
+                                    </div>
+                                    <span class="text-sm font-semibold w-8">9.2</span>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <span class="text-sm w-20">Lokasi</span>
+                                    <div class="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
+                                        <div class="h-full bg-green-500 rounded-full rating-bar" style="width: 98%"></div>
+                                    </div>
+                                    <span class="text-sm font-semibold w-8">9.8</span>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <span class="text-sm w-20">Pelayanan</span>
+                                    <div class="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
+                                        <div class="h-full bg-green-500 rounded-full rating-bar" style="width: 94%"></div>
+                                    </div>
+                                    <span class="text-sm font-semibold w-8">9.4</span>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <span class="text-sm w-20">Fasilitas</span>
+                                    <div class="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
+                                        <div class="h-full bg-green-500 rounded-full rating-bar" style="width: 90%"></div>
+                                    </div>
+                                    <span class="text-sm font-semibold w-8">9.0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Filter Reviews -->
+                    <div class="flex flex-wrap gap-2 mb-6">
+                        <button class="px-4 py-2 bg-purple-600 text-white rounded-full text-sm font-medium">Semua</button>
+                        <button class="px-4 py-2 bg-gray-100 text-gray-700 rounded-full text-sm font-medium hover:bg-gray-200">Keluarga</button>
+                        <button class="px-4 py-2 bg-gray-100 text-gray-700 rounded-full text-sm font-medium hover:bg-gray-200">Bisnis</button>
+                        <button class="px-4 py-2 bg-gray-100 text-gray-700 rounded-full text-sm font-medium hover:bg-gray-200">Pasangan</button>
+                        <button class="px-4 py-2 bg-gray-100 text-gray-700 rounded-full text-sm font-medium hover:bg-gray-200">Solo</button>
+                    </div>
+
+                    <!-- Individual Reviews -->
+                    <div class="space-y-4" id="reviewsList">
+                        <!-- Review 1 -->
+                        <div class="review-card border-b pb-4">
+                            <div class="flex justify-between items-start mb-3">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-full bg-gradient-to-r from-purple-400 to-blue-400 flex items-center justify-center text-white font-bold">
+                                        AD
+                                    </div>
+                                    <div>
+                                        <h5 class="font-semibold text-gray-900">Ahmad Dhani</h5>
+                                        <p class="text-xs text-gray-500">Bisnis • 2 malam • Nov 2024</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-1 bg-green-100 px-2 py-1 rounded-lg">
+                                    <span class="font-bold text-green-700 text-sm">9.5</span>
+                                    <span class="text-xs text-green-600">/10</span>
+                                </div>
+                            </div>
+                            <p class="text-gray-700 mb-3">"Hotel yang sangat bagus untuk keperluan bisnis. Lokasi strategis di pusat kota, kamar bersih dan nyaman. Staff sangat ramah dan helpful. Breakfast juga variatif. Recommended!"</p>
+                            <div class="flex gap-2 mb-3">
+                                <img src="https://images.unsplash.com/photo-1566073771259-6a8506099945?w=100" class="w-16 h-16 object-cover rounded-lg review-photo cursor-pointer" onclick="viewPhoto(this.src)">
+                                <img src="https://images.unsplash.com/photo-1582719508461-905c673771fd?w=100" class="w-16 h-16 object-cover rounded-lg review-photo cursor-pointer" onclick="viewPhoto(this.src)">
+                            </div>
+                            <div class="flex items-center gap-4 text-sm text-gray-500">
+                                <button class="flex items-center gap-1 hover:text-purple-600">
+                                    <i class="far fa-thumbs-up"></i> Helpful (24)
+                                </button>
+                                <button class="hover:text-purple-600">Balas</button>
+                            </div>
+                        </div>
+
+                        <!-- Review 2 -->
+                        <div class="review-card border-b pb-4">
+                            <div class="flex justify-between items-start mb-3">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-full bg-gradient-to-r from-pink-400 to-red-400 flex items-center justify-center text-white font-bold">
+                                        SK
+                                    </div>
+                                    <div>
+                                        <h5 class="font-semibold text-gray-900">Siti Khadijah</h5>
+                                        <p class="text-xs text-gray-500">Keluarga • 3 malam • Okt 2024</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-1 bg-green-100 px-2 py-1 rounded-lg">
+                                    <span class="font-bold text-green-700 text-sm">9.0</span>
+                                    <span class="text-xs text-green-600">/10</span>
+                                </div>
+                            </div>
+                            <p class="text-gray-700 mb-3">"Menginap bersama keluarga, anak-anak suka dengan kolam renangnya. Kamar luas dan bersih. Hanya saja parkir agak sempit. Overall puas dengan pelayanannya."</p>
+                            <div class="flex items-center gap-4 text-sm text-gray-500">
+                                <button class="flex items-center gap-1 hover:text-purple-600">
+                                    <i class="far fa-thumbs-up"></i> Helpful (18)
+                                </button>
+                                <button class="hover:text-purple-600">Balas</button>
+                            </div>
+                        </div>
+
+                        <!-- Review 3 -->
+                        <div class="review-card border-b pb-4">
+                            <div class="flex justify-between items-start mb-3">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-full bg-gradient-to-r from-green-400 to-blue-400 flex items-center justify-center text-white font-bold">
+                                        BR
+                                    </div>
+                                    <div>
+                                        <h5 class="font-semibold text-gray-900">Budi Raharjo</h5>
+                                        <p class="text-xs text-gray-500">Pasangan • 1 malam • Sep 2024</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-1 bg-blue-100 px-2 py-1 rounded-lg">
+                                    <span class="font-bold text-blue-700 text-sm">8.5</span>
+                                    <span class="text-xs text-blue-600">/10</span>
+                                </div>
+                            </div>
+                            <p class="text-gray-700 mb-3">"Good value for money. Kamar agak kecil tapi cukup untuk berdua. Lokasi dekat dengan pusat perbelanjaan. WiFi kencang."</p>
+                            <div class="flex items-center gap-4 text-sm text-gray-500">
+                                <button class="flex items-center gap-1 hover:text-purple-600">
+                                    <i class="far fa-thumbs-up"></i> Helpful (12)
+                                </button>
+                                <button class="hover:text-purple-600">Balas</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Load More -->
+                    <button class="w-full py-3 border-2 border-purple-600 text-purple-600 rounded-xl font-semibold hover:bg-purple-50 mt-4">
+                        Lihat Lebih Banyak Review
+                    </button>
+
+                    <!-- Write Review CTA -->
+                    <div class="mt-6 p-4 bg-purple-50 rounded-xl border border-purple-200">
+                        <h4 class="font-semibold text-purple-900 mb-2">Sudah menginap di sini?</h4>
+                        <p class="text-sm text-purple-700 mb-3">Bagikan pengalaman Anda dan bantu traveler lain!</p>
+                        <button class="px-6 py-2 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700">
+                            Tulis Review
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Photo Viewer Modal -->
+    <div id="photoModal" class="fixed inset-0 bg-black/90 z-[60] hidden flex items-center justify-center p-4" onclick="closePhotoModal()">
+        <button class="absolute top-4 right-4 text-white text-3xl hover:text-gray-300">
+            <i class="fas fa-times"></i>
+        </button>
+        <img id="fullPhoto" src="" class="max-w-full max-h-full rounded-lg shadow-2xl" onclick="event.stopPropagation()">
+    </div>
+
+    <!-- Payment Modal (Previous implementation maintained) -->
+    <div id="paymentModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto animate-slide-in">
+            <div class="sticky top-0 bg-white border-b px-6 py-4 flex justify-between items-center z-10">
+                <h2 class="text-xl font-bold text-gray-900">Pembayaran</h2>
+                <button onclick="closePaymentModal()" class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200">
+                    <i class="fas fa-times text-gray-600"></i>
+                </button>
+            </div>
+
+            <div class="p-6">
+                <!-- Progress Steps -->
+                <div class="flex items-center justify-between mb-8 px-4">
+                    <div class="flex flex-col items-center">
+                        <div class="w-10 h-10 rounded-full bg-purple-600 text-white flex items-center justify-center font-bold step-indicator active" id="step1">1</div>
+                        <span class="text-xs mt-2 font-medium text-purple-600">Metode</span>
+                    </div>
+                    <div class="flex-1 h-1 bg-gray-200 mx-2 step-line" id="line1"></div>
+                    <div class="flex flex-col items-center">
+                        <div class="w-10 h-10 rounded-full bg-gray-200 text-gray-600 flex items-center justify-center font-bold step-indicator" id="step2">2</div>
+                        <span class="text-xs mt-2 font-medium text-gray-500">Detail</span>
+                    </div>
+                    <div class="flex-1 h-1 bg-gray-200 mx-2 step-line" id="line2"></div>
+                    <div class="flex flex-col items-center">
+                        <div class="w-10 h-10 rounded-full bg-gray-200 text-gray-600 flex items-center justify-center font-bold step-indicator" id="step3">3</div>
+                        <span class="text-xs mt-2 font-medium text-gray-500">Konfirmasi</span>
+                    </div>
+                </div>
+
+                <!-- Step 1: Payment Method Selection -->
+                <div id="paymentStep1" class="space-y-4">
+                    <h3 class="font-semibold text-gray-900 mb-4">Pilih Metode Pembayaran</h3>
+                    
+                    <!-- Virtual Account -->
+                    <div class="payment-method bg-gray-50 rounded-xl p-4 cursor-pointer" onclick="selectPaymentMethod('va')">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-university text-blue-600 text-xl"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold text-gray-900">Virtual Account</h4>
+                                    <p class="text-sm text-gray-600">BCA, Mandiri, BNI, BRI</p>
+                                </div>
+                            </div>
+                            <i class="fas fa-chevron-right text-gray-400"></i>
+                        </div>
+                        <div id="vaOptions" class="hidden mt-4 space-y-2 pl-16">
+                            <label class="flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-200 cursor-pointer hover:border-purple-500">
+                                <input type="radio" name="bank" value="bca" class="text-purple-600">
+                                <span class="font-medium">BCA Virtual Account</span>
+                            </label>
+                            <label class="flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-200 cursor-pointer hover:border-purple-500">
+                                <input type="radio" name="bank" value="mandiri" class="text-purple-600">
+                                <span class="font-medium">Mandiri Virtual Account</span>
+                            </label>
+                            <label class="flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-200 cursor-pointer hover:border-purple-500">
+                                <input type="radio" name="bank" value="bni" class="text-purple-600">
+                                <span class="font-medium">BNI Virtual Account</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- E-Wallet -->
+                    <div class="payment-method bg-gray-50 rounded-xl p-4 cursor-pointer" onclick="selectPaymentMethod('ewallet')">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-wallet text-green-600 text-xl"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold text-gray-900">E-Wallet</h4>
+                                    <p class="text-sm text-gray-600">GoPay, DANA, OVO, LinkAja</p>
+                                </div>
+                            </div>
+                            <i class="fas fa-chevron-right text-gray-400"></i>
+                        </div>
+                        <div id="ewalletOptions" class="hidden mt-4 space-y-2 pl-16">
+                            <label class="flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-200 cursor-pointer hover:border-purple-500">
+                                <input type="radio" name="ewallet" value="gopay" class="text-purple-600">
+                                <span class="font-medium">GoPay</span>
+                            </label>
+                            <label class="flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-200 cursor-pointer hover:border-purple-500">
+                                <input type="radio" name="ewallet" value="dana" class="text-purple-600">
+                                <span class="font-medium">DANA</span>
+                            </label>
+                            <label class="flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-200 cursor-pointer hover:border-purple-500">
+                                <input type="radio" name="ewallet" value="ovo" class="text-purple-600">
+                                <span class="font-medium">OVO</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Credit Card -->
+                    <div class="payment-method bg-gray-50 rounded-xl p-4 cursor-pointer" onclick="selectPaymentMethod('cc')">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-credit-card text-purple-600 text-xl"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold text-gray-900">Kartu Kredit/Debit</h4>
+                                    <p class="text-sm text-gray-600">Visa, Mastercard, JCB</p>
+                                </div>
+                            </div>
+                            <i class="fas fa-chevron-right text-gray-400"></i>
+                        </div>
+                        <div id="ccForm" class="hidden mt-4 pl-16 space-y-3">
+                            <input type="text" placeholder="Nomor Kartu" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                            <div class="grid grid-cols-2 gap-3">
+                                <input type="text" placeholder="MM/YY" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                                <input type="text" placeholder="CVV" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                            </div>
+                            <input type="text" placeholder="Nama di Kartu" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                        </div>
+                    </div>
+
+                    <!-- QRIS -->
+                    <div class="payment-method bg-gray-50 rounded-xl p-4 cursor-pointer" onclick="selectPaymentMethod('qris')">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-qrcode text-red-600 text-xl"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold text-gray-900">QRIS</h4>
+                                    <p class="text-sm text-gray-600">Scan QR dari semua aplikasi</p>
+                                </div>
+                            </div>
+                            <i class="fas fa-chevron-right text-gray-400"></i>
+                        </div>
+                    </div>
+
+                    <button onclick="goToStep(2)" class="w-full btn-primary text-white font-semibold py-3 rounded-xl mt-6">
+                        Lanjutkan
+                    </button>
+                </div>
+
+                <!-- Step 2: Payment Details -->
+                <div id="paymentStep2" class="hidden space-y-4">
+                    <div class="bg-purple-50 rounded-xl p-4 border border-purple-200">
+                        <h4 class="font-semibold text-purple-900 mb-2">Ringkasan Pembayaran</h4>
+                        <div class="space-y-1 text-sm">
+                            <div class="flex justify-between">
+                                <span class="text-purple-700">Total Tagihan</span>
+                                <span class="font-bold text-purple-900" id="paymentTotal">Rp 1.375.000</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-purple-700">Metode</span>
+                                <span class="font-bold text-purple-900" id="selectedMethod">BCA Virtual Account</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="vaDetail" class="hidden bg-blue-50 rounded-xl p-4 border border-blue-200">
+                        <h4 class="font-semibold text-blue-900 mb-3">Virtual Account Number</h4>
+                        <div class="bg-white rounded-lg p-4 flex items-center justify-between">
+                            <span class="text-2xl font-mono font-bold text-blue-600 tracking-wider" id="vaNumber">1234 5678 9012 3456</span>
+                            <button onclick="copyVA()" class="text-blue-600 hover:text-blue-800 font-medium">
+                                <i class="fas fa-copy mr-1"></i> Salin
+                            </button>
+                        </div>
+                        <p class="text-sm text-blue-700 mt-2">Bayar sebelum 23:59 WIB hari ini</p>
+                    </div>
+
+                    <div id="qrisDetail" class="hidden text-center">
+                        <div class="bg-white p-4 rounded-xl border-2 border-dashed border-gray-300 inline-block">
+                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=SasikuPayment12345" alt="QRIS Code" class="w-48 h-48">
+                        </div>
+                        <p class="text-sm text-gray-600 mt-3">Scan QR code menggunakan aplikasi pembayaran Anda</p>
+                    </div>
+
+                    <div class="flex gap-3 mt-6">
+                        <button onclick="goToStep(1)" class="flex-1 border border-gray-300 text-gray-700 font-semibold py-3 rounded-xl hover:bg-gray-50">
+                            Kembali
+                        </button>
+                        <button onclick="goToStep(3)" class="flex-1 btn-primary text-white font-semibold py-3 rounded-xl">
+                            Konfirmasi Pembayaran
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 3: Confirmation -->
+                <div id="paymentStep3" class="hidden text-center py-8">
+                    <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-check text-green-600 text-3xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-2">Pembayaran Berhasil!</h3>
+                    <p class="text-gray-600 mb-6">Pemesanan hotel Anda telah dikonfirmasi</p>
+                    
+                    <div class="bg-gray-50 rounded-xl p-4 text-left mb-6">
+                        <div class="flex justify-between mb-2">
+                            <span class="text-gray-600">Kode Booking</span>
+                            <span class="font-bold text-purple-600">SKH-2024-001</span>
+                        </div>
+                        <div class="flex justify-between mb-2">
+                            <span class="text-gray-600">Hotel</span>
+                            <span class="font-medium" id="confirmHotel">Grand Hyatt Jakarta</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Total</span>
+                            <span class="font-bold" id="confirmTotal">Rp 1.375.000</span>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-3">
+                        <button class="flex-1 border border-purple-600 text-purple-600 font-semibold py-3 rounded-xl hover:bg-purple-50">
+                            <i class="fas fa-download mr-2"></i> E-Ticket
+                        </button>
+                        <button onclick="closePaymentModal()" class="flex-1 btn-primary text-white font-semibold py-3 rounded-xl">
+                            Selesai
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Booking Modal -->
+    <div id="bookingModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full animate-slide-in">
+            <div class="p-6">
+                <h3 class="text-xl font-bold text-gray-900 mb-4">Detail Pemesanan</h3>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Check-in</label>
+                        <input type="date" id="modalCheckIn" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Check-out</label>
+                        <input type="date" id="modalCheckOut" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Jumlah Tamu</label>
+                        <select class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                            <option>1 Dewasa</option>
+                            <option selected>2 Dewasa</option>
+                            <option>2 Dewasa, 1 Anak</option>
+                            <option>2 Dewasa, 2 Anak</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="flex gap-3 mt-6">
+                    <button onclick="closeBookingModal()" class="flex-1 border border-gray-300 text-gray-700 font-semibold py-3 rounded-xl hover:bg-gray-50">
+                        Batal
+                    </button>
+                    <button onclick="confirmBooking()" class="flex-1 btn-primary text-white font-semibold py-3 rounded-xl">
+                        Konfirmasi
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentHotel = null;
+        let currentPrice = 0;
+        let selectedPaymentMethod = null;
+        let currentStarFilter = 0;
+        let currentPriceFilter = 5000000;
+        let bookingDetails = {};
+
+        // Initialize dates
+        const today = new Date();
+        const tomorrow = new Date(today);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+
+        document.getElementById('checkInInput').value = today.toISOString().split('T')[0];
+        document.getElementById('checkOutInput').value = tomorrow.toISOString().split('T')[0];
+
+        // Function to calculate nights between dates
+        function calculateNights(checkIn, checkOut) {
+            const start = new Date(checkIn);
+            const end = new Date(checkOut);
+            return Math.max(1, Math.ceil((end - start) / (1000 * 60 * 60 * 24)));
+        }
+
+        // Function to format currency
+        function formatCurrency(amount) {
+            return 'Rp ' + amount.toLocaleString('id-ID');
+        }
+
+        // Function to update the map view with markers
+        function updateMapView() {
+            const mapView = document.getElementById('mapView');
+            if (!mapView) return;
+
+            // Clear existing markers
+            const existingMarkers = mapView.querySelectorAll('.map-marker');
+            existingMarkers.forEach(marker => marker.remove());
+
+            // Add markers for visible hotels
+            const hotels = document.querySelectorAll('.hotel-card');
+            hotels.forEach(hotel => {
+                if (hotel.style.display !== 'none') {
+                    const lat = parseFloat(hotel.dataset.lat);
+                    const lng = parseFloat(hotel.dataset.lng);
+                    const price = parseInt(hotel.dataset.price);
+                    const hotelId = Array.from(hotels).indexOf(hotel) + 1;
+                    
+                    // Create marker element
+                    const marker = document.createElement('div');
+                    marker.className = 'map-marker';
+                    marker.setAttribute('data-hotel', `hotel${hotelId}`);
+                    marker.style.left = `${50 + (Math.random() * 40)}%`;
+                    marker.style.top = `${30 + (Math.random() * 40)}%`;
+                    
+                    marker.innerHTML = `
+                        <div class="marker-pin"></div>
+                        <div class="marker-icon"><i class="fas fa-hotel text-white text-xs"></i></div>
+                        <div class="marker-price">${formatCurrency(price)}</div>
+                    `;
+                    
+                    marker.addEventListener('click', function() {
+                        focusHotel(`hotel${hotelId}`);
+                    });
+                    
+                    mapView.appendChild(marker);
+                }
+            });
+        }
+
+        function filterByStar(stars) {
+            currentStarFilter = stars;
+
+            // Update UI
+            document.querySelectorAll('.star-filter').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById(`star-${stars === 0 ? 'all' : stars}`).classList.add('active');
+
+            // Filter hotels
+            const hotels = document.querySelectorAll('.hotel-card');
+            let visibleCount = 0;
+
+            hotels.forEach(hotel => {
+                const hotelStars = parseInt(hotel.dataset.stars);
+                const hotelPrice = parseInt(hotel.dataset.price);
+
+                const starMatch = stars === 0 || hotelStars === stars;
+                const priceMatch = hotelPrice <= currentPriceFilter;
+
+                if (starMatch && priceMatch) {
+                    hotel.style.display = 'block';
+                    visibleCount++;
+                } else {
+                    hotel.style.display = 'none';
+                }
+            });
+
+            document.getElementById('resultCount').textContent = `Menampilkan ${visibleCount} hotel`;
+            
+            // Update map view
+            updateMapView();
+        }
+
+        function updatePriceLabel(value) {
+            currentPriceFilter = parseInt(value);
+            document.getElementById('priceLabel').textContent = `Rp ${(value/1000000).toFixed(1)}jt`;
+            filterByStar(currentStarFilter);
+        }
+
+        function toggleView(view) {
+            const listView = document.getElementById('listView');
+            const mapView = document.getElementById('mapView');
+            const btnList = document.getElementById('btn-list');
+            const btnMap = document.getElementById('btn-map');
+
+            if (view === 'list') {
+                listView.classList.remove('hidden');
+                mapView.classList.add('hidden');
+                btnList.classList.add('bg-purple-600', 'text-white');
+                btnList.classList.remove('text-gray-600', 'hover:bg-gray-100');
+                btnMap.classList.remove('bg-purple-600', 'text-white');
+                btnMap.classList.add('text-gray-600', 'hover:bg-gray-100');
+            } else {
+                listView.classList.add('hidden');
+                mapView.classList.remove('hidden');
+                btnMap.classList.add('bg-purple-600', 'text-white');
+                btnMap.classList.remove('text-gray-600', 'hover:bg-gray-100');
+                btnList.classList.remove('bg-purple-600', 'text-white');
+                btnList.classList.add('text-gray-600', 'hover:bg-gray-100');
+                
+                // Update map when switching to map view
+                updateMapView();
+            }
+        }
+
+        function showOnMap(hotelId) {
+            toggleView('map');
+            setTimeout(() => focusHotel(hotelId), 300);
+        }
+
+        function focusHotel(hotelId) {
+            // Remove active class from all markers
+            document.querySelectorAll('.map-marker').forEach(marker => {
+                marker.classList.remove('active');
+            });
+
+            // Add active class to selected marker
+            const marker = document.querySelector(`.map-marker[data-hotel="${hotelId}"]`);
+            if (marker) {
+                marker.classList.add('active');
+
+                // Scroll to hotel card if in list view
+                const hotelCard = document.querySelector(`.hotel-card[data-lat][data-lng]`);
+                if (hotelCard && !document.getElementById('listView').classList.contains('hidden')) {
+                    hotelCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    hotelCard.classList.add('ring-2', 'ring-purple-500');
+                    setTimeout(() => hotelCard.classList.remove('ring-2', 'ring-purple-500'), 2000);
+                }
+            }
+        }
+
+        function openReviewModal(hotelId) {
+            const hotelData = {
+                'hotel1': { name: 'Grand Hyatt Jakarta', location: 'Menteng, Jakarta Pusat', rating: 9.2, reviews: '2,134', score: 92 },
+                'hotel2': { name: 'Swiss-Belhotel Bali', location: 'Kuta, Bali', rating: 8.8, reviews: '1,847', score: 88 },
+                'hotel3': { name: 'Hotel Neo Surabaya', location: 'Rungkut, Surabaya', rating: 8.2, reviews: '856', score: 82 },
+                'hotel4': { name: 'Hotel Istana Bandung', location: 'Braga, Bandung', rating: 7.5, reviews: '423', score: 75 },
+                'hotel5': { name: 'Wisma Transit Jakarta', location: 'Gambir, Jakarta Pusat', rating: 6.8, reviews: '312', score: 68 },
+                'hotel6': { name: 'Ayana Resort Bali', location: 'Jimbaran, Bali', rating: 9.0, reviews: '3,247', score: 90 }
+            };
+
+            const hotel = hotelData[hotelId];
+            document.getElementById('reviewHotelName').textContent = hotel.name;
+            document.getElementById('reviewHotelLocation').textContent = hotel.location;
+            document.getElementById('overallScore').textContent = hotel.rating;
+            document.getElementById('totalReviews').textContent = `${hotel.reviews} review`;
+
+            // Update progress ring
+            const circle = document.getElementById('scoreCircle');
+            const circumference = 2 * Math.PI * 44;
+            const offset = circumference - (hotel.score / 100) * circumference;
+            circle.style.strokeDashoffset = offset;
+
+            // Update rating label
+            const labels = { 9: 'Sempurna', 8: 'Sangat Baik', 7: 'Baik', 6: 'Cukup Baik' };
+            let label = 'Cukup';
+            if (hotel.rating >= 9) label = 'Sempurna';
+            else if (hotel.rating >= 8) label = 'Sangat Baik';
+            else if (hotel.rating >= 7) label = 'Baik';
+            else if (hotel.rating >= 6) label = 'Cukup Baik';
+            document.getElementById('ratingLabel').textContent = label;
+
+            document.getElementById('reviewModal').classList.remove('hidden');
+        }
+
+        function closeReviewModal() {
+            document.getElementById('reviewModal').classList.add('hidden');
+        }
+
+        function viewPhoto(src) {
+            document.getElementById('fullPhoto').src = src;
+            document.getElementById('photoModal').classList.remove('hidden');
+        }
+
+        function closePhotoModal() {
+            document.getElementById('photoModal').classList.add('hidden');
+        }
+
+        function openBookingModal(hotelName, price) {
+            currentHotel = hotelName;
+            currentPrice = price;
+            document.getElementById('bookingModal').classList.remove('hidden');
+
+            document.getElementById('modalCheckIn').value = today.toISOString().split('T')[0];
+            document.getElementById('modalCheckOut').value = tomorrow.toISOString().split('T')[0];
+        }
+
+        function closeBookingModal() {
+            document.getElementById('bookingModal').classList.add('hidden');
+        }
+
+        function confirmBooking() {
+            const modalCheckIn = document.getElementById('modalCheckIn').value;
+            const modalCheckOut = document.getElementById('modalCheckOut').value;
+            
+            if (!modalCheckIn || !modalCheckOut) {
+                alert('Silakan pilih tanggal check-in dan check-out');
+                return;
+            }
+            
+            if (new Date(modalCheckIn) >= new Date(modalCheckOut)) {
+                alert('Tanggal check-out harus setelah tanggal check-in');
+                return;
+            }
+
+            closeBookingModal();
+
+            const hotelData = {
+                'Grand Hyatt Jakarta': { stars: 5, location: 'Menteng, Jakarta Pusat', rating: '4.9', reviews: '2,134 ulasan', img: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800' },
+                'Swiss-Belhotel Bali': { stars: 4, location: 'Kuta, Bali', rating: '4.7', reviews: '1,847 ulasan', img: 'https://images.unsplash.com/photo-1582719508461-905c673771fd?w=800' },
+                'Hotel Neo Surabaya': { stars: 3, location: 'Rungkut, Surabaya', rating: '4.3', reviews: '856 ulasan', img: 'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=800' },
+                'Hotel Istana Bandung': { stars: 2, location: 'Braga, Bandung', rating: '4.0', reviews: '423 ulasan', img: 'https://images.unsplash.com/photo-1596436889106-be35e843f974?w=800' },
+                'Wisma Transit Jakarta': { stars: 1, location: 'Gambir, Jakarta Pusat', rating: '3.8', reviews: '312 ulasan', img: 'https://images.unsplash.com/photo-1598928506311-c55ded91a20c?w=800' },
+                'Ayana Resort Bali': { stars: 5, location: 'Jimbaran, Bali', rating: '4.8', reviews: '3,247 ulasan', img: 'https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=800' }
+            };
+
+            const data = hotelData[currentHotel];
+
+            document.getElementById('emptyState').classList.add('hidden');
+            document.getElementById('bookingDetails').classList.remove('hidden');
+
+            document.getElementById('selectedHotelName').textContent = currentHotel;
+            document.getElementById('selectedHotelImg').src = data.img;
+            document.getElementById('selectedHotelLocation').textContent = data.location;
+            document.getElementById('selectedHotelRating').textContent = data.rating;
+            document.getElementById('selectedHotelReviewCount').textContent = data.reviews;
+
+            // Generate stars
+            let starsHtml = '';
+            for (let i = 0; i < data.stars; i++) starsHtml += '<i class="fas fa-star"></i>';
+            document.getElementById('selectedHotelStars').innerHTML = starsHtml;
+
+            document.getElementById('pricePerNight').textContent = formatCurrency(currentPrice);
+
+            const checkIn = modalCheckIn;
+            const checkOut = modalCheckOut;
+
+            document.getElementById('checkInDate').textContent = checkIn;
+            document.getElementById('checkOutDate').textContent = checkOut;
+
+            const nights = calculateNights(checkIn, checkOut);
+            document.getElementById('nightsCount').textContent = nights;
+
+            const subtotal = currentPrice * nights;
+            const tax = subtotal * 0.1;
+            const total = subtotal + tax;
+
+            // Store booking details for payment
+            bookingDetails = {
+                hotel: currentHotel,
+                checkIn: checkIn,
+                checkOut: checkOut,
+                nights: nights,
+                pricePerNight: currentPrice,
+                subtotal: subtotal,
+                tax: tax,
+                total: total
+            };
+
+            document.getElementById('taxAmount').textContent = formatCurrency(tax);
+            document.getElementById('totalAmount').textContent = formatCurrency(total);
+
+            document.getElementById('bookingDetails').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function openPaymentModal() {
+            if (!bookingDetails.total) {
+                alert('Silakan konfirmasi pemesanan terlebih dahulu');
+                return;
+            }
+            document.getElementById('paymentModal').classList.remove('hidden');
+            goToStep(1);
+        }
+
+        function closePaymentModal() {
+            document.getElementById('paymentModal').classList.add('hidden');
+        }
+
+        function selectPaymentMethod(method) {
+            document.getElementById('vaOptions').classList.add('hidden');
+            document.getElementById('ewalletOptions').classList.add('hidden');
+            document.getElementById('ccForm').classList.add('hidden');
+            document.querySelectorAll('.payment-method').forEach(el => el.classList.remove('selected'));
+
+            if (method === 'va') {
+                document.getElementById('vaOptions').classList.remove('hidden');
+                event.currentTarget.classList.add('selected');
+                selectedPaymentMethod = 'Virtual Account';
+            } else if (method === 'ewallet') {
+                document.getElementById('ewalletOptions').classList.remove('hidden');
+                event.currentTarget.classList.add('selected');
+                selectedPaymentMethod = 'E-Wallet';
+            } else if (method === 'cc') {
+                document.getElementById('ccForm').classList.remove('hidden');
+                event.currentTarget.classList.add('selected');
+                selectedPaymentMethod = 'Kartu Kredit';
+            } else if (method === 'qris') {
+                event.currentTarget.classList.add('selected');
+                selectedPaymentMethod = 'QRIS';
+            }
+        }
+
+        function goToStep(step) {
+            document.getElementById('paymentStep1').classList.add('hidden');
+            document.getElementById('paymentStep2').classList.add('hidden');
+            document.getElementById('paymentStep3').classList.add('hidden');
+
+            document.getElementById('step1').classList.remove('active');
+            document.getElementById('step2').classList.remove('active');
+            document.getElementById('step3').classList.remove('active');
+            document.getElementById('line1').classList.remove('completed');
+            document.getElementById('line2').classList.remove('completed');
+
+            if (step === 1) {
+                document.getElementById('paymentStep1').classList.remove('hidden');
+                document.getElementById('step1').classList.add('active');
+            } else if (step === 2) {
+                document.getElementById('paymentStep2').classList.remove('hidden');
+                document.getElementById('step1').classList.add('active');
+                document.getElementById('step2').classList.add('active');
+                document.getElementById('line1').classList.add('completed');
+
+                const total = formatCurrency(bookingDetails.total);
+                document.getElementById('paymentTotal').textContent = total;
+                document.getElementById('confirmTotal').textContent = total;
+                document.getElementById('confirmHotel').textContent = bookingDetails.hotel;
+
+                document.getElementById('vaDetail').classList.add('hidden');
+                document.getElementById('qrisDetail').classList.add('hidden');
+
+                if (selectedPaymentMethod === 'Virtual Account') {
+                    document.getElementById('vaDetail').classList.remove('hidden');
+                    const bank = document.querySelector('input[name="bank"]:checked');
+                    if (bank) {
+                        document.getElementById('selectedMethod').textContent = bank.value.toUpperCase() + ' Virtual Account';
+                    }
+                } else if (selectedPaymentMethod === 'QRIS') {
+                    document.getElementById('qrisDetail').classList.remove('hidden');
+                    document.getElementById('selectedMethod').textContent = 'QRIS';
+                } else {
+                    document.getElementById('selectedMethod').textContent = selectedPaymentMethod;
+                }
+            } else if (step === 3) {
+                document.getElementById('paymentStep3').classList.remove('hidden');
+                document.getElementById('step1').classList.add('active');
+                document.getElementById('step2').classList.add('active');
+                document.getElementById('step3').classList.add('active');
+                document.getElementById('line1').classList.add('completed');
+                document.getElementById('line2').classList.add('completed');
+            }
+        }
+
+        function copyVA() {
+            const vaNumber = document.getElementById('vaNumber').textContent;
+            navigator.clipboard.writeText(vaNumber.replace(/\s/g, ''));
+            alert('Nomor VA disalin!');
+        }
+
+        function selectHotel(hotelId) {
+            document.querySelectorAll('.hotel-card').forEach(card => {
+                card.classList.remove('ring-2', 'ring-purple-500');
+            });
+            event.currentTarget.classList.add('ring-2', 'ring-purple-500');
+        }
+
+        function searchHotels() {
+            const location = document.getElementById('searchLocation').value;
+            if (location.trim() === '') {
+                alert('Silakan masukkan lokasi tujuan');
+                return;
+            }
+            
+            // In a real application, this would make an API call
+            // For now, we'll just show an alert with the search term
+            alert(`Mencari hotel di: ${location}`);
+            
+            // Reset filters to show all results
+            filterByStar(0);
+        }
+
+        // Close modals on outside click
+        window.onclick = function(event) {
+            const paymentModal = document.getElementById('paymentModal');
+            const bookingModal = document.getElementById('bookingModal');
+            const reviewModal = document.getElementById('reviewModal');
+            const photoModal = document.getElementById('photoModal');
+
+            if (event.target === paymentModal) closePaymentModal();
+            if (event.target === bookingModal) closeBookingModal();
+            if (event.target === reviewModal) closeReviewModal();
+            if (event.target === photoModal) closePhotoModal();
+        }
+
+        // Global variables for Google Maps
+        let autocomplete;
+        let map;
+        let markers = [];
+        let infoWindow;
+
+        // Initialize Google Places Autocomplete
+        function initAutocomplete() {
+            const input = document.getElementById('searchLocation');
+            if (input) {
+                autocomplete = new google.maps.places.Autocomplete(input, {
+                    types: ['(cities)'],
+                    fields: ['place_id', 'geometry', 'name', 'formatted_address']
+                });
+
+                autocomplete.addListener('place_changed', fillInAddress);
+            }
+            
+            // Initialize the map
+            initMap();
+        }
+
+        // Initialize the Google Map
+        function initMap() {
+            // Default to Jakarta if no location is selected
+            const jakarta = { lat: -6.2088, lng: 106.8456 };
+            
+            map = new google.maps.Map(document.getElementById("mapContainer"), {
+                zoom: 10,
+                center: jakarta,
+                mapTypeControl: true,
+                streetViewControl: true,
+                fullscreenControl: true
+            });
+            
+            infoWindow = new google.maps.InfoWindow();
+            
+            // Add sample hotels to the map
+            addHotelsToMap();
+        }
+
+        // Fill in address when a place is selected
+        function fillInAddress() {
+            const place = autocomplete.getPlace();
+            
+            if (!place.geometry) {
+                // User entered a city that was not found
+                alert('Lokasi "' + place.name + '" tidak ditemukan. Silakan pilih dari saran kami.');
+                return;
+            }
+            
+            // Center the map on the selected location
+            map.setCenter(place.geometry.location);
+            map.setZoom(12);
+            
+            // Store the location for later use
+            sessionStorage.setItem('selectedLocation', JSON.stringify({
+                name: place.name,
+                lat: place.geometry.location.lat(),
+                lng: place.geometry.location.lng()
+            }));
+            
+            // Add hotels near the selected location
+            addHotelsToMap();
+        }
+
+        // Add hotels to the map
+        function addHotelsToMap() {
+            // Clear existing markers
+            clearMarkers();
+            
+            // Sample hotel data with coordinates
+            const hotels = [
+                { id: 'hotel1', name: 'Grand Hyatt Jakarta', lat: -6.2088, lng: 106.8456, price: 2450000, rating: 4.9, stars: 5 },
+                { id: 'hotel2', name: 'Swiss-Belhotel Bali', lat: -8.4095, lng: 115.1889, price: 1250000, rating: 4.7, stars: 4 },
+                { id: 'hotel3', name: 'Hotel Neo Surabaya', lat: -7.2575, lng: 112.7521, price: 450000, rating: 4.3, stars: 3 },
+                { id: 'hotel4', name: 'Hotel Istana Bandung', lat: -6.9175, lng: 107.6191, price: 250000, rating: 4.0, stars: 2 },
+                { id: 'hotel5', name: 'Wisma Transit Jakarta', lat: -6.1754, lng: 106.8272, price: 150000, rating: 3.8, stars: 1 },
+                { id: 'hotel6', name: 'Ayana Resort Bali', lat: -8.5069, lng: 115.2625, price: 3200000, rating: 4.8, stars: 5 }
+            ];
+            
+            // Add markers for each hotel
+            hotels.forEach(hotel => {
+                // Only add hotels that are currently visible based on filters
+                const hotelCard = document.querySelector(`.hotel-card[data-stars="${hotel.stars}"]`);
+                if (!hotelCard || hotelCard.style.display !== 'none') {
+                    const marker = new google.maps.Marker({
+                        position: { lat: hotel.lat, lng: hotel.lng },
+                        map: map,
+                        title: hotel.name,
+                        hotelId: hotel.id
+                    });
+                    
+                    // Create info window content
+                    const contentString = `
+                        <div class="hotel-info-window">
+                            <h3 class="font-bold text-lg">${hotel.name}</h3>
+                            <div class="flex items-center mt-1">
+                                ${'<i class="fas fa-star text-yellow-400"></i>'.repeat(hotel.stars)}
+                                <span class="ml-2 text-sm">(${hotel.rating})</span>
+                            </div>
+                            <p class="text-purple-600 font-bold mt-2">Rp ${hotel.price.toLocaleString('id-ID')}</p>
+                            <button onclick="selectHotel('${hotel.id}')" class="mt-2 bg-purple-600 text-white px-3 py-1 rounded text-sm">Lihat Detail</button>
+                        </div>
+                    `;
+                    
+                    // Add click listener to show info window
+                    marker.addListener("click", () => {
+                        infoWindow.setContent(contentString);
+                        infoWindow.open(map, marker);
+                    });
+                    
+                    // Store marker reference
+                    markers.push(marker);
+                }
+            });
+        }
+
+        // Clear all markers from the map
+        function clearMarkers() {
+            for (let i = 0; i < markers.length; i++) {
+                markers[i].setMap(null);
+            }
+            markers = [];
+        }
+
+        // Update map view when filters change
+        function updateMapView() {
+            if (map) {
+                // Refresh the map with current filters
+                setTimeout(addHotelsToMap, 100);
+            }
+        }
+
+        // Focus on a specific hotel on the map
+        function focusHotel(hotelId) {
+            // Find the hotel in our data
+            const hotelData = {
+                'hotel1': { lat: -6.2088, lng: 106.8456 },
+                'hotel2': { lat: -8.4095, lng: 115.1889 },
+                'hotel3': { lat: -7.2575, lng: 112.7521 },
+                'hotel4': { lat: -6.9175, lng: 107.6191 },
+                'hotel5': { lat: -6.1754, lng: 106.8272 },
+                'hotel6': { lat: -8.5069, lng: 115.2625 }
+            };
+            
+            const hotel = hotelData[hotelId];
+            if (hotel) {
+                // Center the map on the hotel
+                map.panTo({ lat: hotel.lat, lng: hotel.lat });
+                map.setZoom(15);
+                
+                // Find and highlight the corresponding marker
+                markers.forEach(marker => {
+                    if (marker.hotelId === hotelId) {
+                        // In a real implementation, we would trigger the marker click
+                        // For now, we'll just center the map
+                    }
+                });
+            }
+        }
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set up date validation
+            const checkInInput = document.getElementById('checkInInput');
+            const checkOutInput = document.getElementById('checkOutInput');
+            
+            checkInInput.addEventListener('change', function() {
+                // Set minimum check-out date to day after check-in
+                const checkInDate = new Date(this.value);
+                checkInDate.setDate(checkInDate.getDate() + 1);
+                checkOutInput.min = checkInDate.toISOString().split('T')[0];
+            });
+            
+            // Initialize map view with markers
+            // The map will be initialized when Google Maps API loads (initAutocomplete)
+        });
+
+        function searchHotels() {
+            const location = document.getElementById('searchLocation').value;
+            if (location.trim() === '') {
+                alert('Silakan masukkan lokasi tujuan');
+                return;
+            }
+            
+            // The search is handled by the Google Places API
+            // When a place is selected, fillInAddress is called automatically
+            // If no place was selected from the autocomplete, we can still proceed
+            if (!sessionStorage.getItem('selectedLocation')) {
+                alert(`Mencari hotel di: ${location}. Pilih lokasi dari saran untuk hasil lebih akurat.`);
+            }
+            
+            // Reset filters to show all results
+            filterByStar(0);
+        }
+    </script>
+</body>
+</html>

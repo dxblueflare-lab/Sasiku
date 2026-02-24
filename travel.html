@@ -1,0 +1,2593 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SASIKU - Your Journey Begins Here</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'montserrat': ['Montserrat', 'sans-serif'],
+                        'playfair': ['Playfair Display', 'serif'],
+                        'poppins': ['Poppins', 'sans-serif'],
+                    },
+                    colors: {
+                        'ocean': '#0066CC',
+                        'ocean-light': '#4A90E2',
+                        'sunset': '#FF6B35',
+                        'sunset-light': '#FF8E53',
+                        'sand': '#F5E6D3',
+                        'sand-dark': '#E6D5C3',
+                        'forest': '#2D5A3D',
+                        'forest-light': '#4A7C59',
+                        'sky': '#87CEEB',
+                        'coral': '#FF7F7F',
+                        'gold': '#FFD700',
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'drift': 'drift 20s linear infinite',
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'wave': 'wave 8s ease-in-out infinite',
+                        'cloud': 'cloud 30s linear infinite',
+                        'plane': 'plane 3s ease-in-out infinite',
+                        'train': 'train 4s ease-in-out infinite',
+                        'ship': 'ship 5s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0) rotate(0deg)' },
+                            '50%': { transform: 'translateY(-20px) rotate(2deg)' },
+                        },
+                        drift: {
+                            '0%': { transform: 'translateX(-100%)' },
+                            '100%': { transform: 'translateX(100vw)' },
+                        },
+                        wave: {
+                            '0%, 100%': { transform: 'translateY(0) scaleY(1)' },
+                            '50%': { transform: 'translateY(-10px) scaleY(1.1)' },
+                        },
+                        cloud: {
+                            '0%': { transform: 'translateX(-200px)' },
+                            '100%': { transform: 'translateX(calc(100vw + 200px))' },
+                        },
+                        plane: {
+                            '0%, 100%': { transform: 'translateY(0) rotate(-5deg)' },
+                            '50%': { transform: 'translateY(-15px) rotate(5deg)' },
+                        },
+                        train: {
+                            '0%, 100%': { transform: 'translateX(0)' },
+                            '50%': { transform: 'translateX(10px)' },
+                        },
+                        ship: {
+                            '0%, 100%': { transform: 'translateY(0) rotate(-2deg)' },
+                            '50%': { transform: 'translateY(-8px) rotate(2deg)' },
+                        },
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            overflow-x: hidden;
+            background: #f8fafc;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #0066CC, #FF6B35);
+            border-radius: 5px;
+        }
+
+        /* Glass Morphism */
+        .glass {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .glass-dark {
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Gradient Text */
+        .gradient-text {
+            background: linear-gradient(135deg, #0066CC 0%, #FF6B35 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .gradient-text-sunset {
+            background: linear-gradient(135deg, #FF6B35 0%, #FFD700 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .gradient-text-ocean {
+            background: linear-gradient(135deg, #0066CC 0%, #4A90E2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Card Hover Effects */
+        .travel-card {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .travel-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        /* Button Styles */
+        .btn-primary {
+            background: linear-gradient(135deg, #0066CC 0%, #FF6B35 100%);
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 102, 204, 0.4);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #FF6B35 0%, #FFD700 100%);
+            transition: all 0.3s ease;
+        }
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(255, 107, 53, 0.4);
+        }
+
+        /* Input Styles */
+        .travel-input {
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        .travel-input:focus {
+            border-color: #0066CC;
+            box-shadow: 0 0 0 4px rgba(0, 102, 204, 0.1);
+        }
+
+        /* Ticket Styles */
+        .ticket {
+            background: linear-gradient(135deg, #fff 0%, #f8fafc 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        .ticket::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #0066CC, #FF6B35, #FFD700);
+        }
+
+        /* Wave Background */
+        .wave-bg {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100px;
+            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320'%3E%3Cpath fill='%23ffffff' fill-opacity='1' d='M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,112C672,96,768,96,864,112C960,128,1056,160,1152,160C1248,160,1344,128,1392,112L1440,96L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z'%3E%3C/path%3E%3C/svg%3E");
+            background-size: cover;
+        }
+
+        /* Cloud Animation */
+        .cloud {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 100px;
+            opacity: 0.8;
+        }
+        .cloud::before {
+            content: '';
+            position: absolute;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 100px;
+        }
+
+        /* Step Indicator */
+        .step-active {
+            background: linear-gradient(135deg, #0066CC, #FF6B35);
+            color: white;
+        }
+        .step-completed {
+            background: #2D5A3D;
+            color: white;
+        }
+
+        /* Loading Animation */
+        .loader-plane {
+            animation: fly 2s ease-in-out infinite;
+        }
+        @keyframes fly {
+            0%, 100% { transform: translateX(0) translateY(0); }
+            25% { transform: translateX(10px) translateY(-10px); }
+            50% { transform: translateX(0) translateY(0); }
+            75% { transform: translateX(-10px) translateY(-5px); }
+        }
+
+        /* Reveal Animation */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease;
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Hover Lift */
+        .hover-lift {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .hover-lift:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Parallax */
+        .parallax {
+            transform: translateZ(0);
+            will-change: transform;
+        }
+    </style>
+</head>
+<body class="bg-slate-50">
+
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 glass shadow-lg transition-all duration-300" id="navbar">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <!-- Logo -->
+                <div class="flex items-center space-x-3 cursor-pointer" onclick="showHome()">
+                    <div class="relative">
+                        <div class="w-12 h-12 bg-gradient-to-br from-ocean to-sunset rounded-2xl flex items-center justify-center shadow-lg animate-float">
+                            <i class="fas fa-paper-plane text-white text-xl"></i>
+                        </div>
+                        <div class="absolute -top-1 -right-1 w-4 h-4 bg-gold rounded-full animate-pulse"></div>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-playfair font-bold gradient-text">SASIKU</h1>
+                        <p class="text-xs text-gray-500 font-montserrat tracking-widest">EXPLORE THE WORLD</p>
+                    </div>
+                </div>
+
+                <!-- Menu -->
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#" onclick="showHome()" class="group relative font-montserrat font-medium text-gray-700 hover:text-ocean transition-colors">
+                        Beranda
+                        <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-ocean transition-all group-hover:w-full"></span>
+                    </a>
+                    <a href="#" class="group relative font-montserrat font-medium text-gray-700 hover:text-sunset transition-colors">
+                        Promo
+                        <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-sunset transition-all group-hover:w-full"></span>
+                    </a>
+                    <a href="#" class="group relative font-montserrat font-medium text-gray-700 hover:text-forest transition-colors">
+                        Cek Pesanan
+                        <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-forest transition-all group-hover:w-full"></span>
+                    </a>
+                    <a href="#" class="group relative font-montserrat font-medium text-gray-700 hover:text-coral transition-colors">
+                        Bantuan
+                        <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-coral transition-all group-hover:w-full"></span>
+                    </a>
+                </div>
+
+                <!-- Actions -->
+                <div class="flex items-center space-x-4">
+                    <button class="relative p-2 text-gray-600 hover:text-ocean transition-colors">
+                        <i class="fas fa-bell text-xl"></i>
+                        <span class="absolute top-0 right-0 w-2.5 h-2.5 bg-sunset rounded-full border-2 border-white animate-pulse"></span>
+                    </button>
+                    <!-- User Role Dropdown -->
+                    <div class="relative" id="userDropdown">
+                        <button onclick="toggleUserDropdown()" class="btn-primary px-6 py-2.5 rounded-full text-white font-montserrat font-semibold text-sm shadow-lg hover:shadow-xl transition-all flex items-center space-x-2">
+                            <i class="fas fa-user"></i>
+                            <span id="userRoleText">Pengunjung</span>
+                            <i class="fas fa-chevron-down text-xs"></i>
+                        </button>
+                        <div id="userDropdownMenu" class="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg py-2 hidden z-50">
+                            <button onclick="showLoginModal()" class="block w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors">
+                                <i class="fas fa-sign-in-alt mr-2 text-blue-500"></i> Masuk
+                            </button>
+                            <button onclick="switchUserRole('admin')" class="block w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors">
+                                <i class="fas fa-user-shield mr-2 text-red-500"></i> Admin
+                            </button>
+                            <button onclick="switchUserRole('guest')" class="block w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors">
+                                <i class="fas fa-sign-out-alt mr-2 text-gray-500"></i> Keluar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="pt-20">
+        
+        <!-- HOME PAGE -->
+        <div id="homePage">
+            <!-- Hero Section -->
+            <section class="relative min-h-screen flex items-center overflow-hidden bg-gradient-to-br from-sky-100 via-blue-50 to-orange-50">
+                <!-- Animated Clouds -->
+                <div class="cloud w-32 h-12 top-20 animate-cloud" style="animation-duration: 25s;"></div>
+                <div class="cloud w-48 h-16 top-40 animate-cloud" style="animation-delay: 5s; animation-duration: 35s;"></div>
+                <div class="cloud w-24 h-10 top-60 animate-cloud" style="animation-delay: 10s; animation-duration: 30s;"></div>
+
+                <!-- Decorative Elements -->
+                <div class="absolute top-20 right-20 w-64 h-64 bg-gradient-to-br from-ocean/20 to-sunset/20 rounded-full blur-3xl animate-pulse-slow"></div>
+                <div class="absolute bottom-20 left-20 w-96 h-96 bg-gradient-to-tr from-sunset/20 to-gold/20 rounded-full blur-3xl animate-pulse-slow" style="animation-delay: 2s;"></div>
+
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 relative z-10">
+                    <div class="grid lg:grid-cols-2 gap-12 items-center">
+                        <!-- Left Content -->
+                        <div class="space-y-8 reveal">
+                            <div class="inline-flex items-center space-x-2 px-4 py-2 bg-white/80 rounded-full shadow-md">
+                                <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                                <span class="text-sm font-montserrat text-gray-600">50,000+ Travelers Trust Us</span>
+                            </div>
+                            
+                            <h1 class="text-5xl md:text-7xl font-playfair font-bold leading-tight">
+                                Mulai Petualangan <br>
+                                <span class="gradient-text">Tanpa Batas</span>
+                            </h1>
+                            
+                            <p class="text-xl text-gray-600 font-light leading-relaxed max-w-lg">
+                                Temukan pengalaman perjalanan terbaik dengan harga terjangkau. 
+                                Dari langit biru hingga lautan luas, kami siap mengantar Anda.
+                            </p>
+
+                            <!-- Search Box -->
+                            <div class="glass rounded-3xl p-6 shadow-2xl">
+                                <!-- Transport Tabs -->
+                                <div class="flex flex-wrap gap-3 mb-6">
+                                    <button onclick="setTransportType('plane')" id="btn-plane" class="transport-btn active flex items-center space-x-2 px-6 py-3 rounded-xl bg-ocean text-white font-montserrat font-semibold text-sm transition-all hover:shadow-lg hover:scale-105">
+                                        <i class="fas fa-plane animate-plane"></i>
+                                        <span>Pesawat</span>
+                                    </button>
+                                    <button onclick="setTransportType('train')" id="btn-train" class="transport-btn flex items-center space-x-2 px-6 py-3 rounded-xl bg-white text-gray-600 font-montserrat font-semibold text-sm border-2 border-gray-200 hover:border-forest hover:text-forest transition-all hover:shadow-lg hover:scale-105">
+                                        <i class="fas fa-train animate-train"></i>
+                                        <span>Kereta</span>
+                                    </button>
+                                    <button onclick="setTransportType('bus')" id="btn-bus" class="transport-btn flex items-center space-x-2 px-6 py-3 rounded-xl bg-white text-gray-600 font-montserrat font-semibold text-sm border-2 border-gray-200 hover:border-sunset hover:text-sunset transition-all hover:shadow-lg hover:scale-105">
+                                        <i class="fas fa-bus"></i>
+                                        <span>Bus</span>
+                                    </button>
+                                    <button onclick="setTransportType('ship')" id="btn-ship" class="transport-btn flex items-center space-x-2 px-6 py-3 rounded-xl bg-white text-gray-600 font-montserrat font-semibold text-sm border-2 border-gray-200 hover:border-ocean-light hover:text-ocean-light transition-all hover:shadow-lg hover:scale-105">
+                                        <i class="fas fa-ship animate-ship"></i>
+                                        <span>Kapal</span>
+                                    </button>
+                                </div>
+
+                                <!-- Search Form -->
+                                <form id="searchForm" onsubmit="handleSearch(event)" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                                    <div class="relative group">
+                                        <label class="block text-xs font-montserrat font-semibold text-gray-500 mb-1 uppercase tracking-wider">Dari</label>
+                                        <div class="relative">
+                                            <i class="fas fa-map-marker-alt absolute left-4 top-1/2 -translate-y-1/2 text-ocean"></i>
+                                            <input type="text" id="fromLocation" placeholder="Kota Asal" required
+                                                class="travel-input w-full bg-gray-50 rounded-xl py-3.5 pl-12 pr-4 text-gray-700 font-medium focus:outline-none">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="relative group">
+                                        <label class="block text-xs font-montserrat font-semibold text-gray-500 mb-1 uppercase tracking-wider">Ke</label>
+                                        <div class="relative">
+                                            <i class="fas fa-map-marker-alt absolute left-4 top-1/2 -translate-y-1/2 text-sunset"></i>
+                                            <input type="text" id="toLocation" placeholder="Kota Tujuan" required
+                                                class="travel-input w-full bg-gray-50 rounded-xl py-3.5 pl-12 pr-4 text-gray-700 font-medium focus:outline-none">
+                                        </div>
+                                    </div>
+
+                                    <div class="relative group">
+                                        <label class="block text-xs font-montserrat font-semibold text-gray-500 mb-1 uppercase tracking-wider">Tanggal</label>
+                                        <div class="relative">
+                                            <i class="fas fa-calendar absolute left-4 top-1/2 -translate-y-1/2 text-forest"></i>
+                                            <input type="date" id="travelDate" required
+                                                class="travel-input w-full bg-gray-50 rounded-xl py-3.5 pl-12 pr-4 text-gray-700 font-medium focus:outline-none">
+                                        </div>
+                                    </div>
+
+                                    <div class="relative group">
+                                        <label class="block text-xs font-montserrat font-semibold text-gray-500 mb-1 uppercase tracking-wider">Penumpang</label>
+                                        <div class="relative">
+                                            <i class="fas fa-users absolute left-4 top-1/2 -translate-y-1/2 text-coral"></i>
+                                            <select id="passengerCount" 
+                                                class="travel-input w-full bg-gray-50 rounded-xl py-3.5 pl-12 pr-10 text-gray-700 font-medium focus:outline-none appearance-none cursor-pointer">
+                                                <option value="1">1 Dewasa</option>
+                                                <option value="2">2 Dewasa</option>
+                                                <option value="3">3 Dewasa</option>
+                                                <option value="4">4 Dewasa</option>
+                                            </select>
+                                            <i class="fas fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+                                        </div>
+                                    </div>
+
+                                    <div class="lg:col-span-4 mt-2">
+                                        <button type="submit" 
+                                            class="btn-primary w-full py-4 rounded-xl text-white font-montserrat font-bold text-lg shadow-lg flex items-center justify-center space-x-3 group">
+                                            <i class="fas fa-search group-hover:animate-pulse"></i>
+                                            <span>Cari Perjalanan</span>
+                                            <i class="fas fa-arrow-right group-hover:translate-x-2 transition-transform"></i>
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- Right Image -->
+                        <div class="relative reveal" style="transition-delay: 0.2s;">
+                            <div class="relative">
+                                <img src="https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=800&q=80" 
+                                    alt="Travel" 
+                                    class="rounded-3xl shadow-2xl w-full object-cover h-[600px]">
+                                <div class="absolute -bottom-6 -left-6 bg-white rounded-2xl p-6 shadow-xl animate-float">
+                                    <div class="flex items-center space-x-4">
+                                        <div class="w-14 h-14 bg-gradient-to-br from-ocean to-ocean-light rounded-xl flex items-center justify-center">
+                                            <i class="fas fa-star text-white text-2xl"></i>
+                                        </div>
+                                        <div>
+                                            <p class="text-2xl font-bold gradient-text">4.9/5</p>
+                                            <p class="text-sm text-gray-500">Rating Pelanggan</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="absolute -top-6 -right-6 bg-white rounded-2xl p-6 shadow-xl animate-float" style="animation-delay: 1s;">
+                                    <div class="flex items-center space-x-4">
+                                        <div class="w-14 h-14 bg-gradient-to-br from-sunset to-sunset-light rounded-xl flex items-center justify-center">
+                                            <i class="fas fa-ticket-alt text-white text-2xl"></i>
+                                        </div>
+                                        <div>
+                                            <p class="text-2xl font-bold gradient-text-sunset">500K+</p>
+                                            <p class="text-sm text-gray-500">Tiket Terjual</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Wave Bottom -->
+                <div class="wave-bg"></div>
+            </section>
+
+            <!-- Stats Section -->
+            <section class="py-20 bg-white">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+                        <div class="text-center reveal">
+                            <div class="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-ocean/20 to-ocean/5 rounded-2xl flex items-center justify-center">
+                                <i class="fas fa-plane-departure text-3xl text-ocean"></i>
+                            </div>
+                            <h3 class="text-4xl font-playfair font-bold text-gray-800 mb-2 counter" data-target="50">0</h3>
+                            <p class="text-gray-500 font-montserrat">Maskapai Partner</p>
+                        </div>
+                        <div class="text-center reveal" style="transition-delay: 0.1s;">
+                            <div class="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-sunset/20 to-sunset/5 rounded-2xl flex items-center justify-center">
+                                <i class="fas fa-route text-3xl text-sunset"></i>
+                            </div>
+                            <h3 class="text-4xl font-playfair font-bold text-gray-800 mb-2 counter" data-target="1000">0</h3>
+                            <p class="text-gray-500 font-montserrat">Rute Tersedia</p>
+                        </div>
+                        <div class="text-center reveal" style="transition-delay: 0.2s;">
+                            <div class="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-forest/20 to-forest/5 rounded-2xl flex items-center justify-center">
+                                <i class="fas fa-users text-3xl text-forest"></i>
+                            </div>
+                            <h3 class="text-4xl font-playfair font-bold text-gray-800 mb-2 counter" data-target="1000000">0</h3>
+                            <p class="text-gray-500 font-montserrat">Pelanggan Puas</p>
+                        </div>
+                        <div class="text-center reveal" style="transition-delay: 0.3s;">
+                            <div class="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-gold/20 to-gold/5 rounded-2xl flex items-center justify-center">
+                                <i class="fas fa-award text-3xl text-yellow-600"></i>
+                            </div>
+                            <h3 class="text-4xl font-playfair font-bold text-gray-800 mb-2 counter" data-target="15">0</h3>
+                            <p class="text-gray-500 font-montserrat">Tahun Pengalaman</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Popular Destinations -->
+            <section class="py-20 bg-gradient-to-b from-white to-blue-50">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="text-center mb-16 reveal">
+                        <h2 class="text-4xl md:text-5xl font-playfair font-bold mb-4">
+                            Destinasi <span class="gradient-text">Populer</span>
+                        </h2>
+                        <p class="text-gray-600 text-lg max-w-2xl mx-auto">
+                            Jelajahi destinasi favorit travelers dengan harga terbaik
+                        </p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        <!-- Card 1 -->
+                        <div class="travel-card bg-white rounded-3xl overflow-hidden shadow-lg cursor-pointer group reveal" onclick="selectRoute('Jakarta', 'Bali')">
+                            <div class="relative h-64 overflow-hidden">
+                                <img src="https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=800&q=80" 
+                                    alt="Bali" 
+                                    class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                                <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
+                                <div class="absolute top-4 right-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full">
+                                    <span class="text-sm font-bold text-ocean">Mulai dari</span>
+                                </div>
+                                <div class="absolute bottom-4 left-4 text-white">
+                                    <div class="flex items-center space-x-2 mb-2">
+                                        <i class="fas fa-plane text-sky-300"></i>
+                                        <span class="text-sm font-montserrat">Penerbangan Langsung</span>
+                                    </div>
+                                    <h3 class="text-2xl font-playfair font-bold">Jakarta → Bali</h3>
+                                </div>
+                            </div>
+                            <div class="p-6">
+                                <div class="flex items-center justify-between mb-4">
+                                    <div class="flex items-center space-x-2 text-gray-500 text-sm">
+                                        <i class="far fa-clock"></i>
+                                        <span>1j 50m</span>
+                                    </div>
+                                    <div class="flex items-center space-x-1 text-yellow-500">
+                                        <i class="fas fa-star"></i>
+                                        <span class="text-gray-700 font-semibold">4.9</span>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p class="text-3xl font-bold gradient-text">Rp 850.000</p>
+                                        <p class="text-sm text-gray-400">per orang</p>
+                                    </div>
+                                    <button class="w-12 h-12 bg-ocean/10 rounded-full flex items-center justify-center text-ocean group-hover:bg-ocean group-hover:text-white transition-all">
+                                        <i class="fas fa-arrow-right"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Card 2 -->
+                        <div class="travel-card bg-white rounded-3xl overflow-hidden shadow-lg cursor-pointer group reveal" style="transition-delay: 0.1s;" onclick="selectRoute('Jakarta', 'Yogyakarta')">
+                            <div class="relative h-64 overflow-hidden">
+                                <img src="https://images.unsplash.com/photo-1596401057633-54c8c1b61397?w=800&q=80" 
+                                    alt="Yogyakarta" 
+                                    class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                                <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
+                                <div class="absolute top-4 right-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full">
+                                    <span class="text-sm font-bold text-sunset">Best Seller</span>
+                                </div>
+                                <div class="absolute bottom-4 left-4 text-white">
+                                    <div class="flex items-center space-x-2 mb-2">
+                                        <i class="fas fa-train text-sky-300"></i>
+                                        <span class="text-sm font-montserrat">Kereta Cepat</span>
+                                    </div>
+                                    <h3 class="text-2xl font-playfair font-bold">Jakarta → Yogyakarta</h3>
+                                </div>
+                            </div>
+                            <div class="p-6">
+                                <div class="flex items-center justify-between mb-4">
+                                    <div class="flex items-center space-x-2 text-gray-500 text-sm">
+                                        <i class="far fa-clock"></i>
+                                        <span>6j 30m</span>
+                                    </div>
+                                    <div class="flex items-center space-x-1 text-yellow-500">
+                                        <i class="fas fa-star"></i>
+                                        <span class="text-gray-700 font-semibold">4.8</span>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p class="text-3xl font-bold gradient-text-sunset">Rp 350.000</p>
+                                        <p class="text-sm text-gray-400">per orang</p>
+                                    </div>
+                                    <button class="w-12 h-12 bg-sunset/10 rounded-full flex items-center justify-center text-sunset group-hover:bg-sunset group-hover:text-white transition-all">
+                                        <i class="fas fa-arrow-right"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Card 3 -->
+                        <div class="travel-card bg-white rounded-3xl overflow-hidden shadow-lg cursor-pointer group reveal" style="transition-delay: 0.2s;" onclick="selectRoute('Merak', 'Bakauheni')">
+                            <div class="relative h-64 overflow-hidden">
+                                <img src="https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&q=80" 
+                                    alt="Ferry" 
+                                    class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                                <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
+                                <div class="absolute top-4 right-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full">
+                                    <span class="text-sm font-bold text-forest">Hemat</span>
+                                </div>
+                                <div class="absolute bottom-4 left-4 text-white">
+                                    <div class="flex items-center space-x-2 mb-2">
+                                        <i class="fas fa-ship text-sky-300"></i>
+                                        <span class="text-sm font-montserrat">Ferry Premium</span>
+                                    </div>
+                                    <h3 class="text-2xl font-playfair font-bold">Merak → Bakauheni</h3>
+                                </div>
+                            </div>
+                            <div class="p-6">
+                                <div class="flex items-center justify-between mb-4">
+                                    <div class="flex items-center space-x-2 text-gray-500 text-sm">
+                                        <i class="far fa-clock"></i>
+                                        <span>2j 0m</span>
+                                    </div>
+                                    <div class="flex items-center space-x-1 text-yellow-500">
+                                        <i class="fas fa-star"></i>
+                                        <span class="text-gray-700 font-semibold">4.7</span>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p class="text-3xl font-bold text-forest">Rp 25.000</p>
+                                        <p class="text-sm text-gray-400">per orang</p>
+                                    </div>
+                                    <button class="w-12 h-12 bg-forest/10 rounded-full flex items-center justify-center text-forest group-hover:bg-forest group-hover:text-white transition-all">
+                                        <i class="fas fa-arrow-right"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Features -->
+            <section class="py-20 bg-white">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="text-center mb-16 reveal">
+                        <h2 class="text-4xl md:text-5xl font-playfair font-bold mb-4">
+                            Kenapa Memilih <span class="gradient-text">SASIKU</span>?
+                        </h2>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                        <div class="text-center p-8 rounded-3xl bg-gradient-to-b from-blue-50 to-white hover-lift reveal">
+                            <div class="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-ocean to-ocean-light rounded-2xl flex items-center justify-center shadow-lg shadow-ocean/30">
+                                <i class="fas fa-bolt text-3xl text-white"></i>
+                            </div>
+                            <h3 class="text-xl font-montserrat font-bold mb-3 text-gray-800">Booking Cepat</h3>
+                            <p class="text-gray-600 text-sm leading-relaxed">Proses pemesanan kurang dari 2 menit dengan konfirmasi instan</p>
+                        </div>
+
+                        <div class="text-center p-8 rounded-3xl bg-gradient-to-b from-orange-50 to-white hover-lift reveal" style="transition-delay: 0.1s;">
+                            <div class="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-sunset to-sunset-light rounded-2xl flex items-center justify-center shadow-lg shadow-sunset/30">
+                                <i class="fas fa-shield-alt text-3xl text-white"></i>
+                            </div>
+                            <h3 class="text-xl font-montserrat font-bold mb-3 text-gray-800">100% Aman</h3>
+                            <p class="text-gray-600 text-sm leading-relaxed">Sistem pembayaran terenkripsi dan garansi uang kembali</p>
+                        </div>
+
+                        <div class="text-center p-8 rounded-3xl bg-gradient-to-b from-green-50 to-white hover-lift reveal" style="transition-delay: 0.2s;">
+                            <div class="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-forest to-forest-light rounded-2xl flex items-center justify-center shadow-lg shadow-forest/30">
+                                <i class="fas fa-tags text-3xl text-white"></i>
+                            </div>
+                            <h3 class="text-xl font-montserrat font-bold mb-3 text-gray-800">Harga Terbaik</h3>
+                            <p class="text-gray-600 text-sm leading-relaxed">Jaminan harga termurah atau gratis selisihnya</p>
+                        </div>
+
+                        <div class="text-center p-8 rounded-3xl bg-gradient-to-b from-yellow-50 to-white hover-lift reveal" style="transition-delay: 0.3s;">
+                            <div class="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-yellow-400 to-gold rounded-2xl flex items-center justify-center shadow-lg shadow-yellow-400/30">
+                                <i class="fas fa-headset text-3xl text-white"></i>
+                            </div>
+                            <h3 class="text-xl font-montserrat font-bold mb-3 text-gray-800">24/7 Support</h3>
+                            <p class="text-gray-600 text-sm leading-relaxed">Tim support siap membantu kapan saja, di mana saja</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Newsletter -->
+            <section class="py-20 bg-gradient-to-r from-ocean to-ocean-light relative overflow-hidden">
+                <div class="absolute inset-0 opacity-10">
+                    <div class="absolute top-0 left-0 w-full h-full" style="background-image: url('data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'0.4\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');"></div>
+                </div>
+                <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10 reveal">
+                    <h2 class="text-4xl font-playfair font-bold text-white mb-4">Dapatkan Promo Eksklusif</h2>
+                    <p class="text-white/90 text-lg mb-8">Berlangganan newsletter kami dan dapatkan diskon hingga 50% untuk perjalanan pertama Anda</p>
+                    <form class="flex flex-col sm:flex-row gap-4 max-w-lg mx-auto">
+                        <input type="email" placeholder="Masukkan email Anda" 
+                            class="flex-1 px-6 py-4 rounded-xl text-gray-700 focus:outline-none focus:ring-4 focus:ring-white/30">
+                        <button type="submit" class="btn-secondary px-8 py-4 rounded-xl text-white font-montserrat font-bold shadow-lg">
+                            Berlangganan
+                        </button>
+                    </form>
+                </div>
+            </section>
+        </div>
+
+        <!-- SEARCH RESULTS PAGE -->
+        <div id="searchResultsPage" class="hidden min-h-screen bg-gray-50 py-8">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <!-- Header -->
+                <div class="flex items-center justify-between mb-8 reveal">
+                    <button onclick="showHome()" class="flex items-center space-x-3 text-gray-600 hover:text-ocean transition-colors group">
+                        <div class="w-10 h-10 rounded-full bg-white shadow-md flex items-center justify-center group-hover:bg-ocean group-hover:text-white transition-all">
+                            <i class="fas fa-arrow-left"></i>
+                        </div>
+                        <span class="font-montserrat font-medium">Kembali</span>
+                    </button>
+                    
+                    <div class="text-center">
+                        <h2 class="text-2xl font-playfair font-bold text-gray-800" id="routeDisplay">Jakarta → Bali</h2>
+                        <p class="text-ocean font-montserrat" id="dateDisplay">Kamis, 15 Februari 2026</p>
+                    </div>
+
+                    <div class="w-10"></div>
+                </div>
+
+                <!-- Filter Bar -->
+                <div class="glass rounded-2xl p-4 mb-6 reveal">
+                    <div class="flex flex-wrap gap-3 items-center justify-between">
+                        <div class="flex gap-2 overflow-x-auto pb-2 sm:pb-0">
+                            <button class="px-5 py-2.5 rounded-xl bg-ocean text-white font-montserrat font-medium text-sm shadow-md">Termurah</button>
+                            <button class="px-5 py-2.5 rounded-xl bg-white text-gray-600 font-montserrat font-medium text-sm border border-gray-200 hover:border-ocean hover:text-ocean transition-all">Tercepat</button>
+                            <button class="px-5 py-2.5 rounded-xl bg-white text-gray-600 font-montserrat font-medium text-sm border border-gray-200 hover:border-ocean hover:text-ocean transition-all">Pagi</button>
+                            <button class="px-5 py-2.5 rounded-xl bg-white text-gray-600 font-montserrat font-medium text-sm border border-gray-200 hover:border-ocean hover:text-ocean transition-all">Siang</button>
+                            <button class="px-5 py-2.5 rounded-xl bg-white text-gray-600 font-montserrat font-medium text-sm border border-gray-200 hover:border-ocean hover:text-ocean transition-all">Malam</button>
+                        </div>
+                        <button class="flex items-center space-x-2 text-gray-600 hover:text-ocean transition-colors">
+                            <i class="fas fa-sliders-h"></i>
+                            <span class="font-montserrat text-sm font-medium">Filter Lanjutan</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Results -->
+                <div id="resultsList" class="space-y-4">
+                    <!-- Results populated by JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- BOOKING PAGE -->
+        <div id="bookingPage" class="hidden min-h-screen bg-gray-50 py-8">
+            <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+                
+                <!-- Progress Steps -->
+                <div class="mb-12 reveal">
+                    <div class="flex items-center justify-center">
+                        <div class="flex items-center space-x-4 w-full max-w-3xl">
+                            <div class="flex-1 flex items-center">
+                                <div class="relative">
+                                    <div id="step1-indicator" class="w-14 h-14 rounded-2xl flex items-center justify-center font-montserrat font-bold text-lg step-active transition-all duration-500 shadow-lg">
+                                        1
+                                    </div>
+                                    <div class="absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap font-montserrat text-xs font-medium text-ocean">Data</div>
+                                </div>
+                                <div class="flex-1 h-1 mx-4 bg-gray-200 rounded-full overflow-hidden">
+                                    <div id="progress-bar-1" class="h-full bg-gradient-to-r from-ocean to-sunset w-full transition-all duration-500"></div>
+                                </div>
+                            </div>
+
+                            <div class="flex-1 flex items-center">
+                                <div class="relative">
+                                    <div id="step2-indicator" class="w-14 h-14 rounded-2xl flex items-center justify-center font-montserrat font-bold text-lg bg-white text-gray-400 border-2 border-gray-200 transition-all duration-500">
+                                        2
+                                    </div>
+                                    <div class="absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap font-montserrat text-xs font-medium text-gray-400">S&K</div>
+                                </div>
+                                <div class="flex-1 h-1 mx-4 bg-gray-200 rounded-full overflow-hidden">
+                                    <div id="progress-bar-2" class="h-full bg-gradient-to-r from-ocean to-sunset w-0 transition-all duration-500"></div>
+                                </div>
+                            </div>
+
+                            <div class="flex-1 flex items-center">
+                                <div class="relative">
+                                    <div id="step3-indicator" class="w-14 h-14 rounded-2xl flex items-center justify-center font-montserrat font-bold text-lg bg-white text-gray-400 border-2 border-gray-200 transition-all duration-500">
+                                        3
+                                    </div>
+                                    <div class="absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap font-montserrat text-xs font-medium text-gray-400">Bayar</div>
+                                </div>
+                                <div class="flex-1 h-1 mx-4 bg-gray-200 rounded-full overflow-hidden">
+                                    <div id="progress-bar-3" class="h-full bg-gradient-to-r from-ocean to-sunset w-0 transition-all duration-500"></div>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center">
+                                <div class="relative">
+                                    <div id="step4-indicator" class="w-14 h-14 rounded-2xl flex items-center justify-center font-montserrat font-bold text-lg bg-white text-gray-400 border-2 border-gray-200 transition-all duration-500">
+                                        4
+                                    </div>
+                                    <div class="absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap font-montserrat text-xs font-medium text-gray-400">Tiket</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <!-- Main Content -->
+                    <div class="lg:col-span-2 space-y-6">
+                        
+                        <!-- Step 1: Data Pemesan -->
+                        <div id="step1-content" class="bg-white rounded-3xl shadow-lg p-8 reveal">
+                            <div class="flex items-center space-x-4 mb-8">
+                                <div class="w-12 h-12 bg-ocean/10 rounded-xl flex items-center justify-center">
+                                    <i class="fas fa-user text-ocean text-xl"></i>
+                                </div>
+                                <div>
+                                    <h2 class="text-2xl font-playfair font-bold text-gray-800">Data Pemesan</h2>
+                                    <p class="text-gray-500 text-sm">Lengkapi data diri Anda</p>
+                                </div>
+                            </div>
+
+                            <form id="passengerForm" onsubmit="goToStep2(event)" class="space-y-6">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label class="block text-sm font-montserrat font-semibold text-gray-700 mb-2">Nama Lengkap <span class="text-sunset">*</span></label>
+                                        <input type="text" required class="travel-input w-full bg-gray-50 rounded-xl px-4 py-3.5 text-gray-700 focus:outline-none" placeholder="Sesuai KTP/Paspor">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-montserrat font-semibold text-gray-700 mb-2">Email <span class="text-sunset">*</span></label>
+                                        <input type="email" required class="travel-input w-full bg-gray-50 rounded-xl px-4 py-3.5 text-gray-700 focus:outline-none" placeholder="email@example.com">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-montserrat font-semibold text-gray-700 mb-2">Nomor Telepon <span class="text-sunset">*</span></label>
+                                        <input type="tel" required class="travel-input w-full bg-gray-50 rounded-xl px-4 py-3.5 text-gray-700 focus:outline-none" placeholder="+62 8xx-xxxx-xxxx">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-montserrat font-semibold text-gray-700 mb-2">Nomor KTP/Paspor <span class="text-sunset">*</span></label>
+                                        <input type="text" required class="travel-input w-full bg-gray-50 rounded-xl px-4 py-3.5 text-gray-700 focus:outline-none" placeholder="3175xxxxxxxxxxxx">
+                                    </div>
+                                </div>
+
+                                <div class="border-t border-gray-200 pt-6">
+                                    <h3 class="text-lg font-montserrat font-bold text-gray-800 mb-4 flex items-center">
+                                        <i class="fas fa-users text-forest mr-3"></i>
+                                        Data Penumpang (1 Dewasa)
+                                    </h3>
+                                    <div class="bg-gray-50 rounded-2xl p-6 space-y-4">
+                                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                            <select class="travel-input w-full bg-white rounded-xl px-4 py-3.5 text-gray-700 focus:outline-none border border-gray-200">
+                                                <option>Tuan</option>
+                                                <option>Nyonya</option>
+                                                <option>Nona</option>
+                                            </select>
+                                            <div class="md:col-span-2">
+                                                <input type="text" required class="travel-input w-full bg-white rounded-xl px-4 py-3.5 text-gray-700 focus:outline-none border border-gray-200" placeholder="Nama lengkap penumpang">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="bg-yellow-50 border-l-4 border-yellow-400 rounded-r-xl p-4 flex items-start space-x-3">
+                                    <i class="fas fa-exclamation-triangle text-yellow-500 mt-1"></i>
+                                    <div>
+                                        <p class="font-montserrat font-semibold text-yellow-800 text-sm">Perhatian</p>
+                                        <p class="text-yellow-700 text-sm mt-1">Pastikan data sesuai dengan KTP/Paspor. Kesalahan data dapat menyebabkan penolakan boarding.</p>
+                                    </div>
+                                </div>
+
+                                <button type="submit" class="btn-primary w-full py-4 rounded-xl text-white font-montserrat font-bold text-lg shadow-lg flex items-center justify-center space-x-3 group">
+                                    <span>Lanjut ke Syarat & Ketentuan</span>
+                                    <i class="fas fa-arrow-right group-hover:translate-x-2 transition-transform"></i>
+                                </button>
+                            </form>
+                        </div>
+
+                        <!-- Step 2: Syarat & Ketentuan -->
+                        <div id="step2-content" class="hidden bg-white rounded-3xl shadow-lg p-8 reveal">
+                            <div class="flex items-center space-x-4 mb-8">
+                                <div class="w-12 h-12 bg-forest/10 rounded-xl flex items-center justify-center">
+                                    <i class="fas fa-file-contract text-forest text-xl"></i>
+                                </div>
+                                <div>
+                                    <h2 class="text-2xl font-playfair font-bold text-gray-800">Syarat & Ketentuan</h2>
+                                    <p class="text-gray-500 text-sm">Baca dengan seksama</p>
+                                </div>
+                            </div>
+
+                            <div class="space-y-4 max-h-96 overflow-y-auto custom-scrollbar pr-2 mb-6">
+                                <div class="bg-gray-50 rounded-2xl p-6 border-l-4 border-ocean hover:shadow-md transition-shadow">
+                                    <h4 class="font-montserrat font-bold text-ocean mb-2">1. Pemesanan dan Pembayaran</h4>
+                                    <p class="text-gray-600 text-sm leading-relaxed">Pemesanan tiket harus dilakukan minimal 2 jam sebelum keberangkatan untuk penerbangan dan 1 jam untuk transportasi darat/laut. Pembayaran harus diselesaikan dalam waktu 30 menit.</p>
+                                </div>
+                                
+                                <div class="bg-gray-50 rounded-2xl p-6 border-l-4 border-sunset hover:shadow-md transition-shadow">
+                                    <h4 class="font-montserrat font-bold text-sunset mb-2">2. Pembatalan dan Refund</h4>
+                                    <ul class="text-gray-600 text-sm space-y-2">
+                                        <li class="flex items-center"><i class="fas fa-check-circle text-green-500 mr-2"></i> >72 jam: Biaya admin 10%</li>
+                                        <li class="flex items-center"><i class="fas fa-check-circle text-yellow-500 mr-2"></i> 24-72 jam: Biaya admin 25%</li>
+                                        <li class="flex items-center"><i class="fas fa-times-circle text-red-500 mr-2"></i> <24 jam: Biaya admin 50%</li>
+                                    </ul>
+                                </div>
+
+                                <div class="bg-gray-50 rounded-2xl p-6 border-l-4 border-forest hover:shadow-md transition-shadow">
+                                    <h4 class="font-montserrat font-bold text-forest mb-2">3. Perubahan Jadwal</h4>
+                                    <p class="text-gray-600 text-sm leading-relaxed">Perubahan jadwal dapat dilakukan maksimal 24 jam sebelum keberangkatan dengan biaya tambahan sesuai kebijakan operator.</p>
+                                </div>
+
+                                <div class="bg-gray-50 rounded-2xl p-6 border-l-4 border-coral hover:shadow-md transition-shadow">
+                                    <h4 class="font-montserrat font-bold text-coral mb-2">4. Bagasi</h4>
+                                    <p class="text-gray-600 text-sm leading-relaxed">Bagasi gratis sesuai ketentuan masing-masing operator. Kelebihan bagasi akan dikenakan biaya tambahan.</p>
+                                </div>
+                            </div>
+
+                            <label class="flex items-center space-x-4 mb-6 cursor-pointer group">
+                                <div class="relative">
+                                    <input type="checkbox" id="agreeTerms" class="peer sr-only" onchange="togglePaymentButton()">
+                                    <div class="w-6 h-6 rounded-lg border-2 border-gray-300 peer-checked:bg-ocean peer-checked:border-ocean transition-all flex items-center justify-center">
+                                        <i class="fas fa-check text-white text-sm opacity-0 peer-checked:opacity-100"></i>
+                                    </div>
+                                </div>
+                                <span class="text-gray-700 group-hover:text-ocean transition-colors">Saya setuju dengan semua syarat dan ketentuan</span>
+                            </label>
+
+                            <div class="flex space-x-4">
+                                <button onclick="goBackToStep1()" class="flex-1 py-4 rounded-xl border-2 border-gray-200 text-gray-600 font-montserrat font-bold hover:border-ocean hover:text-ocean transition-all">
+                                    Kembali
+                                </button>
+                                <button id="continueToPaymentBtn" onclick="goToStep3()" disabled class="flex-1 py-4 rounded-xl bg-gray-200 text-gray-400 font-montserrat font-bold cursor-not-allowed transition-all">
+                                    Lanjut ke Pembayaran
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Step 3: Pembayaran -->
+                        <div id="step3-content" class="hidden bg-white rounded-3xl shadow-lg p-8 reveal">
+                            <div class="flex items-center space-x-4 mb-8">
+                                <div class="w-12 h-12 bg-sunset/10 rounded-xl flex items-center justify-center">
+                                    <i class="fas fa-credit-card text-sunset text-xl"></i>
+                                </div>
+                                <div>
+                                    <h2 class="text-2xl font-playfair font-bold text-gray-800">Pembayaran</h2>
+                                    <p class="text-gray-500 text-sm">Pilih metode pembayaran</p>
+                                </div>
+                            </div>
+
+                            <!-- Payment Tabs -->
+                            <div class="flex space-x-2 mb-6 overflow-x-auto pb-2">
+                                <button onclick="setPaymentMethod('bank')" id="pay-bank" class="payment-tab active flex items-center space-x-2 px-6 py-3 rounded-xl bg-ocean text-white font-montserrat font-medium whitespace-nowrap transition-all">
+                                    <i class="fas fa-university"></i>
+                                    <span>Transfer Bank</span>
+                                </button>
+                                <button onclick="setPaymentMethod('va')" id="pay-va" class="payment-tab flex items-center space-x-2 px-6 py-3 rounded-xl bg-gray-100 text-gray-600 font-montserrat font-medium whitespace-nowrap hover:bg-ocean/10 hover:text-ocean transition-all">
+                                    <i class="fas fa-money-check"></i>
+                                    <span>Virtual Account</span>
+                                </button>
+                                <button onclick="setPaymentMethod('ewallet')" id="pay-ewallet" class="payment-tab flex items-center space-x-2 px-6 py-3 rounded-xl bg-gray-100 text-gray-600 font-montserrat font-medium whitespace-nowrap hover:bg-ocean/10 hover:text-ocean transition-all">
+                                    <i class="fas fa-wallet"></i>
+                                    <span>E-Wallet</span>
+                                </button>
+                            </div>
+
+                            <!-- Bank Options -->
+                            <div id="bank-options" class="space-y-3 mb-6">
+                                <label class="flex items-center justify-between p-5 bg-gray-50 rounded-2xl cursor-pointer hover:bg-blue-50 transition-all border-2 border-transparent hover:border-ocean group">
+                                    <div class="flex items-center space-x-4">
+                                        <input type="radio" name="bank" value="bca" checked class="w-5 h-5 text-ocean">
+                                        <div class="w-14 h-14 bg-blue-600 rounded-xl flex items-center justify-center text-white font-bold shadow-lg">BCA</div>
+                                        <div>
+                                            <p class="font-montserrat font-bold text-gray-800">Bank BCA</p>
+                                            <p class="text-gray-500 text-sm">Transfer ke rekening SASIKU</p>
+                                        </div>
+                                    </div>
+                                    <i class="fas fa-check-circle text-2xl text-ocean opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                                </label>
+
+                                <label class="flex items-center justify-between p-5 bg-gray-50 rounded-2xl cursor-pointer hover:bg-blue-50 transition-all border-2 border-transparent hover:border-ocean group">
+                                    <div class="flex items-center space-x-4">
+                                        <input type="radio" name="bank" value="mandiri" class="w-5 h-5 text-ocean">
+                                        <div class="w-14 h-14 bg-yellow-500 rounded-xl flex items-center justify-center text-white font-bold shadow-lg">M</div>
+                                        <div>
+                                            <p class="font-montserrat font-bold text-gray-800">Bank Mandiri</p>
+                                            <p class="text-gray-500 text-sm">Transfer ke rekening SASIKU</p>
+                                        </div>
+                                    </div>
+                                    <i class="fas fa-check-circle text-2xl text-ocean opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                                </label>
+
+                                <label class="flex items-center justify-between p-5 bg-gray-50 rounded-2xl cursor-pointer hover:bg-blue-50 transition-all border-2 border-transparent hover:border-ocean group">
+                                    <div class="flex items-center space-x-4">
+                                        <input type="radio" name="bank" value="bni" class="w-5 h-5 text-ocean">
+                                        <div class="w-14 h-14 bg-orange-600 rounded-xl flex items-center justify-center text-white font-bold shadow-lg">BNI</div>
+                                        <div>
+                                            <p class="font-montserrat font-bold text-gray-800">Bank BNI</p>
+                                            <p class="text-gray-500 text-sm">Transfer ke rekening SASIKU</p>
+                                        </div>
+                                    </div>
+                                    <i class="fas fa-check-circle text-2xl text-ocean opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                                </label>
+                            </div>
+
+                            <!-- Virtual Account Options -->
+                            <div id="va-options" class="hidden space-y-3 mb-6">
+                                <label class="flex items-center justify-between p-5 bg-gray-50 rounded-2xl cursor-pointer hover:bg-purple-50 transition-all border-2 border-transparent hover:border-purple-500 group">
+                                    <div class="flex items-center space-x-4">
+                                        <input type="radio" name="va" value="bca_va" class="w-5 h-5 text-purple-500">
+                                        <div class="w-14 h-14 bg-blue-600 rounded-xl flex items-center justify-center text-white font-bold shadow-lg">BCA</div>
+                                        <div>
+                                            <p class="font-montserrat font-bold text-gray-800">BCA Virtual Account</p>
+                                            <p class="text-gray-500 text-sm">Otomatis terverifikasi</p>
+                                        </div>
+                                    </div>
+                                </label>
+                                <label class="flex items-center justify-between p-5 bg-gray-50 rounded-2xl cursor-pointer hover:bg-purple-50 transition-all border-2 border-transparent hover:border-purple-500 group">
+                                    <div class="flex items-center space-x-4">
+                                        <input type="radio" name="va" value="mandiri_va" class="w-5 h-5 text-purple-500">
+                                        <div class="w-14 h-14 bg-yellow-500 rounded-xl flex items-center justify-center text-white font-bold shadow-lg">M</div>
+                                        <div>
+                                            <p class="font-montserrat font-bold text-gray-800">Mandiri Virtual Account</p>
+                                            <p class="text-gray-500 text-sm">Otomatis terverifikasi</p>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <!-- E-Wallet Options -->
+                            <div id="ewallet-options" class="hidden space-y-3 mb-6">
+                                <label class="flex items-center justify-between p-5 bg-gray-50 rounded-2xl cursor-pointer hover:bg-green-50 transition-all border-2 border-transparent hover:border-green-500 group">
+                                    <div class="flex items-center space-x-4">
+                                        <input type="radio" name="ewallet" value="gopay" class="w-5 h-5 text-green-500">
+                                        <div class="w-14 h-14 bg-gradient-to-br from-blue-400 to-cyan-400 rounded-xl flex items-center justify-center text-white font-bold shadow-lg">G</div>
+                                        <div>
+                                            <p class="font-montserrat font-bold text-gray-800">GoPay</p>
+                                            <p class="text-gray-500 text-sm">Scan QRIS</p>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <!-- Total & Countdown -->
+                            <div class="bg-gradient-to-r from-ocean/10 to-sunset/10 rounded-2xl p-6 mb-6 border border-ocean/20">
+                                <div class="flex items-center justify-between mb-4">
+                                    <span class="text-gray-600 font-montserrat">Total Pembayaran</span>
+                                    <span class="text-3xl font-playfair font-bold gradient-text" id="paymentTotal">Rp 1.250.000</span>
+                                </div>
+                                <div class="flex items-center space-x-3 text-gray-600">
+                                    <i class="fas fa-clock text-sunset animate-pulse"></i>
+                                    <span class="font-montserrat text-sm">Selesaikan dalam <span id="countdown" class="text-sunset font-bold text-lg">14:59</span></span>
+                                </div>
+                                <div class="mt-4 h-2 bg-gray-200 rounded-full overflow-hidden">
+                                    <div id="countdown-bar" class="h-full bg-gradient-to-r from-ocean to-sunset w-full transition-all duration-1000"></div>
+                                </div>
+                            </div>
+
+                            <div class="flex space-x-4">
+                                <button onclick="goBackToStep2()" class="flex-1 py-4 rounded-xl border-2 border-gray-200 text-gray-600 font-montserrat font-bold hover:border-sunset hover:text-sunset transition-all">
+                                    Kembali
+                                </button>
+                                <button onclick="processPayment()" class="flex-1 btn-secondary py-4 rounded-xl text-white font-montserrat font-bold shadow-lg flex items-center justify-center space-x-3 group">
+                                    <i class="fas fa-lock"></i>
+                                    <span>Bayar Sekarang</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Step 4: Success -->
+                        <div id="step4-content" class="hidden reveal">
+                            <div class="text-center mb-10">
+                                <div class="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center shadow-lg animate-bounce">
+                                    <i class="fas fa-check text-4xl text-white"></i>
+                                </div>
+                                <h2 class="text-3xl font-playfair font-bold text-gray-800 mb-2">Pembayaran Berhasil!</h2>
+                                <p class="text-gray-600">E-ticket telah dikirim ke email Anda</p>
+                            </div>
+
+                            <!-- E-Ticket -->
+                            <div class="ticket rounded-3xl shadow-2xl overflow-hidden mb-8">
+                                <div class="bg-gradient-to-r from-ocean to-ocean-light p-6 text-white text-center relative overflow-hidden">
+                                    <div class="absolute inset-0 opacity-20">
+                                        <div class="absolute inset-0" style="background-image: url('data:image/svg+xml,%3Csvg width=\'20\' height=\'20\' viewBox=\'0 0 20 20\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'0.2\' fill-rule=\'evenodd\'%3E%3Ccircle cx=\'3\' cy=\'3\' r=\'3\'/%3E%3Ccircle cx=\'13\' cy=\'13\' r=\'3\'/%3E%3C/g%3E%3C/svg%3E');"></div>
+                                    </div>
+                                    <h3 class="text-2xl font-playfair font-bold relative z-10">E-TICKET SASIKU</h3>
+                                    <p class="text-white/80 relative z-10 font-montserrat text-sm tracking-wider" id="ticketType">PENERBANGAN</p>
+                                </div>
+
+                                <div class="p-8">
+                                    <div class="flex justify-between items-start mb-8">
+                                        <div>
+                                            <p class="text-gray-500 text-sm font-montserrat mb-1">Kode Booking</p>
+                                            <p class="text-4xl font-playfair font-bold gradient-text-ocean" id="bookingCode">SAS2026X</p>
+                                        </div>
+                                        <div class="bg-white p-3 rounded-xl shadow-lg">
+                                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=SAS2026X" alt="QR" class="w-24 h-24">
+                                        </div>
+                                    </div>
+
+                                    <div class="border-t-2 border-dashed border-gray-200 pt-8 mb-8">
+                                        <div class="flex justify-between items-center">
+                                            <div class="text-center">
+                                                <p class="text-4xl font-playfair font-bold text-gray-800" id="ticketFrom">CGK</p>
+                                                <p class="text-gray-500 font-montserrat" id="ticketFromCity">Jakarta</p>
+                                                <p class="text-ocean font-montserrat font-bold text-xl mt-2" id="ticketTime">08:00</p>
+                                            </div>
+                                            
+                                            <div class="flex-1 px-8 flex items-center justify-center">
+                                                <div class="w-full h-0.5 bg-gray-300 relative">
+                                                    <i class="fas fa-plane absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-ocean text-2xl bg-white px-4"></i>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="text-center">
+                                                <p class="text-4xl font-playfair font-bold text-gray-800" id="ticketTo">DPS</p>
+                                                <p class="text-gray-500 font-montserrat" id="ticketToCity">Bali</p>
+                                                <p class="text-sunset font-montserrat font-bold text-xl mt-2" id="ticketArrival">10:50</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="grid grid-cols-2 gap-4 mb-8">
+                                        <div class="bg-gray-50 rounded-xl p-4 border-l-4 border-ocean">
+                                            <p class="text-gray-500 text-xs font-montserrat mb-1">Maskapai</p>
+                                            <p class="font-montserrat font-bold text-gray-800" id="ticketAirline">Garuda Indonesia</p>
+                                        </div>
+                                        <div class="bg-gray-50 rounded-xl p-4 border-l-4 border-sunset">
+                                            <p class="text-gray-500 text-xs font-montserrat mb-1">Tanggal</p>
+                                            <p class="font-montserrat font-bold text-gray-800" id="ticketDate">15 Feb 2026</p>
+                                        </div>
+                                        <div class="bg-gray-50 rounded-xl p-4 border-l-4 border-forest">
+                                            <p class="text-gray-500 text-xs font-montserrat mb-1">Penumpang</p>
+                                            <p class="font-montserrat font-bold text-gray-800">1 Dewasa</p>
+                                        </div>
+                                        <div class="bg-gray-50 rounded-xl p-4 border-l-4 border-coral">
+                                            <p class="text-gray-500 text-xs font-montserrat mb-1">Kelas</p>
+                                            <p class="font-montserrat font-bold text-gray-800">Ekonomi</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="bg-gray-50 rounded-xl p-6 flex items-center justify-between">
+                                        <div class="flex items-center space-x-4">
+                                            <div class="w-12 h-12 bg-ocean/10 rounded-full flex items-center justify-center">
+                                                <i class="fas fa-user text-ocean"></i>
+                                            </div>
+                                            <div>
+                                                <p class="font-montserrat font-bold text-gray-800" id="passengerName">John Doe</p>
+                                                <p class="text-gray-500 text-sm">ID: 3175XXXXXXXX</p>
+                                            </div>
+                                        </div>
+                                        <div class="text-right">
+                                            <p class="text-gray-500 text-xs font-montserrat mb-1">Gate</p>
+                                            <p class="text-2xl font-playfair font-bold text-sunset">TBA</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="bg-gray-100 p-4 text-center">
+                                    <p class="text-gray-500 text-xs font-montserrat">Scan QR code di gate check-in • Tunjukkan KTP asli • Datang 90 menit sebelum keberangkatan</p>
+                                </div>
+                            </div>
+
+                            <div class="flex justify-center space-x-4">
+                                <button onclick="downloadTicket()" class="flex items-center space-x-3 px-8 py-4 bg-white rounded-xl shadow-lg text-gray-700 font-montserrat font-bold hover:shadow-xl transition-all group">
+                                    <i class="fas fa-download text-ocean group-hover:animate-bounce"></i>
+                                    <span>Unduh Tiket</span>
+                                </button>
+                                <button onclick="sendEmailConfirmation()" class="flex items-center space-x-3 px-8 py-4 btn-primary rounded-xl text-white font-montserrat font-bold shadow-lg group">
+                                    <i class="fas fa-envelope group-hover:animate-pulse"></i>
+                                    <span>Kirim Email</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sidebar Summary -->
+                    <div class="lg:col-span-1">
+                        <div class="bg-white rounded-3xl shadow-lg p-6 sticky top-24">
+                            <h3 class="text-lg font-playfair font-bold text-gray-800 mb-6 flex items-center">
+                                <i class="fas fa-receipt text-ocean mr-3"></i>
+                                Ringkasan Pesanan
+                            </h3>
+                            
+                            <div class="space-y-4 mb-6">
+                                <div class="flex items-start space-x-4">
+                                    <div class="w-12 h-12 bg-ocean/10 rounded-xl flex items-center justify-center flex-shrink-0">
+                                        <i class="fas fa-plane text-ocean text-xl" id="summaryIcon"></i>
+                                    </div>
+                                    <div>
+                                        <p class="font-montserrat font-bold text-gray-800" id="summaryRoute">Jakarta → Bali</p>
+                                        <p class="text-gray-500 text-sm" id="summaryDate">Kamis, 15 Feb 2026</p>
+                                        <p class="text-ocean font-montserrat font-medium mt-1" id="summaryTime">08:00 - 10:50</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-start space-x-4">
+                                    <div class="w-12 h-12 bg-forest/10 rounded-xl flex items-center justify-center flex-shrink-0">
+                                        <i class="fas fa-user text-forest text-xl"></i>
+                                    </div>
+                                    <div>
+                                        <p class="font-montserrat font-bold text-gray-800">1 Dewasa</p>
+                                        <p class="text-gray-500 text-sm">Ekonomi</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="border-t border-gray-200 pt-4 space-y-3">
+                                <div class="flex justify-between text-sm">
+                                    <span class="text-gray-500">Harga Tiket</span>
+                                    <span class="font-montserrat font-medium" id="priceTicket">Rp 1.150.000</span>
+                                </div>
+                                <div class="flex justify-between text-sm">
+                                    <span class="text-gray-500">Biaya Admin</span>
+                                    <span class="font-montserrat font-medium" id="priceAdmin">Rp 50.000</span>
+                                </div>
+                                <div class="flex justify-between text-sm">
+                                    <span class="text-gray-500">Asuransi</span>
+                                    <span class="font-montserrat font-medium" id="priceInsurance">Rp 50.000</span>
+                                </div>
+                                <div class="border-t border-gray-200 pt-3 flex justify-between items-center">
+                                    <span class="font-montserrat font-bold text-gray-800">Total</span>
+                                    <span class="text-2xl font-playfair font-bold gradient-text" id="priceTotal">Rp 1.250.000</span>
+                                </div>
+                            </div>
+
+                            <div class="mt-6 p-4 bg-green-50 rounded-xl border border-green-200">
+                                <div class="flex items-center space-x-2 mb-2">
+                                    <i class="fas fa-shield-alt text-green-500"></i>
+                                    <span class="font-montserrat font-bold text-green-700 text-sm">Garansi Termurah</span>
+                                </div>
+                                <p class="text-green-600 text-xs">Jika ada yang lebih murah, kami refund 2x selisihnya!</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-8 right-8 transform translate-y-20 opacity-0 transition-all duration-500 z-50">
+        <div class="bg-white rounded-2xl shadow-2xl p-6 flex items-center space-x-4 border-l-4 border-ocean min-w-[300px]">
+            <div class="w-12 h-12 bg-ocean/10 rounded-full flex items-center justify-center flex-shrink-0">
+                <i class="fas fa-check-circle text-ocean text-2xl"></i>
+            </div>
+            <div>
+                <h4 class="font-montserrat font-bold text-gray-800" id="toastTitle">Sukses!</h4>
+                <p class="text-gray-600 text-sm" id="toastMessage">Operasi berhasil dilakukan</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize GSAP
+        gsap.registerPlugin(ScrollTrigger);
+
+        // Counter Animation
+        const counters = document.querySelectorAll('.counter');
+        counters.forEach(counter => {
+            const target = +counter.getAttribute('data-target');
+            const increment = target / 100;
+            
+            const updateCounter = () => {
+                const c = +counter.innerText.replace(/,/g, '');
+                if (c < target) {
+                    counter.innerText = Math.ceil(c + increment).toLocaleString();
+                    setTimeout(updateCounter, 20);
+                } else {
+                    counter.innerText = target.toLocaleString();
+                }
+            };
+            
+            ScrollTrigger.create({
+                trigger: counter,
+                start: "top 80%",
+                onEnter: () => updateCounter(),
+                once: true
+            });
+        });
+
+        // Scroll Reveal
+        const reveals = document.querySelectorAll('.reveal');
+        reveals.forEach((reveal, index) => {
+            ScrollTrigger.create({
+                trigger: reveal,
+                start: "top 85%",
+                onEnter: () => {
+                    reveal.classList.add('active');
+                },
+                once: true
+            });
+        });
+
+        // Navbar Scroll Effect
+        window.addEventListener('scroll', () => {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('shadow-xl');
+                navbar.classList.remove('py-2');
+            } else {
+                navbar.classList.remove('shadow-xl');
+                navbar.classList.add('py-2');
+            }
+        });
+
+        // Global State
+        let currentTransport = 'plane';
+        let currentStep = 1;
+        let selectedFlight = null;
+        let bookingData = {
+            from: '',
+            to: '',
+            date: '',
+            passengers: 1,
+            transportType: 'plane'
+        };
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('travelDate').min = today;
+            document.getElementById('travelDate').value = today;
+        });
+
+        // Navigation Functions
+        function showHome() {
+            document.getElementById('homePage').classList.remove('hidden');
+            document.getElementById('searchResultsPage').classList.add('hidden');
+            document.getElementById('bookingPage').classList.add('hidden');
+            window.scrollTo(0, 0);
+        }
+
+        function showSearchResults() {
+            document.getElementById('homePage').classList.add('hidden');
+            document.getElementById('searchResultsPage').classList.remove('hidden');
+            document.getElementById('bookingPage').classList.add('hidden');
+            generateSearchResults();
+            window.scrollTo(0, 0);
+        }
+
+        function showBooking() {
+            document.getElementById('homePage').classList.add('hidden');
+            document.getElementById('searchResultsPage').classList.add('hidden');
+            document.getElementById('bookingPage').classList.remove('hidden');
+            resetBookingSteps();
+            window.scrollTo(0, 0);
+        }
+
+        // Transport Type Selection
+        function setTransportType(type) {
+            currentTransport = type;
+            bookingData.transportType = type;
+            
+            document.querySelectorAll('.transport-btn').forEach(btn => {
+                btn.classList.remove('active', 'bg-ocean', 'text-white');
+                btn.classList.add('bg-white', 'text-gray-600', 'border-2', 'border-gray-200');
+                
+                // Reset icons
+                const icon = btn.querySelector('i');
+                icon.classList.remove('animate-plane', 'animate-train', 'animate-ship');
+            });
+            
+            const activeBtn = document.getElementById(`btn-${type}`);
+            activeBtn.classList.remove('bg-white', 'text-gray-600', 'border-2', 'border-gray-200');
+            activeBtn.classList.add('active', 'bg-ocean', 'text-white');
+            
+            // Add animation
+            const iconMap = {
+                'plane': 'animate-plane',
+                'train': 'animate-train',
+                'ship': 'animate-ship'
+            };
+            if (iconMap[type]) {
+                activeBtn.querySelector('i').classList.add(iconMap[type]);
+            }
+            
+            // Update summary icon
+            const summaryIconMap = {
+                'plane': 'fa-plane',
+                'train': 'fa-train',
+                'bus': 'fa-bus',
+                'ship': 'fa-ship'
+            };
+            document.getElementById('summaryIcon').className = `fas ${summaryIconMap[type]} text-ocean text-xl`;
+        }
+
+        // Search Handler
+        function handleSearch(e) {
+            e.preventDefault();
+            
+            bookingData.from = document.getElementById('fromLocation').value;
+            bookingData.to = document.getElementById('toLocation').value;
+            bookingData.date = document.getElementById('travelDate').value;
+            bookingData.passengers = document.getElementById('passengerCount').value;
+            
+            document.getElementById('routeDisplay').textContent = `${bookingData.from} → ${bookingData.to}`;
+            const dateObj = new Date(bookingData.date);
+            document.getElementById('dateDisplay').textContent = dateObj.toLocaleDateString('id-ID', { 
+                weekday: 'long', 
+                day: 'numeric', 
+                month: 'long', 
+                year: 'numeric' 
+            });
+            
+            showSearchResults();
+        }
+
+        function selectRoute(from, to) {
+            document.getElementById('fromLocation').value = from;
+            document.getElementById('toLocation').value = to;
+            document.getElementById('travelDate').focus();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Generate Search Results
+        function generateSearchResults() {
+            const resultsContainer = document.getElementById('resultsList');
+            resultsContainer.innerHTML = '';
+            
+            const items = [
+                { name: 'Garuda Indonesia', code: 'GA', price: 1150000, time: '08:00', arrival: '10:50', duration: '1j 50m', logo: 'bg-blue-600', color: 'ocean' },
+                { name: 'Lion Air', code: 'JT', price: 850000, time: '09:30', arrival: '12:20', duration: '1j 50m', logo: 'bg-red-600', color: 'sunset' },
+                { name: 'AirAsia', code: 'QZ', price: 720000, time: '13:15', arrival: '16:05', duration: '1j 50m', logo: 'bg-red-500', color: 'sunset' },
+                { name: 'Batik Air', code: 'ID', price: 950000, time: '15:45', arrival: '18:35', duration: '1j 50m', logo: 'bg-purple-600', color: 'ocean' },
+                { name: 'Citilink', code: 'QG', price: 680000, time: '19:20', arrival: '22:10', duration: '1j 50m', logo: 'bg-green-600', color: 'forest' },
+            ];
+            
+            if (currentTransport !== 'plane') {
+                const transportData = {
+                    'train': [
+                        { name: 'Argo Bromo', code: 'ARGO', price: 450000, time: '08:00', arrival: '16:00', duration: '8j 0m', logo: 'bg-blue-700', color: 'ocean' },
+                        { name: 'Taksaka', code: 'TKS', price: 520000, time: '20:00', arrival: '04:00', duration: '8j 0m', logo: 'bg-yellow-600', color: 'sunset' }
+                    ],
+                    'bus': [
+                        { name: 'PO Haryanto', code: 'HAR', price: 280000, time: '20:00', arrival: '06:00', duration: '10j 0m', logo: 'bg-orange-600', color: 'sunset' },
+                        { name: 'Sinar Jaya', code: 'SIN', price: 250000, time: '19:30', arrival: '05:30', duration: '10j 0m', logo: 'bg-blue-600', color: 'ocean' }
+                    ],
+                    'ship': [
+                        { name: 'ASDP Ferry', code: 'ASDP', price: 25000, time: '08:00', arrival: '10:00', duration: '2j 0m', logo: 'bg-cyan-600', color: 'ocean' },
+                        { name: 'Express Bahari', code: 'EB', price: 45000, time: '14:00', arrival: '16:00', duration: '2j 0m', logo: 'bg-blue-500', color: 'ocean' }
+                    ]
+                };
+                items.length = 0;
+                items.push(...transportData[currentTransport]);
+            }
+            
+            items.forEach((item, index) => {
+                const card = document.createElement('div');
+                card.className = 'bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-all cursor-pointer group reveal';
+                card.style.animationDelay = `${index * 0.1}s`;
+                card.onclick = () => selectFlight(item);
+                
+                card.innerHTML = `
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                        <div class="flex items-center space-x-6">
+                            <div class="w-20 h-20 ${item.logo} rounded-2xl flex items-center justify-center text-white font-bold text-2xl shadow-lg group-hover:scale-110 transition-transform">
+                                ${item.code}
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-montserrat font-bold text-gray-800 group-hover:text-${item.color} transition-colors">${item.name}</h3>
+                                <p class="text-gray-500 text-sm">Ekonomi • Direct</p>
+                                <div class="flex items-center space-x-2 mt-2 text-${item.color}">
+                                    <i class="fas fa-suitcase"></i>
+                                    <span class="text-sm">20kg bagasi</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center space-x-8">
+                            <div class="text-center">
+                                <p class="text-3xl font-playfair font-bold text-gray-800">${item.time}</p>
+                                <p class="text-gray-500 text-sm">${bookingData.from.substring(0, 3).toUpperCase()}</p>
+                            </div>
+                            
+                            <div class="flex flex-col items-center w-32">
+                                <p class="text-xs text-gray-400 mb-1">${item.duration}</p>
+                                <div class="w-full h-0.5 bg-gray-200 relative">
+                                    <div class="absolute top-0 left-0 w-full h-full bg-${item.color} transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></div>
+                                    <i class="fas fa-${currentTransport === 'plane' ? 'plane' : currentTransport === 'train' ? 'train' : currentTransport === 'bus' ? 'bus' : 'ship'} absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-gray-400 group-hover:text-${item.color} transition-colors bg-white px-2"></i>
+                                </div>
+                            </div>
+                            
+                            <div class="text-center">
+                                <p class="text-3xl font-playfair font-bold text-gray-800">${item.arrival}</p>
+                                <p class="text-gray-500 text-sm">${bookingData.to.substring(0, 3).toUpperCase()}</p>
+                            </div>
+                        </div>
+                        
+                        <div class="text-right min-w-[180px]">
+                            <p class="text-3xl font-playfair font-bold text-${item.color}">Rp ${item.price.toLocaleString('id-ID')}</p>
+                            <p class="text-gray-400 text-sm">/pax</p>
+                            <button class="mt-4 w-full bg-${item.color} text-white px-6 py-3 rounded-xl font-montserrat font-bold shadow-lg hover:shadow-xl transition-all transform group-hover:scale-105">
+                                Pilih
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                resultsContainer.appendChild(card);
+            });
+        }
+
+        function selectFlight(flight) {
+            selectedFlight = flight;
+            
+            document.getElementById('summaryRoute').textContent = `${bookingData.from} → ${bookingData.to}`;
+            document.getElementById('summaryDate').textContent = new Date(bookingData.date).toLocaleDateString('id-ID', { 
+                weekday: 'long', 
+                day: 'numeric', 
+                month: 'short', 
+                year: 'numeric' 
+            });
+            document.getElementById('summaryTime').textContent = `${flight.time} - ${flight.arrival}`;
+            document.getElementById('priceTicket').textContent = `Rp ${flight.price.toLocaleString('id-ID')}`;
+            
+            const total = flight.price + 50000 + 50000;
+            document.getElementById('priceTotal').textContent = `Rp ${total.toLocaleString('id-ID')}`;
+            document.getElementById('paymentTotal').textContent = `Rp ${total.toLocaleString('id-ID')}`;
+            
+            document.getElementById('ticketFrom').textContent = bookingData.from.substring(0, 3).toUpperCase();
+            document.getElementById('ticketTo').textContent = bookingData.to.substring(0, 3).toUpperCase();
+            document.getElementById('ticketFromCity').textContent = bookingData.from;
+            document.getElementById('ticketToCity').textContent = bookingData.to;
+            document.getElementById('ticketTime').textContent = flight.time;
+            document.getElementById('ticketArrival').textContent = flight.arrival;
+            document.getElementById('ticketAirline').textContent = flight.name;
+            document.getElementById('ticketDate').textContent = new Date(bookingData.date).toLocaleDateString('id-ID', { 
+                day: 'numeric', 
+                month: 'short', 
+                year: 'numeric' 
+            });
+            document.getElementById('ticketType').textContent = currentTransport === 'plane' ? 'PENERBANGAN' : 
+                currentTransport === 'train' ? 'KERETA API' : 
+                currentTransport === 'bus' ? 'BUS' : 'KAPAL LAUT';
+            
+            showBooking();
+        }
+
+        // Booking Steps Logic
+        function resetBookingSteps() {
+            currentStep = 1;
+            updateStepIndicators();
+            document.getElementById('step1-content').classList.remove('hidden');
+            document.getElementById('step2-content').classList.add('hidden');
+            document.getElementById('step3-content').classList.add('hidden');
+            document.getElementById('step4-content').classList.add('hidden');
+        }
+
+        function updateStepIndicators() {
+            for (let i = 1; i <= 4; i++) {
+                const indicator = document.getElementById(`step${i}-indicator`);
+                const bar = document.getElementById(`progress-bar-${i-1}`);
+                
+                if (i < currentStep) {
+                    indicator.className = 'w-14 h-14 rounded-2xl flex items-center justify-center font-montserrat font-bold text-lg step-completed transition-all duration-500 shadow-lg';
+                    indicator.innerHTML = '<i class="fas fa-check"></i>';
+                    if (bar) {
+                        bar.style.width = '100%';
+                        bar.classList.remove('w-0');
+                    }
+                } else if (i === currentStep) {
+                    indicator.className = 'w-14 h-14 rounded-2xl flex items-center justify-center font-montserrat font-bold text-lg step-active transition-all duration-500 shadow-lg animate-pulse';
+                    indicator.textContent = i;
+                } else {
+                    indicator.className = 'w-14 h-14 rounded-2xl flex items-center justify-center font-montserrat font-bold text-lg bg-white text-gray-400 border-2 border-gray-200 transition-all duration-500';
+                    indicator.textContent = i;
+                    if (bar) {
+                        bar.style.width = '0%';
+                        bar.classList.add('w-0');
+                    }
+                }
+            }
+        }
+
+        function goToStep2(e) {
+            e.preventDefault();
+            currentStep = 2;
+            updateStepIndicators();
+            
+            gsap.to('#step1-content', { opacity: 0, x: -50, duration: 0.3, onComplete: () => {
+                document.getElementById('step1-content').classList.add('hidden');
+                document.getElementById('step2-content').classList.remove('hidden');
+                gsap.fromTo('#step2-content', { opacity: 0, x: 50 }, { opacity: 1, x: 0, duration: 0.3 });
+            }});
+        }
+
+        function goBackToStep1() {
+            currentStep = 1;
+            updateStepIndicators();
+            
+            gsap.to('#step2-content', { opacity: 0, x: 50, duration: 0.3, onComplete: () => {
+                document.getElementById('step2-content').classList.add('hidden');
+                document.getElementById('step1-content').classList.remove('hidden');
+                gsap.fromTo('#step1-content', { opacity: 0, x: -50 }, { opacity: 1, x: 0, duration: 0.3 });
+            }});
+        }
+
+        function togglePaymentButton() {
+            const checkbox = document.getElementById('agreeTerms');
+            const btn = document.getElementById('continueToPaymentBtn');
+            if (checkbox.checked) {
+                btn.disabled = false;
+                btn.classList.remove('bg-gray-200', 'text-gray-400', 'cursor-not-allowed');
+                btn.classList.add('btn-primary', 'text-white', 'shadow-lg');
+                btn.innerHTML = '<span class="flex items-center justify-center space-x-2"><span>LANJUT KE PEMBAYARAN</span><i class="fas fa-arrow-right"></i></span>';
+            } else {
+                btn.disabled = true;
+                btn.classList.add('bg-gray-200', 'text-gray-400', 'cursor-not-allowed');
+                btn.classList.remove('btn-primary', 'text-white', 'shadow-lg');
+                btn.innerHTML = 'LANJUT KE PEMBAYARAN';
+            }
+        }
+
+        function goToStep3() {
+            currentStep = 3;
+            updateStepIndicators();
+            
+            gsap.to('#step2-content', { opacity: 0, x: -50, duration: 0.3, onComplete: () => {
+                document.getElementById('step2-content').classList.add('hidden');
+                document.getElementById('step3-content').classList.remove('hidden');
+                gsap.fromTo('#step3-content', { opacity: 0, x: 50 }, { opacity: 1, x: 0, duration: 0.3 });
+                startCountdown();
+            }});
+        }
+
+        function goBackToStep2() {
+            currentStep = 2;
+            updateStepIndicators();
+            
+            gsap.to('#step3-content', { opacity: 0, x: 50, duration: 0.3, onComplete: () => {
+                document.getElementById('step3-content').classList.add('hidden');
+                document.getElementById('step2-content').classList.remove('hidden');
+                gsap.fromTo('#step2-content', { opacity: 0, x: -50 }, { opacity: 1, x: 0, duration: 0.3 });
+            }});
+        }
+
+        // Payment Methods
+        function setPaymentMethod(method) {
+            document.getElementById('bank-options').classList.add('hidden');
+            document.getElementById('va-options').classList.add('hidden');
+            document.getElementById('ewallet-options').classList.add('hidden');
+            
+            document.querySelectorAll('.payment-tab').forEach(tab => {
+                tab.classList.remove('active', 'bg-ocean', 'text-white');
+                tab.classList.add('bg-gray-100', 'text-gray-600');
+            });
+            
+            document.getElementById(`${method}-options`).classList.remove('hidden');
+            const activeTab = document.getElementById(`pay-${method}`);
+            activeTab.classList.remove('bg-gray-100', 'text-gray-600');
+            activeTab.classList.add('active', 'bg-ocean', 'text-white');
+        }
+
+        function startCountdown() {
+            let minutes = 14;
+            let seconds = 59;
+            const totalSeconds = 15 * 60;
+            let elapsed = 0;
+            
+            const timer = setInterval(() => {
+                if (seconds === 0) {
+                    if (minutes === 0) {
+                        clearInterval(timer);
+                        showToast('Waktu Habis', 'Silakan ulangi pemesanan');
+                        return;
+                    }
+                    minutes--;
+                    seconds = 59;
+                } else {
+                    seconds--;
+                }
+                
+                elapsed++;
+                const percentage = ((totalSeconds - elapsed) / totalSeconds) * 100;
+                document.getElementById('countdown-bar').style.width = `${percentage}%`;
+                document.getElementById('countdown').textContent = 
+                    `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }, 1000);
+        }
+
+        function processPayment() {
+            const btn = event.target;
+            btn.innerHTML = '<div class="loader-plane inline-block mr-2"><i class="fas fa-plane"></i></div><span>MEMPROSES...</span>';
+            btn.disabled = true;
+            
+            setTimeout(() => {
+                currentStep = 4;
+                updateStepIndicators();
+                
+                const code = 'SAS' + Math.random().toString(36).substring(2, 8).toUpperCase();
+                document.getElementById('bookingCode').textContent = code;
+                
+                gsap.to('#step3-content', { opacity: 0, scale: 0.9, duration: 0.3, onComplete: () => {
+                    document.getElementById('step3-content').classList.add('hidden');
+                    document.getElementById('step4-content').classList.remove('hidden');
+                    gsap.fromTo('#step4-content', { opacity: 0, scale: 1.1 }, { opacity: 1, scale: 1, duration: 0.5 });
+                    createConfetti();
+                }});
+                
+                showToast('Pembayaran Berhasil!', 'E-ticket telah dikirim ke email Anda');
+            }, 2000);
+        }
+
+        function createConfetti() {
+            for (let i = 0; i < 50; i++) {
+                const confetti = document.createElement('div');
+                confetti.style.position = 'fixed';
+                confetti.style.width = '10px';
+                confetti.style.height = '10px';
+                confetti.style.backgroundColor = ['#0066CC', '#FF6B35', '#FFD700', '#2D5A3D'][Math.floor(Math.random() * 4)];
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.top = '-10px';
+                confetti.style.zIndex = '9999';
+                confetti.style.borderRadius = '50%';
+                document.body.appendChild(confetti);
+                
+                gsap.to(confetti, {
+                    y: '100vh',
+                    x: Math.random() * 200 - 100,
+                    rotation: Math.random() * 360,
+                    duration: Math.random() * 3 + 2,
+                    ease: 'power1.out',
+                    onComplete: () => confetti.remove()
+                });
+            }
+        }
+
+        // Utility Functions
+        function showToast(title, message) {
+            document.getElementById('toastTitle').textContent = title;
+            document.getElementById('toastMessage').textContent = message;
+            const toast = document.getElementById('toast');
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+
+        function downloadTicket() {
+            showToast('Mengunduh...', 'Tiket Anda sedang diproses');
+        }
+
+        function sendEmailConfirmation() {
+            showToast('Email Terkirim!', 'Cek inbox atau folder spam Anda');
+        }
+
+        // Role Management
+        let currentUserRole = 'guest'; // Default role
+        let bookingHistory = []; // Store booking history
+        let allBookings = []; // Store all bookings for admin
+
+        // Toggle user dropdown menu
+        function toggleUserDropdown() {
+            const menu = document.getElementById('userDropdownMenu');
+            menu.classList.toggle('hidden');
+        }
+
+        // Switch user role
+        function switchUserRole(role) {
+            currentUserRole = role;
+            
+            // Update UI based on role
+            const roleText = document.getElementById('userRoleText');
+            const roleIcon = document.querySelector('#userDropdown .fa-user');
+            
+            if (role === 'user') {
+                roleText.textContent = 'Pengguna';
+                roleIcon.className = 'fas fa-user';
+                showToast('Berhasil!', 'Anda sekarang sebagai Pengguna');
+            } else if (role === 'admin') {
+                roleText.textContent = 'Admin';
+                roleIcon.className = 'fas fa-user-shield';
+                showToast('Berhasil!', 'Anda sekarang sebagai Admin');
+                showAdminPanel();
+            } else {
+                roleText.textContent = 'Pengunjung';
+                roleIcon.className = 'fas fa-user';
+                showToast('Berhasil!', 'Anda telah keluar');
+            }
+            
+            // Hide dropdown
+            document.getElementById('userDropdownMenu').classList.add('hidden');
+        }
+
+        // Show admin panel
+        function showAdminPanel() {
+            // Create admin panel if it doesn't exist
+            let adminPanel = document.getElementById('adminPanel');
+            if (!adminPanel) {
+                adminPanel = document.createElement('div');
+                adminPanel.id = 'adminPanel';
+                adminPanel.className = 'fixed top-20 right-4 w-96 bg-white rounded-2xl shadow-2xl z-50 p-6 max-h-[80vh] overflow-y-auto';
+                adminPanel.innerHTML = `
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xl font-bold text-red-600">Panel Admin</h3>
+                        <button onclick="closeAdminPanel()" class="text-gray-500 hover:text-red-500">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <h4 class="font-semibold mb-1">Total Pemesanan: <span id="totalBookings">0</span></h4>
+                            <h4 class="font-semibold mb-1">Pemesanan Hari Ini: <span id="dailyBookings">0</span></h4>
+                            <h4 class="font-semibold">Pendapatan Hari Ini: <span id="dailyRevenue">Rp 0</span></h4>
+                        </div>
+                        <div class="border-t pt-4">
+                            <div class="flex justify-between items-center mb-2">
+                                <h4 class="font-semibold">Daftar Pemesanan</h4>
+                                <button onclick="refreshAdminData()" class="text-sm bg-gray-100 text-gray-700 px-2 py-1 rounded">
+                                    <i class="fas fa-sync mr-1"></i> Muat Ulang
+                                </button>
+                            </div>
+                            <div id="adminBookingsList" class="space-y-2 max-h-60 overflow-y-auto">
+                                <!-- Bookings will be populated here -->
+                            </div>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(adminPanel);
+            } else {
+                adminPanel.classList.remove('hidden');
+            }
+            
+            // Update admin data
+            updateAdminPanel();
+        }
+
+        // Close admin panel
+        function closeAdminPanel() {
+            const adminPanel = document.getElementById('adminPanel');
+            if (adminPanel) {
+                adminPanel.classList.add('hidden');
+            }
+        }
+
+        // Refresh admin data
+        function refreshAdminData() {
+            updateAdminPanel();
+            showToast('Data Dimuat Ulang', 'Informasi terbaru telah dimuat');
+        }
+
+        // Update admin panel data
+        function updateAdminPanel() {
+            if (currentUserRole === 'admin') {
+                document.getElementById('totalBookings').textContent = allBookings.length;
+                
+                // Count today's bookings
+                const today = new Date().toDateString();
+                const dailyBookingsList = allBookings.filter(booking => 
+                    new Date(booking.date).toDateString() === today
+                );
+                document.getElementById('dailyBookings').textContent = dailyBookingsList.length;
+                
+                // Calculate today's revenue
+                const dailyRevenue = dailyBookingsList.reduce((sum, booking) => sum + booking.price, 0);
+                document.getElementById('dailyRevenue').textContent = `Rp ${dailyRevenue.toLocaleString('id-ID')}`;
+                
+                // Update bookings list
+                const bookingsList = document.getElementById('adminBookingsList');
+                bookingsList.innerHTML = '';
+                
+                // Show latest bookings first
+                const sortedBookings = [...allBookings].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+                
+                sortedBookings.forEach(booking => {
+                    const bookingEl = document.createElement('div');
+                    bookingEl.className = 'p-3 bg-gray-50 rounded-lg border-l-4 border-blue-500';
+                    bookingEl.innerHTML = `
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="font-semibold">${booking.route}</p>
+                                <p class="text-sm text-gray-600">${new Date(booking.date).toLocaleDateString('id-ID')} | ${booking.time}</p>
+                                <p class="text-sm">Kode: ${booking.code} | Penumpang: ${booking.passengers} | Tipe: ${getTransportTypeName(booking.transportType)}</p>
+                                <p class="text-sm font-bold">Rp ${booking.price.toLocaleString('id-ID')}</p>
+                            </div>
+                            <div class="flex flex-col space-y-1">
+                                <button onclick="updateBookingStatus('${booking.id}', 'confirmed')" class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded hover:bg-green-200 transition-colors">Konfirmasi</button>
+                                <button onclick="updateBookingStatus('${booking.id}', 'cancelled')" class="text-xs bg-red-100 text-red-700 px-2 py-1 rounded hover:bg-red-200 transition-colors">Batal</button>
+                                <button onclick="viewBookingDetails('${booking.id}')" class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded hover:bg-blue-200 transition-colors">Detail</button>
+                            </div>
+                        </div>
+                        <div class="mt-2 text-xs">
+                            <span class="px-2 py-1 rounded-full ${getStatusClass(booking.status)}">${booking.status}</span>
+                        </div>
+                    `;
+                    bookingsList.appendChild(bookingEl);
+                });
+            }
+        }
+
+        // View booking details
+        function viewBookingDetails(bookingId) {
+            const booking = allBookings.find(b => b.id === bookingId);
+            if (booking) {
+                let detailsModal = document.getElementById('bookingDetailsModal');
+                if (!detailsModal) {
+                    detailsModal = document.createElement('div');
+                    detailsModal.id = 'bookingDetailsModal';
+                    detailsModal.className = 'fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4';
+                    detailsModal.innerHTML = `
+                        <div class="bg-white rounded-2xl w-full max-w-2xl max-h-[80vh] overflow-hidden">
+                            <div class="p-6 border-b flex justify-between items-center">
+                                <h3 class="text-xl font-bold">Detail Pemesanan</h3>
+                                <button onclick="closeBookingDetailsModal()" class="text-gray-500 hover:text-gray-700">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            <div class="p-6 overflow-y-auto max-h-[60vh]" id="bookingDetailsContent">
+                                <!-- Details will be populated here -->
+                            </div>
+                        </div>
+                    `;
+                    document.body.appendChild(detailsModal);
+                }
+                
+                const content = document.getElementById('bookingDetailsContent');
+                content.innerHTML = `
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <h4 class="font-semibold text-gray-700">Kode Pemesanan</h4>
+                                <p class="text-lg font-bold">${booking.code}</p>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-gray-700">Status</h4>
+                                <p class="text-lg font-bold"><span class="px-2 py-1 rounded-full ${getStatusClass(booking.status)}">${booking.status}</span></p>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <h4 class="font-semibold text-gray-700">Rute</h4>
+                                <p class="text-lg">${booking.route}</p>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-gray-700">Tipe Transportasi</h4>
+                                <p class="text-lg">${getTransportTypeName(booking.transportType)}</p>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <h4 class="font-semibold text-gray-700">Tanggal & Waktu</h4>
+                                <p class="text-lg">${new Date(booking.date).toLocaleDateString('id-ID')} | ${booking.time}</p>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-gray-700">Jumlah Penumpang</h4>
+                                <p class="text-lg">${booking.passengers}</p>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h4 class="font-semibold text-gray-700">Harga</h4>
+                            <p class="text-2xl font-bold text-green-600">Rp ${booking.price.toLocaleString('id-ID')}</p>
+                        </div>
+                        
+                        <div>
+                            <h4 class="font-semibold text-gray-700">ID Pengguna</h4>
+                            <p>${booking.userId}</p>
+                        </div>
+                        
+                        <div class="flex space-x-3 pt-4">
+                            <button onclick="updateBookingStatus('${booking.id}', 'confirmed')" class="flex-1 bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors">Konfirmasi</button>
+                            <button onclick="updateBookingStatus('${booking.id}', 'cancelled')" class="flex-1 bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition-colors">Batalkan</button>
+                            <button onclick="closeBookingDetailsModal()" class="flex-1 bg-gray-200 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-300 transition-colors">Tutup</button>
+                        </div>
+                    </div>
+                `;
+                
+                detailsModal.classList.remove('hidden');
+            }
+        }
+
+        // Close booking details modal
+        function closeBookingDetailsModal() {
+            const detailsModal = document.getElementById('bookingDetailsModal');
+            if (detailsModal) {
+                detailsModal.classList.add('hidden');
+            }
+        }
+
+        // Get status class for display
+        function getStatusClass(status) {
+            switch(status) {
+                case 'confirmed': return 'bg-green-100 text-green-700';
+                case 'pending': return 'bg-yellow-100 text-yellow-700';
+                case 'cancelled': return 'bg-red-100 text-red-700';
+                default: return 'bg-gray-100 text-gray-700';
+            }
+        }
+
+        // Update booking status
+        function updateBookingStatus(bookingId, newStatus) {
+            const booking = allBookings.find(b => b.id === bookingId);
+            if (booking) {
+                booking.status = newStatus;
+                showToast('Status Diperbarui', `Pemesanan ${newStatus}`);
+                updateAdminPanel();
+            }
+        }
+
+        // Save booking to history
+        function saveBooking() {
+            if (selectedFlight && currentUserRole !== 'guest') {
+                const booking = {
+                    id: 'BK' + Date.now(),
+                    userId: currentUserRole === 'user' ? 'user123' : 'admin',
+                    route: `${bookingData.from} → ${bookingData.to}`,
+                    date: bookingData.date,
+                    time: selectedFlight.time + ' - ' + selectedFlight.arrival,
+                    passengers: bookingData.passengers,
+                    price: selectedFlight.price,
+                    transportType: currentTransport,
+                    status: 'pending',
+                    code: 'SAS' + Math.random().toString(36).substring(2, 8).toUpperCase(),
+                    timestamp: new Date().toISOString()
+                };
+                
+                bookingHistory.push(booking);
+                allBookings.push(booking);
+                
+                // Update admin panel if user is admin
+                if (currentUserRole === 'admin') {
+                    updateAdminPanel();
+                }
+            }
+        }
+
+        // Show user's booking history
+        function showBookingHistory() {
+            if (currentUserRole === 'guest') {
+                showToast('Akses Ditolak', 'Silakan login terlebih dahulu');
+                return;
+            }
+            
+            // Create booking history modal
+            let historyModal = document.getElementById('historyModal');
+            if (!historyModal) {
+                historyModal = document.createElement('div');
+                historyModal.id = 'historyModal';
+                historyModal.className = 'fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4';
+                historyModal.innerHTML = `
+                    <div class="bg-white rounded-2xl w-full max-w-2xl max-h-[80vh] overflow-hidden">
+                        <div class="p-6 border-b flex justify-between items-center">
+                            <h3 class="text-xl font-bold">Riwayat Pemesanan</h3>
+                            <div class="flex space-x-2">
+                                <button onclick="showFileManager()" class="text-gray-600 hover:text-blue-600">
+                                    <i class="fas fa-folder-open"></i>
+                                </button>
+                                <button onclick="closeBookingHistory()" class="text-gray-500 hover:text-gray-700">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="p-6 overflow-y-auto max-h-[60vh]">
+                            <div id="userBookingsList" class="space-y-4">
+                                <!-- Bookings will be populated here -->
+                            </div>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(historyModal);
+            }
+            
+            // Populate user's bookings
+            const userBookings = currentUserRole === 'admin' ? allBookings : bookingHistory;
+            const bookingsList = document.getElementById('userBookingsList');
+            bookingsList.innerHTML = '';
+            
+            if (userBookings.length === 0) {
+                bookingsList.innerHTML = '<p class="text-center text-gray-500 py-8">Belum ada riwayat pemesanan</p>';
+            } else {
+                userBookings.slice().reverse().forEach(booking => {
+                    const bookingEl = document.createElement('div');
+                    bookingEl.className = 'p-4 border rounded-lg';
+                    bookingEl.innerHTML = `
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <div class="flex items-center space-x-2 mb-1">
+                                    <h4 class="font-bold">${booking.route}</h4>
+                                    <span class="px-2 py-1 rounded-full text-xs ${getStatusClass(booking.status)}">${booking.status}</span>
+                                </div>
+                                <p class="text-sm text-gray-600">${new Date(booking.date).toLocaleDateString('id-ID')} | ${booking.time}</p>
+                                <p class="text-sm">Kode: ${booking.code} | Penumpang: ${booking.passengers}</p>
+                                <p class="text-sm mt-1">Tipe: ${getTransportTypeName(booking.transportType)} | Harga: Rp ${booking.price.toLocaleString('id-ID')}</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="font-bold">Rp ${booking.price.toLocaleString('id-ID')}</p>
+                                <button onclick="downloadTicketForBooking('${booking.code}')" class="mt-2 text-sm bg-blue-100 text-blue-700 px-3 py-1 rounded">Unduh Tiket</button>
+                            </div>
+                        </div>
+                    `;
+                    bookingsList.appendChild(bookingEl);
+                });
+            }
+            
+            historyModal.classList.remove('hidden');
+        }
+
+        // Get transport type name
+        function getTransportTypeName(type) {
+            const names = {
+                'plane': 'Pesawat',
+                'train': 'Kereta Api',
+                'bus': 'Bus',
+                'ship': 'Kapal'
+            };
+            return names[type] || type;
+        }
+
+        // Download ticket for specific booking
+        function downloadTicketForBooking(code) {
+            // Create a sample ticket data to store
+            const ticketData = {
+                bookingCode: code,
+                route: document.getElementById('summaryRoute')?.textContent || 'Jakarta → Bali',
+                date: new Date().toISOString(),
+                passenger: currentUser ? currentUser.username : 'Guest',
+                transportType: currentTransport || 'plane'
+            };
+            
+            // Save ticket to user's file storage
+            if (currentUser) {
+                saveUserFile(currentUser.id, `ticket_${code}.json`, JSON.stringify(ticketData));
+                showToast('Tiket Siap Diunduh', `Tiket dengan kode ${code} telah disimpan`);
+            } else {
+                showToast('Harap Login', 'Silakan login untuk menyimpan tiket');
+            }
+        }
+
+        // Close booking history modal
+        function closeBookingHistory() {
+            const historyModal = document.getElementById('historyModal');
+            if (historyModal) {
+                historyModal.classList.add('hidden');
+            }
+        }
+
+        // Show file manager for user
+        function showFileManager() {
+            if (!isAuthenticated) {
+                showToast('Akses Ditolak', 'Silakan login terlebih dahulu');
+                return;
+            }
+            
+            // Create file manager modal
+            let fileManagerModal = document.getElementById('fileManagerModal');
+            if (!fileManagerModal) {
+                fileManagerModal = document.createElement('div');
+                fileManagerModal.id = 'fileManagerModal';
+                fileManagerModal.className = 'fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4';
+                fileManagerModal.innerHTML = `
+                    <div class="bg-white rounded-2xl w-full max-w-4xl max-h-[80vh] overflow-hidden flex flex-col">
+                        <div class="p-6 border-b flex justify-between items-center">
+                            <h3 class="text-xl font-bold">Manajemen File</h3>
+                            <button onclick="closeFileManager()" class="text-gray-500 hover:text-gray-700">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div class="p-6 overflow-y-auto flex-grow">
+                            <div class="mb-4">
+                                <input type="file" id="fileUploadInput" class="hidden" onchange="handleFileUpload(event)">
+                                <button onclick="document.getElementById('fileUploadInput').click()" class="btn-primary px-4 py-2 rounded-lg">
+                                    <i class="fas fa-upload mr-2"></i> Unggah File
+                                </button>
+                            </div>
+                            <div id="userFilesList" class="space-y-2">
+                                <!-- Files will be populated here -->
+                            </div>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(fileManagerModal);
+            }
+            
+            // Populate user's files
+            const userFiles = getUserFiles(currentUser.id);
+            const filesList = document.getElementById('userFilesList');
+            filesList.innerHTML = '';
+            
+            if (userFiles.length === 0) {
+                filesList.innerHTML = '<p class="text-center text-gray-500 py-8">Belum ada file yang disimpan</p>';
+            } else {
+                userFiles.forEach(file => {
+                    const fileEl = document.createElement('div');
+                    fileEl.className = 'p-4 border rounded-lg flex justify-between items-center';
+                    fileEl.innerHTML = `
+                        <div>
+                            <p class="font-semibold">${file.name}</p>
+                            <p class="text-sm text-gray-600">${new Date(file.timestamp).toLocaleDateString('id-ID')} | Ukuran: ${(file.size / 1024).toFixed(2)} KB</p>
+                        </div>
+                        <div class="flex space-x-2">
+                            <button onclick="downloadUserFile(${currentUser.id}, ${file.id})" class="text-sm bg-blue-100 text-blue-700 px-3 py-1 rounded">
+                                <i class="fas fa-download mr-1"></i> Unduh
+                            </button>
+                            <button onclick="deleteUserFile(${currentUser.id}, ${file.id}); showFileManager();" class="text-sm bg-red-100 text-red-700 px-3 py-1 rounded">
+                                <i class="fas fa-trash mr-1"></i> Hapus
+                            </button>
+                        </div>
+                    `;
+                    filesList.appendChild(fileEl);
+                });
+            }
+            
+            fileManagerModal.classList.remove('hidden');
+        }
+
+        // Close file manager
+        function closeFileManager() {
+            const fileManagerModal = document.getElementById('fileManagerModal');
+            if (fileManagerModal) {
+                fileManagerModal.classList.add('hidden');
+            }
+        }
+
+        // Handle file upload
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const fileData = e.target.result;
+                saveUserFile(currentUser.id, file.name, fileData);
+                showToast('File Tersimpan', `File ${file.name} berhasil disimpan`);
+                showFileManager(); // Refresh the file list
+            };
+            reader.readAsText(file);
+        }
+
+        // Download user file
+        function downloadUserFile(userId, fileId) {
+            const userFiles = getUserFiles(userId);
+            const file = userFiles.find(f => f.id === fileId);
+            
+            if (file) {
+                // Create a temporary download link
+                const blob = new Blob([file.data], { type: 'application/octet-stream' });
+                const url = URL.createObjectURL(blob);
+                
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = file.name;
+                document.body.appendChild(a);
+                a.click();
+                
+                // Clean up
+                setTimeout(() => {
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                }, 100);
+            }
+        }
+
+        // Override the original processPayment function to save booking
+        const originalProcessPayment = processPayment;
+        processPayment = function() {
+            originalProcessPayment.call(this);
+            saveBooking();
+        };
+
+        // Update navigation to include booking history link
+        const originalShowHome = showHome;
+        showHome = function() {
+            originalShowHome();
+            updateAdminPanel();
+        };
+
+        // Initialize booking history array
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add booking history link to navigation
+            const cekPesananLink = document.querySelector('a[href="#"].font-montserrat:nth-child(3)');
+            if (cekPesananLink) {
+                cekPesananLink.href = '#';
+                cekPesananLink.onclick = function(e) {
+                    e.preventDefault();
+                    showBookingHistory();
+                };
+            }
+            
+            // Add file manager link to navigation
+            const bantuanLink = document.querySelector('a[href="#"].font-montserrat:nth-child(4)');
+            if (bantuanLink) {
+                bantuanLink.onclick = function(e) {
+                    e.preventDefault();
+                    showFileManager();
+                };
+            }
+        });
+
+        // Authentication System
+        let isAuthenticated = false;
+        let currentUser = null;
+        let users = JSON.parse(localStorage.getItem('users')) || [
+            { id: 1, username: 'admin', password: 'admin123', role: 'admin', email: 'admin@sasiku.com', name: 'Administrator' },
+            { id: 2, username: 'user', password: 'user123', role: 'user', email: 'user@sasiku.com', name: 'John Doe' }
+        ];
+
+        // Show login modal
+        function showLoginModal() {
+            // Close dropdown first
+            document.getElementById('userDropdownMenu').classList.add('hidden');
+            
+            // Create login modal if it doesn't exist
+            let loginModal = document.getElementById('loginModal');
+            if (!loginModal) {
+                loginModal = document.createElement('div');
+                loginModal.id = 'loginModal';
+                loginModal.className = 'fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4';
+                loginModal.innerHTML = `
+                    <div class="bg-white rounded-2xl w-full max-w-md overflow-hidden">
+                        <div class="p-6 border-b">
+                            <div class="flex justify-between items-center">
+                                <h3 class="text-xl font-bold">Masuk ke Akun</h3>
+                                <button onclick="closeLoginModal()" class="text-gray-500 hover:text-gray-700">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <form id="loginForm" onsubmit="handleLogin(event)">
+                                <div class="mb-4">
+                                    <label class="block text-gray-700 font-montserrat font-medium mb-2">Username</label>
+                                    <input type="text" id="loginUsername" required
+                                        class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-ocean focus:border-transparent"
+                                        placeholder="Masukkan username">
+                                </div>
+                                <div class="mb-6">
+                                    <label class="block text-gray-700 font-montserrat font-medium mb-2">Password</label>
+                                    <input type="password" id="loginPassword" required
+                                        class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-ocean focus:border-transparent"
+                                        placeholder="Masukkan password">
+                                </div>
+                                <button type="submit"
+                                    class="w-full btn-primary py-3 rounded-xl text-white font-montserrat font-bold shadow-lg hover:shadow-xl transition-all">
+                                    Masuk
+                                </button>
+                            </form>
+                            <div class="mt-4 text-sm text-gray-600 bg-blue-50 p-3 rounded-lg">
+                                <p class="font-semibold mb-1">Akun Demo:</p>
+                                <p><strong>Admin:</strong> admin / admin123</p>
+                                <p><strong>User:</strong> user / user123</p>
+                            </div>
+                            <div class="mt-4 text-center">
+                                <p class="text-gray-600">Belum punya akun? 
+                                    <button onclick="showRegisterModal()" class="text-ocean font-semibold hover:underline">Daftar</button>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(loginModal);
+            }
+            
+            loginModal.classList.remove('hidden');
+        }
+
+        // Close login modal
+        function closeLoginModal() {
+            const loginModal = document.getElementById('loginModal');
+            if (loginModal) {
+                loginModal.classList.add('hidden');
+            }
+        }
+
+        // Handle login
+        function handleLogin(event) {
+            event.preventDefault();
+            
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            // Find user
+            const user = users.find(u => u.username === username && u.password === password);
+            
+            if (user) {
+                isAuthenticated = true;
+                currentUser = user;
+                
+                // Update UI
+                document.getElementById('userRoleText').textContent = user.role === 'admin' ? 'Admin' : 'Pengguna';
+                document.querySelector('#userDropdown .fa-user').className = user.role === 'admin' ? 'fas fa-user-shield' : 'fas fa-user';
+                
+                closeLoginModal();
+                showToast('Berhasil Masuk!', `Selamat datang, ${user.name || user.username}!`);
+                
+                // Update role
+                switchUserRole(user.role);
+                
+                // If user is admin, show admin panel automatically
+                if (user.role === 'admin') {
+                    setTimeout(showAdminPanel, 1000);
+                }
+            } else {
+                showToast('Gagal Masuk', 'Username atau password salah');
+            }
+        }
+
+        // Show register modal
+        function showRegisterModal() {
+            // Close login modal first
+            closeLoginModal();
+            
+            // Create register modal
+            let registerModal = document.getElementById('registerModal');
+            if (!registerModal) {
+                registerModal = document.createElement('div');
+                registerModal.id = 'registerModal';
+                registerModal.className = 'fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4';
+                registerModal.innerHTML = `
+                    <div class="bg-white rounded-2xl w-full max-w-md overflow-hidden">
+                        <div class="p-6 border-b">
+                            <div class="flex justify-between items-center">
+                                <h3 class="text-xl font-bold">Daftar Akun Baru</h3>
+                                <button onclick="closeRegisterModal()" class="text-gray-500 hover:text-gray-700">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <form id="registerForm" onsubmit="handleRegister(event)">
+                                <div class="mb-4">
+                                    <label class="block text-gray-700 font-montserrat font-medium mb-2">Email</label>
+                                    <input type="email" id="registerEmail" required
+                                        class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-ocean focus:border-transparent"
+                                        placeholder="Masukkan email">
+                                </div>
+                                <div class="mb-4">
+                                    <label class="block text-gray-700 font-montserrat font-medium mb-2">Username</label>
+                                    <input type="text" id="registerUsername" required
+                                        class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-ocean focus:border-transparent"
+                                        placeholder="Masukkan username">
+                                </div>
+                                <div class="mb-4">
+                                    <label class="block text-gray-700 font-montserrat font-medium mb-2">Password</label>
+                                    <input type="password" id="registerPassword" required
+                                        class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-ocean focus:border-transparent"
+                                        placeholder="Masukkan password">
+                                </div>
+                                <div class="mb-6">
+                                    <label class="block text-gray-700 font-montserrat font-medium mb-2">Konfirmasi Password</label>
+                                    <input type="password" id="registerPasswordConfirm" required
+                                        class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-ocean focus:border-transparent"
+                                        placeholder="Konfirmasi password">
+                                </div>
+                                <button type="submit"
+                                    class="w-full btn-primary py-3 rounded-xl text-white font-montserrat font-bold shadow-lg hover:shadow-xl transition-all">
+                                    Daftar
+                                </button>
+                            </form>
+                            <div class="mt-4 text-center">
+                                <p class="text-gray-600">Sudah punya akun? 
+                                    <button onclick="showLoginModal()" class="text-ocean font-semibold hover:underline">Masuk</button>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(registerModal);
+            }
+            
+            registerModal.classList.remove('hidden');
+        }
+
+        // Close register modal
+        function closeRegisterModal() {
+            const registerModal = document.getElementById('registerModal');
+            if (registerModal) {
+                registerModal.classList.add('hidden');
+            }
+        }
+
+        // Handle registration
+        function handleRegister(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('registerEmail').value;
+            const username = document.getElementById('registerUsername').value;
+            const password = document.getElementById('registerPassword').value;
+            const confirmPassword = document.getElementById('registerPasswordConfirm').value;
+            
+            // Validate passwords match
+            if (password !== confirmPassword) {
+                showToast('Gagal Daftar', 'Password tidak cocok');
+                return;
+            }
+            
+            // Check if username already exists
+            if (users.some(u => u.username === username)) {
+                showToast('Gagal Daftar', 'Username sudah terdaftar');
+                return;
+            }
+            
+            // Create new user
+            const newUser = {
+                id: users.length + 1,
+                username: username,
+                password: password,
+                role: 'user', // Default role is user
+                email: email
+            };
+            
+            users.push(newUser);
+            localStorage.setItem('users', JSON.stringify(users));
+            
+            showToast('Berhasil Daftar', 'Akun berhasil dibuat, silakan masuk');
+            closeRegisterModal();
+            showLoginModal();
+        }
+
+        // Logout function
+        function logout() {
+            isAuthenticated = false;
+            currentUser = null;
+            switchUserRole('guest');
+            showToast('Berhasil Keluar', 'Anda telah keluar dari akun');
+        }
+
+        // File Storage System
+        let userFiles = JSON.parse(localStorage.getItem('userFiles')) || {};
+
+        // Save file for user
+        function saveUserFile(userId, fileName, fileData) {
+            if (!userFiles[userId]) {
+                userFiles[userId] = [];
+            }
+            
+            const fileEntry = {
+                id: Date.now(),
+                name: fileName,
+                data: fileData,
+                timestamp: new Date().toISOString(),
+                size: fileData.length // Approximate size
+            };
+            
+            userFiles[userId].push(fileEntry);
+            localStorage.setItem('userFiles', JSON.stringify(userFiles));
+        }
+
+        // Get user files
+        function getUserFiles(userId) {
+            return userFiles[userId] || [];
+        }
+
+        // Delete user file
+        function deleteUserFile(userId, fileId) {
+            if (userFiles[userId]) {
+                userFiles[userId] = userFiles[userId].filter(file => file.id !== fileId);
+                localStorage.setItem('userFiles', JSON.stringify(userFiles));
+            }
+        }
+
+        // Override the original switchUserRole function to handle auth
+        const originalSwitchUserRole = switchUserRole;
+        switchUserRole = function(role) {
+            if (role === 'guest') {
+                logout();
+            } else {
+                originalSwitchUserRole(role);
+            }
+        };
+
+        // Update the logout button to call the logout function
+        document.addEventListener('DOMContentLoaded', function() {
+            // Find the logout button and attach the logout function
+            const logoutButton = document.querySelector('button[onclick*="switchUserRole(\'guest\')"]');
+            if (logoutButton) {
+                logoutButton.onclick = function() {
+                    logout();
+                };
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,2101 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DocuFlow - Portal Monitoring Dokumen</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        display: ['Poppins', 'sans-serif'],
+                        body: ['Poppins', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        :root {
+            --bg: #0a0f1a;
+            --bg-secondary: #111827;
+            --fg: #f1f5f9;
+            --fg-muted: #94a3b8;
+            --accent: #10b981;
+            --accent-glow: rgba(16, 185, 129, 0.3);
+            --card: rgba(17, 24, 39, 0.8);
+            --border: rgba(148, 163, 184, 0.1);
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--fg);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .font-display { font-family: 'Space Grotesk', sans-serif; }
+
+        .bg-grid {
+            background-image: 
+                linear-gradient(rgba(16, 185, 129, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(16, 185, 129, 0.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+        }
+
+        .bg-gradient-radial {
+            background: 
+                radial-gradient(ellipse 80% 50% at 50% -20%, rgba(16, 185, 129, 0.15), transparent),
+                radial-gradient(ellipse 60% 40% at 80% 100%, rgba(59, 130, 246, 0.1), transparent);
+        }
+
+        .glass-card {
+            background: var(--card);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -2px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        }
+
+        .input-modern {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+        }
+
+        .input-modern:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent) 0%, #059669 100%);
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+        }
+
+        .btn-primary:active { transform: translateY(0); }
+
+        .btn-secondary {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(59, 130, 246, 0.2);
+            border-color: rgba(59, 130, 246, 0.5);
+        }
+
+        .status-pending { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
+        .status-approved { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+        .status-revision { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
+        .status-process { background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); }
+
+        .sidebar-item {
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .sidebar-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: var(--accent);
+            transform: scaleY(0);
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-item:hover::before,
+        .sidebar-item.active::before { transform: scaleY(1); }
+
+        .sidebar-item:hover,
+        .sidebar-item.active { background: rgba(16, 185, 129, 0.1); }
+
+        .progress-ring { transform: rotate(-90deg); }
+        .progress-ring-circle { transition: stroke-dashoffset 1s ease; }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideInLeft {
+            from { opacity: 0; transform: translateX(-30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes pulse-ring {
+            0% { transform: scale(0.8); opacity: 1; }
+            100% { transform: scale(1.3); opacity: 0; }
+        }
+
+        .animate-fade-in-up { animation: fadeInUp 0.6s ease forwards; }
+        .animate-slide-in-left { animation: slideInLeft 0.5s ease forwards; }
+        .animate-float { animation: float 6s ease-in-out infinite; }
+
+        .stagger-1 { animation-delay: 0.1s; opacity: 0; }
+        .stagger-2 { animation-delay: 0.2s; opacity: 0; }
+        .stagger-3 { animation-delay: 0.3s; opacity: 0; }
+        .stagger-4 { animation-delay: 0.4s; opacity: 0; }
+        .stagger-5 { animation-delay: 0.5s; opacity: 0; }
+
+        .table-row-hover { transition: background 0.2s ease; }
+        .table-row-hover:hover { background: rgba(16, 185, 129, 0.05); }
+
+        .flow-node { transition: all 0.3s ease; }
+        .flow-node:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px var(--accent-glow);
+        }
+
+        /* File Upload Styles */
+        .upload-zone {
+            border: 2px dashed rgba(148, 163, 184, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .upload-zone:hover,
+        .upload-zone.dragover {
+            border-color: var(--accent);
+            background: rgba(16, 185, 129, 0.05);
+        }
+
+        .upload-zone.dragover {
+            transform: scale(1.02);
+        }
+
+        .file-item {
+            animation: fadeInUp 0.3s ease forwards;
+        }
+
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-secondary); }
+        ::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.3); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(148, 163, 184, 0.5); }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                position: fixed;
+                z-index: 50;
+            }
+            .sidebar.open { transform: translateX(0); }
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 100;
+            animation: slideInLeft 0.3s ease forwards;
+        }
+
+        .toast.hide {
+            animation: fadeOut 0.3s ease forwards;
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; transform: translateX(0); }
+            to { opacity: 0; transform: translateX(100px); }
+        }
+    </style>
+</head>
+<body class="bg-grid bg-gradient-radial">
+
+    <!-- Toast Container -->
+    <div id="toastContainer"></div>
+
+    <!-- Login Page -->
+    <div id="loginPage" class="min-h-screen flex items-center justify-center p-4">
+        <div class="w-full max-w-md">
+            <!-- Logo -->
+            <div class="text-center mb-8 animate-fade-in-up stagger-1">
+                <div class="inline-flex items-center justify-center w-20 h-20 rounded-2xl glass-card mb-4 animate-float">
+                    <svg class="w-10 h-10 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/>
+                    </svg>
+                </div>
+                <h1 class="font-display text-3xl font-bold text-white mb-2">DocuFlow</h1>
+                <p class="text-slate-400">Portal Monitoring Pelaporan Dokumen</p>
+            </div>
+
+            <!-- Login Card -->
+            <div class="glass-card rounded-2xl p-8 animate-fade-in-up stagger-2">
+                <!-- Tabs -->
+                <div class="flex mb-6 bg-slate-800/50 rounded-xl p-1">
+                    <button onclick="switchLoginTab('email')" id="tabEmail" class="flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-all bg-emerald-500/20 text-emerald-400">
+                        Email
+                    </button>
+                    <button onclick="switchLoginTab('whatsapp')" id="tabWhatsapp" class="flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-all text-slate-400 hover:text-white">
+                        WhatsApp
+                    </button>
+                </div>
+
+                <!-- Email Form -->
+                <form id="emailForm" onsubmit="handleEmailLogin(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-300 mb-2">Alamat Email</label>
+                        <div class="relative">
+                            <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"/>
+                            </svg>
+                            <input type="email" id="emailInput" placeholder="nama@perusahaan.com" 
+                                class="input-modern w-full pl-12 pr-4 py-3 rounded-xl text-white placeholder-slate-500" required>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-300 mb-2">Kata Sandi</label>
+                        <div class="relative">
+                            <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"/>
+                            </svg>
+                            <input type="password" id="passwordInput" placeholder="Masukkan kata sandi" 
+                                class="input-modern w-full pl-12 pr-12 py-3 rounded-xl text-white placeholder-slate-500" required>
+                            <button type="button" onclick="togglePassword()" class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white transition-colors">
+                                <svg id="eyeIcon" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <label class="flex items-center cursor-pointer">
+                            <input type="checkbox" id="rememberMe" class="w-4 h-4 rounded border-slate-600 bg-slate-800 text-emerald-500 focus:ring-emerald-500">
+                            <span class="ml-2 text-sm text-slate-400">Ingat saya</span>
+                        </label>
+                        <a href="#" class="text-sm text-emerald-400 hover:text-emerald-300 transition-colors">Lupa kata sandi?</a>
+                    </div>
+                    <button type="submit" class="btn-primary w-full py-3 rounded-xl text-white font-semibold">
+                        Masuk
+                    </button>
+                </form>
+
+                <!-- WhatsApp Form -->
+                <form id="whatsappForm" onsubmit="handleWhatsAppLogin(event)" class="space-y-4 hidden">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-300 mb-2">Nomor WhatsApp</label>
+                        <div class="relative">
+                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500">+62</span>
+                            <input type="tel" id="whatsappInput" placeholder="81234567890" 
+                                class="input-modern w-full pl-14 pr-4 py-3 rounded-xl text-white placeholder-slate-500" required>
+                        </div>
+                        <p class="mt-2 text-xs text-slate-500">Kami akan mengirimkan kode verifikasi ke nomor Anda</p>
+                    </div>
+                    
+                    <!-- OTP Input -->
+                    <div id="otpSection" class="hidden">
+                        <label class="block text-sm font-medium text-slate-300 mb-2">Kode Verifikasi</label>
+                        <div class="flex gap-2 justify-center">
+                            <input type="text" maxlength="1" class="otp-input input-modern w-12 h-12 text-center text-xl font-bold rounded-xl text-white" oninput="moveToNext(this, 1)">
+                            <input type="text" maxlength="1" class="otp-input input-modern w-12 h-12 text-center text-xl font-bold rounded-xl text-white" oninput="moveToNext(this, 2)">
+                            <input type="text" maxlength="1" class="otp-input input-modern w-12 h-12 text-center text-xl font-bold rounded-xl text-white" oninput="moveToNext(this, 3)">
+                            <input type="text" maxlength="1" class="otp-input input-modern w-12 h-12 text-center text-xl font-bold rounded-xl text-white" oninput="moveToNext(this, 4)">
+                        </div>
+                        <p class="mt-2 text-xs text-slate-500 text-center">Masukkan kode 4 digit yang dikirim ke WhatsApp Anda</p>
+                    </div>
+
+                    <button type="submit" id="whatsappSubmitBtn" class="btn-secondary w-full py-3 rounded-xl text-blue-400 font-semibold flex items-center justify-center gap-2">
+                        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                        </svg>
+                        <span id="whatsappBtnText">Kirim Kode Verifikasi</span>
+                    </button>
+                </form>
+
+                <!-- Divider -->
+                <div class="relative my-6">
+                    <div class="absolute inset-0 flex items-center">
+                        <div class="w-full border-t border-slate-700"></div>
+                    </div>
+                    <div class="relative flex justify-center text-sm">
+                        <span class="px-4 bg-slate-900/50 text-slate-500">atau masuk dengan</span>
+                    </div>
+                </div>
+
+                <!-- SSO Options -->
+                <div class="grid grid-cols-2 gap-3">
+                    <button onclick="handleSSO('google')" class="flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-slate-800/50 border border-slate-700 hover:bg-slate-700/50 transition-all text-sm font-medium">
+                        <svg class="w-5 h-5" viewBox="0 0 24 24">
+                            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                        </svg>
+                        Google
+                    </button>
+                    <button onclick="handleSSO('microsoft')" class="flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-slate-800/50 border border-slate-700 hover:bg-slate-700/50 transition-all text-sm font-medium">
+                        <svg class="w-5 h-5" viewBox="0 0 24 24">
+                            <path fill="#F25022" d="M1 1h10v10H1z"/>
+                            <path fill="#00A4EF" d="M1 13h10v10H1z"/>
+                            <path fill="#7FBA00" d="M13 1h10v10H13z"/>
+                            <path fill="#FFB900" d="M13 13h10v10H13z"/>
+                        </svg>
+                        Microsoft
+                    </button>
+                </div>
+
+                <!-- Demo Login -->
+                <div class="mt-6 p-4 rounded-xl bg-slate-800/30 border border-slate-700/50">
+                    <p class="text-xs text-slate-500 mb-3">Demo Login (Klik untuk mencoba):</p>
+                    <div class="grid grid-cols-3 gap-2">
+                        <button onclick="demoLogin('staff')" class="text-xs py-2 px-3 rounded-lg bg-blue-500/20 text-blue-400 hover:bg-blue-500/30 transition-all">
+                            Staff Bisnis
+                        </button>
+                        <button onclick="demoLogin('kepala')" class="text-xs py-2 px-3 rounded-lg bg-amber-500/20 text-amber-400 hover:bg-amber-500/30 transition-all">
+                            Kepala Divisi
+                        </button>
+                        <button onclick="demoLogin('manager')" class="text-xs py-2 px-3 rounded-lg bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30 transition-all">
+                            Manager Umum
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <p class="text-center mt-6 text-sm text-slate-500 animate-fade-in-up stagger-3">
+                Dilindungi dengan enkripsi end-to-end
+                <svg class="inline w-4 h-4 ml-1 text-emerald-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/>
+                </svg>
+            </p>
+        </div>
+    </div>
+
+    <!-- Dashboard Page -->
+    <div id="dashboardPage" class="min-h-screen hidden">
+        <!-- Sidebar -->
+        <aside id="sidebar" class="sidebar fixed left-0 top-0 h-full w-64 glass-card border-r border-slate-700/50 z-40 transition-transform duration-300">
+            <div class="p-6 overflow-y-auto h-full pb-24">
+                <!-- Logo -->
+                <div class="flex items-center gap-3 mb-8">
+                    <div class="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center">
+                        <svg class="w-6 h-6 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/>
+                        </svg>
+                    </div>
+                    <span class="font-display text-xl font-bold text-white">DocuFlow</span>
+                </div>
+
+                <!-- Navigation -->
+                <nav id="sidebarNav" class="space-y-1">
+                    <!-- Will be rendered based on role -->
+                </nav>
+
+                <!-- Divider -->
+                <div class="border-t border-slate-700/50 my-6"></div>
+
+                <!-- Quick Stats -->
+                <div class="space-y-3">
+                    <h4 class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Status Cepat</h4>
+                    <div class="flex items-center justify-between text-sm">
+                        <span class="text-slate-400">Menunggu</span>
+                        <span id="quickPending" class="font-semibold text-amber-400">0</span>
+                    </div>
+                    <div class="flex items-center justify-between text-sm">
+                        <span class="text-slate-400">Proses</span>
+                        <span id="quickProcess" class="font-semibold text-blue-400">0</span>
+                    </div>
+                    <div class="flex items-center justify-between text-sm">
+                        <span class="text-slate-400">Selesai</span>
+                        <span id="quickDone" class="font-semibold text-emerald-400">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- User Section -->
+            <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-slate-700/50 bg-slate-900/90 backdrop-blur-xl">
+                <div class="flex items-center gap-3">
+                    <div id="userAvatar" class="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white font-bold">
+                        S
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p id="userName" class="text-sm font-medium text-white truncate">Staff Bisnis</p>
+                        <p id="userRole" class="text-xs text-slate-500 truncate">staff@company.com</p>
+                    </div>
+                    <button onclick="handleLogout()" class="p-2 text-slate-400 hover:text-red-400 transition-colors" aria-label="Logout" title="Keluar">
+                        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="md:ml-64 min-h-screen">
+            <!-- Top Bar -->
+            <header class="sticky top-0 z-30 glass-card border-b border-slate-700/50 px-6 py-4">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-4">
+                        <button onclick="toggleSidebar()" class="md:hidden p-2 text-slate-400 hover:text-white transition-colors" aria-label="Toggle menu">
+                            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/>
+                            </svg>
+                        </button>
+                        <div>
+                            <h1 id="pageTitle" class="font-display text-xl font-bold text-white">Overview</h1>
+                            <p id="pageSubtitle" class="text-sm text-slate-500">Selamat datang di dashboard</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <!-- Search -->
+                        <div class="hidden md:block relative">
+                            <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/>
+                            </svg>
+                            <input type="text" placeholder="Cari dokumen..." class="input-modern w-64 pl-10 pr-4 py-2 rounded-lg text-sm text-white placeholder-slate-500">
+                        </div>
+                        <!-- Notifications -->
+                        <button onclick="toggleNotifications()" class="relative p-2 text-slate-400 hover:text-white transition-colors" aria-label="Notifications">
+                            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"/>
+                            </svg>
+                            <span id="notifBadge" class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+                        </button>
+                        <!-- New Document Button (Staff Only) -->
+                        <button id="newDocBtn" onclick="openUploadModal()" class="btn-primary px-4 py-2 rounded-lg text-sm font-medium text-white flex items-center gap-2">
+                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
+                            </svg>
+                            <span class="hidden sm:inline">Upload Dokumen</span>
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Notification Panel -->
+            <div id="notifPanel" class="fixed top-16 right-4 w-80 glass-card rounded-xl shadow-2xl z-50 hidden animate-fade-in-up">
+                <div class="p-4 border-b border-slate-700/50 flex items-center justify-between">
+                    <h3 class="font-semibold text-white">Notifikasi</h3>
+                    <button onclick="markAllRead()" class="text-xs text-emerald-400 hover:text-emerald-300">Tandai semua dibaca</button>
+                </div>
+                <div class="max-h-96 overflow-y-auto">
+                    <div id="notifList" class="divide-y divide-slate-700/50">
+                        <!-- Notifications will be rendered here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content Sections -->
+            <div class="p-6">
+                <!-- Overview Section -->
+                <section id="sectionOverview" class="space-y-6">
+                    <!-- Welcome Banner -->
+                    <div class="glass-card rounded-xl p-6 relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-emerald-500/10 to-transparent rounded-full -translate-y-1/2 translate-x-1/2"></div>
+                        <div class="relative">
+                            <h2 id="welcomeTitle" class="font-display text-2xl font-bold text-white mb-2">Selamat Datang!</h2>
+                            <p id="welcomeMessage" class="text-slate-400 max-w-xl">Kelola dokumen Anda dengan mudah dan pantau status persetujuan secara real-time.</p>
+                        </div>
+                    </div>
+
+                    <!-- Stats Cards -->
+                    <div id="statsContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <!-- Stats will be rendered based on role -->
+                    </div>
+
+                    <!-- Main Content Grid -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <!-- Recent Documents -->
+                        <div class="lg:col-span-2 glass-card rounded-xl overflow-hidden animate-fade-in-up stagger-4">
+                            <div class="p-5 border-b border-slate-700/50 flex items-center justify-between">
+                                <h3 id="recentDocsTitle" class="font-semibold text-white">Dokumen Terbaru</h3>
+                                <button onclick="showSection('documents')" class="text-sm text-emerald-400 hover:text-emerald-300 transition-colors">Lihat Semua</button>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="w-full">
+                                    <thead>
+                                        <tr class="border-b border-slate-700/50">
+                                            <th class="text-left py-3 px-5 text-xs font-semibold text-slate-500 uppercase tracking-wider">Dokumen</th>
+                                            <th class="text-left py-3 px-5 text-xs font-semibold text-slate-500 uppercase tracking-wider">Status</th>
+                                            <th class="text-left py-3 px-5 text-xs font-semibold text-slate-500 uppercase tracking-wider">SLA</th>
+                                            <th class="text-left py-3 px-5 text-xs font-semibold text-slate-500 uppercase tracking-wider">Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="recentDocsTable">
+                                        <!-- Documents will be rendered here -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Right Panel -->
+                        <div class="space-y-6">
+                            <!-- SLA Progress -->
+                            <div class="glass-card rounded-xl p-5 animate-fade-in-up stagger-5">
+                                <h3 class="font-semibold text-white mb-4">SLA Compliance</h3>
+                                <div class="flex justify-center mb-4">
+                                    <div class="relative">
+                                        <svg class="progress-ring w-32 h-32" viewBox="0 0 100 100">
+                                            <circle cx="50" cy="50" r="40" stroke-width="8" fill="none" stroke="rgba(148, 163, 184, 0.2)"/>
+                                            <circle id="slaRing" class="progress-ring-circle" cx="50" cy="50" r="40" stroke-width="8" fill="none" 
+                                                stroke="url(#gradient)" stroke-linecap="round"
+                                                stroke-dasharray="251.2" stroke-dashoffset="251.2"/>
+                                            <defs>
+                                                <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                                    <stop offset="0%" stop-color="#10b981"/>
+                                                    <stop offset="100%" stop-color="#3b82f6"/>
+                                                </linearGradient>
+                                            </defs>
+                                        </svg>
+                                        <div class="absolute inset-0 flex items-center justify-center">
+                                            <div class="text-center">
+                                                <span id="slaPercent" class="text-2xl font-bold text-white">0%</span>
+                                                <p class="text-xs text-slate-500">On-time</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="space-y-3">
+                                    <div class="flex items-center justify-between text-sm">
+                                        <span class="text-slate-400">On-time</span>
+                                        <span id="slaOnTime" class="text-emerald-400 font-medium">0 dokumen</span>
+                                    </div>
+                                    <div class="flex items-center justify-between text-sm">
+                                        <span class="text-slate-400">Terlambat</span>
+                                        <span id="slaLate" class="text-red-400 font-medium">0 dokumen</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Quick Actions (Role Specific) -->
+                            <div id="quickActions" class="glass-card rounded-xl p-5">
+                                <h3 class="font-semibold text-white mb-4">Aksi Cepat</h3>
+                                <div id="quickActionsContent" class="space-y-2">
+                                    <!-- Will be rendered based on role -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Activity Timeline -->
+                    <div class="glass-card rounded-xl p-5 animate-fade-in-up stagger-5">
+                        <h3 class="font-semibold text-white mb-4">Aktivitas Terkini</h3>
+                        <div id="activityTimeline" class="space-y-4">
+                            <!-- Activity items will be rendered here -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Documents Section -->
+                <section id="sectionDocuments" class="hidden space-y-6">
+                    <!-- Filter Bar -->
+                    <div class="glass-card rounded-xl p-4 flex flex-wrap gap-4 items-center">
+                        <div class="flex-1 min-w-64">
+                            <div class="relative">
+                                <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/>
+                                </svg>
+                                <input type="text" id="docSearch" placeholder="Cari dokumen..." 
+                                    class="input-modern w-full pl-10 pr-4 py-2 rounded-lg text-sm text-white placeholder-slate-500"
+                                    oninput="filterDocuments()">
+                            </div>
+                        </div>
+                        <select id="docStatusFilter" onchange="filterDocuments()" 
+                            class="input-modern px-4 py-2 rounded-lg text-sm text-white">
+                            <option value="">Semua Status</option>
+                            <option value="pending">Menunggu</option>
+                            <option value="process">Dalam Proses</option>
+                            <option value="approved">Disetujui</option>
+                            <option value="revision">Revisi</option>
+                        </select>
+                        <select id="docTypeFilter" onchange="filterDocuments()" 
+                            class="input-modern px-4 py-2 rounded-lg text-sm text-white">
+                            <option value="">Semua Tipe</option>
+                            <option value="proposal">Proposal</option>
+                            <option value="kontrak">Kontrak</option>
+                            <option value="laporan">Laporan</option>
+                            <option value="memo">Memo</option>
+                        </select>
+                    </div>
+
+                    <!-- Documents Table -->
+                    <div class="glass-card rounded-xl overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead>
+                                    <tr class="border-b border-slate-700/50">
+                                        <th class="text-left py-4 px-5 text-xs font-semibold text-slate-500 uppercase tracking-wider">No. Dokumen</th>
+                                        <th class="text-left py-4 px-5 text-xs font-semibold text-slate-500 uppercase tracking-wider">Judul</th>
+                                        <th class="text-left py-4 px-5 text-xs font-semibold text-slate-500 uppercase tracking-wider">Tipe</th>
+                                        <th class="text-left py-4 px-5 text-xs font-semibold text-slate-500 uppercase tracking-wider">Pemohon</th>
+                                        <th class="text-left py-4 px-5 text-xs font-semibold text-slate-500 uppercase tracking-wider">Status</th>
+                                        <th class="text-left py-4 px-5 text-xs font-semibold text-slate-500 uppercase tracking-wider">SLA</th>
+                                        <th class="text-left py-4 px-5 text-xs font-semibold text-slate-500 uppercase tracking-wider">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="documentsTable">
+                                    <!-- Documents will be rendered here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- My Documents Section (Staff Only) -->
+                <section id="sectionMyDocuments" class="hidden space-y-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h2 class="font-display text-xl font-bold text-white">Dokumen Saya</h2>
+                            <p class="text-sm text-slate-500">Kelola semua dokumen yang Anda ajukan</p>
+                        </div>
+                        <button onclick="openUploadModal()" class="btn-primary px-4 py-2 rounded-lg text-sm font-medium text-white flex items-center gap-2">
+                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
+                            </svg>
+                            Upload Dokumen Baru
+                        </button>
+                    </div>
+
+                    <!-- My Documents Grid -->
+                    <div id="myDocsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <!-- Will be rendered -->
+                    </div>
+                </section>
+
+                <!-- Approvals Section (Kepala & Manager Only) -->
+                <section id="sectionApprovals" class="hidden space-y-6">
+                    <div>
+                        <h2 class="font-display text-xl font-bold text-white">Menunggu Persetujuan</h2>
+                        <p class="text-sm text-slate-500">Dokumen yang membutuhkan persetujuan Anda</p>
+                    </div>
+
+                    <div id="approvalsList" class="space-y-4">
+                        <!-- Will be rendered -->
+                    </div>
+                </section>
+
+                <!-- Workflow Section -->
+                <section id="sectionWorkflow" class="hidden space-y-6">
+                    <div class="glass-card rounded-xl p-6">
+                        <h3 class="font-semibold text-white mb-6">Diagram Alur Kerja Dokumen</h3>
+                        
+                        <!-- Workflow Diagram -->
+                        <div class="relative overflow-x-auto pb-4">
+                            <div class="flex items-center justify-start gap-4 min-w-max px-4">
+                                <!-- Start -->
+                                <div class="flow-node flex flex-col items-center">
+                                    <div class="w-20 h-20 rounded-full bg-emerald-500/20 border-2 border-emerald-500 flex items-center justify-center">
+                                        <svg class="w-8 h-8 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z"/>
+                                        </svg>
+                                    </div>
+                                    <span class="mt-2 text-xs font-medium text-emerald-400">MULAI</span>
+                                </div>
+
+                                <!-- Arrow -->
+                                <svg class="w-8 h-8 text-slate-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/>
+                                </svg>
+
+                                <!-- Staff Bisnis -->
+                                <div id="wfStaff" class="flow-node flex flex-col items-center">
+                                    <div class="w-32 p-4 rounded-xl bg-blue-500/20 border-2 border-blue-500 text-center">
+                                        <svg class="w-8 h-8 mx-auto text-blue-400 mb-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/>
+                                        </svg>
+                                        <span class="text-sm font-medium text-blue-400">STAFF BISNIS</span>
+                                        <p class="text-xs text-slate-500 mt-1">Membuat Dokumen</p>
+                                    </div>
+                                    <span class="mt-2 text-xs text-slate-500">SLA: 1 hari</span>
+                                </div>
+
+                                <!-- Arrow -->
+                                <svg class="w-8 h-8 text-slate-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/>
+                                </svg>
+
+                                <!-- Kepala Divisi -->
+                                <div id="wfKepala" class="flow-node flex flex-col items-center">
+                                    <div class="w-32 p-4 rounded-xl bg-amber-500/20 border-2 border-amber-500 text-center">
+                                        <svg class="w-8 h-8 mx-auto text-amber-400 mb-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z"/>
+                                        </svg>
+                                        <span class="text-sm font-medium text-amber-400">KEPALA DIVISI</span>
+                                        <p class="text-xs text-slate-500 mt-1">Review & Approval</p>
+                                    </div>
+                                    <span class="mt-2 text-xs text-slate-500">SLA: 2 hari</span>
+                                </div>
+
+                                <!-- Decision -->
+                                <div class="flow-node flex flex-col items-center">
+                                    <div class="w-24 h-24 rotate-45 bg-slate-700/50 border-2 border-slate-500 flex items-center justify-center">
+                                        <span class="-rotate-45 text-xs font-medium text-slate-300">Keputusan</span>
+                                    </div>
+                                </div>
+
+                                <!-- Branch: Revision -->
+                                <div class="flow-node flex flex-col items-center">
+                                    <div class="w-28 p-3 rounded-xl bg-red-500/20 border-2 border-red-500 text-center">
+                                        <svg class="w-6 h-6 mx-auto text-red-400 mb-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3"/>
+                                        </svg>
+                                        <span class="text-xs font-medium text-red-400">REVISI</span>
+                                    </div>
+                                    <span class="mt-2 text-xs text-slate-500">Kembali ke Staff</span>
+                                </div>
+
+                                <!-- Arrow -->
+                                <svg class="w-8 h-8 text-slate-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/>
+                                </svg>
+
+                                <!-- Manager Umum -->
+                                <div id="wfManager" class="flow-node flex flex-col items-center">
+                                    <div class="w-32 p-4 rounded-xl bg-emerald-500/20 border-2 border-emerald-500 text-center">
+                                        <svg class="w-8 h-8 mx-auto text-emerald-400 mb-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/>
+                                        </svg>
+                                        <span class="text-sm font-medium text-emerald-400">MANAGER UMUM</span>
+                                        <p class="text-xs text-slate-500 mt-1">Final Approval</p>
+                                    </div>
+                                    <span class="mt-2 text-xs text-slate-500">SLA: 3 hari</span>
+                                </div>
+
+                                <!-- Arrow -->
+                                <svg class="w-8 h-8 text-slate-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/>
+                                </svg>
+
+                                <!-- End -->
+                                <div class="flow-node flex flex-col items-center">
+                                    <div class="w-20 h-20 rounded-full bg-slate-700/50 border-2 border-slate-500 flex items-center justify-center">
+                                        <svg class="w-8 h-8 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 10.5h6"/>
+                                        </svg>
+                                    </div>
+                                    <span class="mt-2 text-xs font-medium text-slate-400">SELESAI</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Current User Position in Workflow -->
+                    <div class="glass-card rounded-xl p-5">
+                        <h3 class="font-semibold text-white mb-4">Posisi Anda dalam Alur Kerja</h3>
+                        <div id="userWorkflowPosition" class="flex items-center gap-4">
+                            <!-- Will be rendered based on user role -->
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- Upload Document Modal -->
+    <div id="uploadModal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeUploadModal()"></div>
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div class="glass-card rounded-2xl m-4">
+                <div class="p-6 border-b border-slate-700/50 flex items-center justify-between">
+                    <h3 class="font-display text-xl font-bold text-white">Upload Dokumen Baru</h3>
+                    <button onclick="closeUploadModal()" class="p-2 text-slate-400 hover:text-white transition-colors">
+                        <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+                <form onsubmit="submitDocument(event)" class="p-6 space-y-6">
+                    <!-- File Upload Zone -->
+                    <div>
+                        <label class="block text-sm font-medium text-slate-300 mb-2">File Dokumen</label>
+                        <div id="uploadZone" class="upload-zone rounded-xl p-8 text-center cursor-pointer" 
+                            onclick="document.getElementById('fileInput').click()"
+                            ondragover="handleDragOver(event)"
+                            ondragleave="handleDragLeave(event)"
+                            ondrop="handleDrop(event)">
+                            <input type="file" id="fileInput" class="hidden" accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg" onchange="handleFileSelect(event)" multiple>
+                            <div id="uploadPlaceholder">
+                                <svg class="w-16 h-16 mx-auto text-slate-600 mb-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z"/>
+                                </svg>
+                                <p class="text-slate-400 mb-2">Drag & drop file di sini atau klik untuk memilih</p>
+                                <p class="text-xs text-slate-600">Mendukung: PDF, DOC, DOCX, XLS, XLSX, PNG, JPG (Maks. 10MB per file)</p>
+                            </div>
+                            <div id="fileList" class="hidden space-y-2">
+                                <!-- Selected files will be listed here -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Document Details -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-300 mb-2">Judul Dokumen <span class="text-red-400">*</span></label>
+                            <input type="text" id="docTitle" required
+                                class="input-modern w-full px-4 py-3 rounded-xl text-white placeholder-slate-500" placeholder="Masukkan judul dokumen">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-300 mb-2">Tipe Dokumen <span class="text-red-400">*</span></label>
+                            <select id="docType" required class="input-modern w-full px-4 py-3 rounded-xl text-white">
+                                <option value="">Pilih tipe</option>
+                                <option value="proposal">Proposal</option>
+                                <option value="kontrak">Kontrak</option>
+                                <option value="laporan">Laporan</option>
+                                <option value="memo">Memo</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-slate-300 mb-2">Deskripsi</label>
+                        <textarea id="docDescription" rows="3"
+                            class="input-modern w-full px-4 py-3 rounded-xl text-white placeholder-slate-500 resize-none" placeholder="Deskripsi singkat dokumen (opsional)"></textarea>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-slate-300 mb-2">Prioritas</label>
+                        <div class="flex gap-4">
+                            <label class="flex items-center cursor-pointer">
+                                <input type="radio" name="priority" value="normal" checked class="w-4 h-4 text-emerald-500 bg-slate-800 border-slate-600 focus:ring-emerald-500">
+                                <span class="ml-2 text-sm text-slate-300">Normal</span>
+                            </label>
+                            <label class="flex items-center cursor-pointer">
+                                <input type="radio" name="priority" value="high" class="w-4 h-4 text-amber-500 bg-slate-800 border-slate-600 focus:ring-amber-500">
+                                <span class="ml-2 text-sm text-slate-300">Tinggi</span>
+                            </label>
+                            <label class="flex items-center cursor-pointer">
+                                <input type="radio" name="priority" value="urgent" class="w-4 h-4 text-red-500 bg-slate-800 border-slate-600 focus:ring-red-500">
+                                <span class="ml-2 text-sm text-slate-300">Urgent</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-3 pt-4 border-t border-slate-700/50">
+                        <button type="button" onclick="closeUploadModal()" class="flex-1 py-3 rounded-xl bg-slate-700/50 text-slate-300 font-medium hover:bg-slate-700 transition-all">
+                            Batal
+                        </button>
+                        <button type="submit" id="submitBtn" class="flex-1 btn-primary py-3 rounded-xl text-white font-semibold flex items-center justify-center gap-2" disabled>
+                            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/>
+                            </svg>
+                            Upload & Kirim
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Document Detail Modal -->
+    <div id="docModal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeDocModal()"></div>
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div class="glass-card rounded-2xl m-4">
+                <div class="p-6 border-b border-slate-700/50 flex items-center justify-between">
+                    <h3 class="font-display text-xl font-bold text-white">Detail Dokumen</h3>
+                    <button onclick="closeDocModal()" class="p-2 text-slate-400 hover:text-white transition-colors">
+                        <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+                <div id="docModalContent" class="p-6">
+                    <!-- Content will be rendered here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Logout Confirmation Modal -->
+    <div id="logoutModal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeLogoutModal()"></div>
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-sm">
+            <div class="glass-card rounded-2xl m-4 p-6 text-center">
+                <div class="w-16 h-16 mx-auto rounded-full bg-red-500/20 flex items-center justify-center mb-4">
+                    <svg class="w-8 h-8 text-red-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75"/>
+                    </svg>
+                </div>
+                <h3 class="font-display text-xl font-bold text-white mb-2">Keluar dari Aplikasi?</h3>
+                <p class="text-slate-400 mb-6">Anda akan keluar dari sesi saat ini. Pastikan semua perubahan telah disimpan.</p>
+                <div class="flex gap-3">
+                    <button onclick="closeLogoutModal()" class="flex-1 py-3 rounded-xl bg-slate-700/50 text-slate-300 font-medium hover:bg-slate-700 transition-all">
+                        Batal
+                    </button>
+                    <button onclick="confirmLogout()" class="flex-1 py-3 rounded-xl bg-red-500 text-white font-semibold hover:bg-red-600 transition-all">
+                        Keluar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ===== DATA =====
+        const users = {
+            staff: {
+                name: 'Budi Santoso',
+                email: 'budi.santoso@company.com',
+                phone: '81234567890',
+                role: 'Staff Bisnis',
+                roleKey: 'staff',
+                avatar: 'BS',
+                color: 'from-blue-400 to-cyan-500',
+                department: 'Divisi Bisnis'
+            },
+            kepala: {
+                name: 'Dewi Lestari',
+                email: 'dewi.lestari@company.com',
+                phone: '81234567891',
+                role: 'Kepala Divisi',
+                roleKey: 'kepala',
+                avatar: 'DL',
+                color: 'from-amber-400 to-orange-500',
+                department: 'Divisi Bisnis'
+            },
+            manager: {
+                name: 'Ahmad Wijaya',
+                email: 'ahmad.wijaya@company.com',
+                phone: '81234567892',
+                role: 'Manager Umum',
+                roleKey: 'manager',
+                avatar: 'AW',
+                color: 'from-emerald-400 to-teal-500',
+                department: 'Manajemen'
+            }
+        };
+
+        let documents = [
+            { id: 'DOC-2025-001', title: 'Proposal Proyek Digitalisasi Arsip', type: 'proposal', requester: 'Budi Santoso', requesterId: 'staff', status: 'approved', currentLevel: 'done', createdAt: '2025-01-15', slaDeadline: '2025-01-21', slaRemaining: 0, slaStatus: 'ontime', priority: 'normal', description: 'Proposal untuk digitalisasi arsip perusahaan', files: [{ name: 'proposal_digitalisasi.pdf', size: '2.4 MB' }], history: [
+                { action: 'created', by: 'Budi Santoso', at: '2025-01-15 09:00', note: 'Dokumen dibuat' },
+                { action: 'approved', by: 'Dewi Lestari', at: '2025-01-16 14:30', note: 'Disetujui untuk lanjut ke Manager' },
+                { action: 'approved', by: 'Ahmad Wijaya', at: '2025-01-18 10:00', note: 'Disetujui - Final' }
+            ]},
+            { id: 'DOC-2025-002', title: 'Kontrak Kerjasama Vendor IT', type: 'kontrak', requester: 'Siti Rahayu', requesterId: 'staff', status: 'process', currentLevel: 'manager', createdAt: '2025-01-28', slaDeadline: '2025-02-04', slaRemaining: 0, slaStatus: 'ontime', priority: 'high', description: 'Kontrak kerjasama dengan vendor IT untuk pengadaan server', files: [{ name: 'kontrak_vendor_it.pdf', size: '1.8 MB' }, { name: 'lampiran_spesifikasi.pdf', size: '500 KB' }], history: [
+                { action: 'created', by: 'Siti Rahayu', at: '2025-01-28 10:00', note: 'Dokumen dibuat' },
+                { action: 'approved', by: 'Dewi Lestari', at: '2025-01-29 15:00', note: 'Disetujui, menunggu Manager' }
+            ]},
+            { id: 'DOC-2025-003', title: 'Laporan Keuangan Q4 2024', type: 'laporan', requester: 'Budi Santoso', requesterId: 'staff', status: 'pending', currentLevel: 'kepala', createdAt: '2025-02-01', slaDeadline: '2025-02-05', slaRemaining: 1, slaStatus: 'warning', priority: 'urgent', description: 'Laporan keuangan kuartal 4 tahun 2024', files: [{ name: 'laporan_keuangan_q4.pdf', size: '3.2 MB' }], history: [
+                { action: 'created', by: 'Budi Santoso', at: '2025-02-01 08:30', note: 'Dokumen dibuat' }
+            ]},
+            { id: 'DOC-2025-004', title: 'Memo Kebijakan Kerja Remote', type: 'memo', requester: 'Andi Pratama', requesterId: 'staff', status: 'revision', currentLevel: 'staff', createdAt: '2025-01-20', slaDeadline: '2025-01-25', slaRemaining: -10, slaStatus: 'late', priority: 'normal', description: 'Memo tentang kebijakan kerja remote karyawan', files: [{ name: 'memo_kerja_remote.docx', size: '150 KB' }], history: [
+                { action: 'created', by: 'Andi Pratama', at: '2025-01-20 11:00', note: 'Dokumen dibuat' },
+                { action: 'revision', by: 'Dewi Lestari', at: '2025-01-22 09:00', note: 'Perlu revisi: tambahkan detail jadwal hybrid' }
+            ]},
+            { id: 'DOC-2025-005', title: 'Proposal Pelatihan Karyawan', type: 'proposal', requester: 'Dewi Lestari', requesterId: 'kepala', status: 'pending', currentLevel: 'kepala', createdAt: '2025-02-02', slaDeadline: '2025-02-06', slaRemaining: 2, slaStatus: 'ontime', priority: 'normal', description: 'Proposal program pelatihan pengembangan karyawan', files: [{ name: 'proposal_pelatihan.pdf', size: '1.5 MB' }], history: [
+                { action: 'created', by: 'Dewi Lestari', at: '2025-02-02 14:00', note: 'Dokumen dibuat' }
+            ]},
+        ];
+
+        const activities = [
+            { type: 'approved', user: 'Ahmad Wijaya', doc: 'DOC-2025-001', title: 'Proposal Proyek Digitalisasi Arsip', time: '2 jam lalu' },
+            { type: 'submitted', user: 'Budi Santoso', doc: 'DOC-2025-003', title: 'Laporan Keuangan Q4 2024', time: '4 jam lalu' },
+            { type: 'revision', user: 'Dewi Lestari', doc: 'DOC-2025-004', title: 'Memo Kebijakan Kerja Remote', time: '1 hari lalu' },
+            { type: 'submitted', user: 'Siti Rahayu', doc: 'DOC-2025-002', title: 'Kontrak Kerjasama Vendor IT', time: '2 hari lalu' },
+        ];
+
+        let notifications = [
+            { id: 1, title: 'Dokumen Baru Menunggu', message: 'Laporan Keuangan Q4 2024 membutuhkan persetujuan Anda', time: '10 menit lalu', read: false },
+            { id: 2, title: 'SLA Mendekati Batas', message: 'Laporan Keuangan Q4 2024 akan melewati batas SLA dalam 1 hari', time: '1 jam lalu', read: false },
+            { id: 3, title: 'Dokumen Disetujui', message: 'Proposal Proyek Digitalisasi Arsip telah disetujui', time: '2 jam lalu', read: true },
+        ];
+
+        // ===== STATE =====
+        let currentUser = null;
+        let currentSection = 'overview';
+        let uploadedFiles = [];
+        let whatsappStep = 'phone'; // 'phone' or 'otp'
+
+        // ===== INITIALIZATION =====
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedUser = localStorage.getItem('docuflow_user');
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                showDashboard();
+            }
+        });
+
+        // ===== TOAST NOTIFICATIONS =====
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast glass-card rounded-xl p-4 flex items-center gap-3 min-w-72`;
+            
+            const icons = {
+                success: '<svg class="w-5 h-5 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>',
+                error: '<svg class="w-5 h-5 text-red-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>',
+                warning: '<svg class="w-5 h-5 text-amber-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>',
+                info: '<svg class="w-5 h-5 text-blue-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"/></svg>'
+            };
+            
+            toast.innerHTML = `
+                ${icons[type]}
+                <span class="text-sm text-white">${message}</span>
+            `;
+            
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.classList.add('hide');
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+
+        // ===== AUTH FUNCTIONS =====
+        function switchLoginTab(tab) {
+            const emailForm = document.getElementById('emailForm');
+            const whatsappForm = document.getElementById('whatsappForm');
+            const tabEmail = document.getElementById('tabEmail');
+            const tabWhatsapp = document.getElementById('tabWhatsapp');
+
+            if (tab === 'email') {
+                emailForm.classList.remove('hidden');
+                whatsappForm.classList.add('hidden');
+                tabEmail.classList.add('bg-emerald-500/20', 'text-emerald-400');
+                tabEmail.classList.remove('text-slate-400');
+                tabWhatsapp.classList.remove('bg-emerald-500/20', 'text-emerald-400');
+                tabWhatsapp.classList.add('text-slate-400');
+            } else {
+                emailForm.classList.add('hidden');
+                whatsappForm.classList.remove('hidden');
+                tabWhatsapp.classList.add('bg-emerald-500/20', 'text-emerald-400');
+                tabWhatsapp.classList.remove('text-slate-400');
+                tabEmail.classList.remove('bg-emerald-500/20', 'text-emerald-400');
+                tabEmail.classList.add('text-slate-400');
+                whatsappStep = 'phone';
+                resetWhatsAppForm();
+            }
+        }
+
+        function togglePassword() {
+            const input = document.getElementById('passwordInput');
+            const icon = document.getElementById('eyeIcon');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88"/>';
+            } else {
+                input.type = 'password';
+                icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>';
+            }
+        }
+
+        function handleEmailLogin(event) {
+            event.preventDefault();
+            const email = document.getElementById('emailInput').value;
+            const password = document.getElementById('passwordInput').value;
+            
+            // Determine role based on email for demo
+            let role = 'staff';
+            if (email.includes('kepala') || email.includes('dewi')) role = 'kepala';
+            else if (email.includes('manager') || email.includes('ahmad')) role = 'manager';
+            
+            demoLogin(role);
+        }
+
+        function handleWhatsAppLogin(event) {
+            event.preventDefault();
+            
+            if (whatsappStep === 'phone') {
+                const phone = document.getElementById('whatsappInput').value;
+                if (phone.length >= 10) {
+                    // Show OTP input
+                    document.getElementById('otpSection').classList.remove('hidden');
+                    document.getElementById('whatsappBtnText').textContent = 'Verifikasi Kode';
+                    whatsappStep = 'otp';
+                    showToast('Kode verifikasi telah dikirim ke WhatsApp Anda', 'success');
+                }
+            } else {
+                // Verify OTP
+                const otpInputs = document.querySelectorAll('.otp-input');
+                let otp = '';
+                otpInputs.forEach(input => otp += input.value);
+                
+                if (otp.length === 4) {
+                    // For demo, accept any 4-digit OTP
+                    const phone = document.getElementById('whatsappInput').value;
+                    let role = 'staff';
+                    if (phone.endsWith('1')) role = 'kepala';
+                    else if (phone.endsWith('2')) role = 'manager';
+                    
+                    demoLogin(role);
+                }
+            }
+        }
+
+        function moveToNext(input, index) {
+            if (input.value.length === 1) {
+                const inputs = document.querySelectorAll('.otp-input');
+                if (index < inputs.length) {
+                    inputs[index].focus();
+                }
+            }
+        }
+
+        function resetWhatsAppForm() {
+            document.getElementById('otpSection').classList.add('hidden');
+            document.getElementById('whatsappBtnText').textContent = 'Kirim Kode Verifikasi';
+            document.getElementById('whatsappInput').value = '';
+            document.querySelectorAll('.otp-input').forEach(input => input.value = '');
+        }
+
+        function handleSSO(provider) {
+            showToast(`Menghubungkan ke ${provider}...`, 'info');
+            setTimeout(() => demoLogin('staff'), 1000);
+        }
+
+        function demoLogin(role) {
+            currentUser = users[role];
+            localStorage.setItem('docuflow_user', JSON.stringify(currentUser));
+            showToast(`Selamat datang, ${currentUser.name}!`, 'success');
+            showDashboard();
+        }
+
+        function handleLogout() {
+            document.getElementById('logoutModal').classList.remove('hidden');
+        }
+
+        function closeLogoutModal() {
+            document.getElementById('logoutModal').classList.add('hidden');
+        }
+
+        function confirmLogout() {
+            currentUser = null;
+            localStorage.removeItem('docuflow_user');
+            closeLogoutModal();
+            document.getElementById('dashboardPage').classList.add('hidden');
+            document.getElementById('loginPage').classList.remove('hidden');
+            showToast('Anda telah keluar dari aplikasi', 'info');
+        }
+
+        // ===== DASHBOARD FUNCTIONS =====
+        function showDashboard() {
+            document.getElementById('loginPage').classList.add('hidden');
+            document.getElementById('dashboardPage').classList.remove('hidden');
+            
+            // Update user info
+            document.getElementById('userAvatar').textContent = currentUser.avatar;
+            document.getElementById('userAvatar').className = `w-10 h-10 rounded-full bg-gradient-to-br ${currentUser.color} flex items-center justify-center text-white font-bold`;
+            document.getElementById('userName').textContent = currentUser.name;
+            document.getElementById('userRole').textContent = currentUser.role;
+
+            // Render sidebar based on role
+            renderSidebar();
+            
+            // Show/hide upload button based on role
+            document.getElementById('newDocBtn').style.display = currentUser.roleKey === 'staff' ? 'flex' : 'none';
+
+            // Render all sections
+            renderWelcomeBanner();
+            renderStats();
+            renderRecentDocuments();
+            renderDocumentsTable();
+            renderActivityTimeline();
+            renderNotifications();
+            renderSLAProgress();
+            renderWorkflowPosition();
+            renderQuickActions();
+            
+            if (currentUser.roleKey === 'staff') {
+                renderMyDocuments();
+            } else {
+                renderApprovals();
+            }
+        }
+
+        function renderSidebar() {
+            const nav = document.getElementById('sidebarNav');
+            
+            const baseItems = [
+                { id: 'overview', icon: '<path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z"/>', label: 'Overview' },
+                { id: 'documents', icon: '<path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/>', label: 'Semua Dokumen' },
+            ];
+
+            const roleSpecificItems = {
+                staff: [
+                    { id: 'myDocuments', icon: '<path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/>', label: 'Dokumen Saya' },
+                ],
+                kepala: [
+                    { id: 'approvals', icon: '<path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>', label: 'Persetujuan' },
+                ],
+                manager: [
+                    { id: 'approvals', icon: '<path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>', label: 'Persetujuan' },
+                ]
+            };
+
+            const workflowItem = { id: 'workflow', icon: '<path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3v11.25A2.25 2.25 0 006 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0118 16.5h-2.25m-7.5 0h7.5m-7.5 0l-1 3m8.5-3l1 3m0 0l.5 1.5m-.5-1.5h-9.5m0 0l-.5 1.5"/>', label: 'Alur Kerja' };
+
+            const allItems = [...baseItems, ...roleSpecificItems[currentUser.roleKey], workflowItem];
+
+            nav.innerHTML = allItems.map(item => `
+                <button onclick="showSection('${item.id}')" class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left ${item.id === 'overview' ? 'active text-white' : 'text-slate-400 hover:text-white'}">
+                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">${item.icon}</svg>
+                    <span class="text-sm font-medium">${item.label}</span>
+                </button>
+            `).join('');
+        }
+
+        function renderWelcomeBanner() {
+            const title = document.getElementById('welcomeTitle');
+            const message = document.getElementById('welcomeMessage');
+            const hour = new Date().getHours();
+            let greeting = 'Selamat Pagi';
+            if (hour >= 12 && hour < 15) greeting = 'Selamat Siang';
+            else if (hour >= 15 && hour < 18) greeting = 'Selamat Sore';
+            else if (hour >= 18) greeting = 'Selamat Malam';
+
+            title.textContent = `${greeting}, ${currentUser.name.split(' ')[0]}!`;
+
+            const messages = {
+                staff: 'Anda dapat mengupload dokumen baru dan memantau status persetujuan dokumen Anda.',
+                kepala: 'Tinjau dan setujui dokumen yang diajukan oleh staf divisi Anda.',
+                manager: 'Tinjau dan berikan persetujuan final untuk dokumen yang telah disetujui kepala divisi.'
+            };
+            message.textContent = messages[currentUser.roleKey];
+        }
+
+        function renderStats() {
+            const container = document.getElementById('statsContainer');
+            
+            let stats = [];
+            
+            if (currentUser.roleKey === 'staff') {
+                const myDocs = documents.filter(d => d.requesterId === currentUser.roleKey || d.requester === currentUser.name);
+                stats = [
+                    { label: 'Total Dokumen Saya', value: myDocs.length, color: 'blue', icon: '<path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/>' },
+                    { label: 'Menunggu Persetujuan', value: myDocs.filter(d => d.status === 'pending').length, color: 'amber', icon: '<path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/>' },
+                    { label: 'Dalam Proses', value: myDocs.filter(d => d.status === 'process').length, color: 'blue', icon: '<path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"/>' },
+                    { label: 'Disetujui', value: myDocs.filter(d => d.status === 'approved').length, color: 'emerald', icon: '<path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>' }
+                ];
+            } else {
+                const pendingForMe = documents.filter(d => d.currentLevel === currentUser.roleKey && d.status !== 'approved');
+                stats = [
+                    { label: 'Menunggu Saya', value: pendingForMe.length, color: 'amber', icon: '<path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/>' },
+                    { label: 'Total Dokumen', value: documents.length, color: 'blue', icon: '<path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/>' },
+                    { label: 'Sudah Diproses', value: documents.filter(d => d.status === 'approved' || (d.currentLevel !== currentUser.roleKey && d.status !== 'pending')).length, color: 'emerald', icon: '<path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>' },
+                    { label: 'Perlu Revisi', value: documents.filter(d => d.status === 'revision').length, color: 'red', icon: '<path stroke-linecap="round" stroke-linejoin="round" d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3"/>' }
+                ];
+            }
+
+            container.innerHTML = stats.map((stat, i) => `
+                <div class="glass-card rounded-xl p-5 animate-fade-in-up stagger-${i + 1}">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="w-10 h-10 rounded-lg bg-${stat.color}-500/20 flex items-center justify-center">
+                            <svg class="w-5 h-5 text-${stat.color}-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">${stat.icon}</svg>
+                        </div>
+                    </div>
+                    <p class="text-2xl font-bold text-white">${stat.value}</p>
+                    <p class="text-sm text-slate-500">${stat.label}</p>
+                </div>
+            `).join('');
+
+            // Update quick stats
+            const total = documents.length;
+            const pending = documents.filter(d => d.status === 'pending').length;
+            const process = documents.filter(d => d.status === 'process').length;
+            const approved = documents.filter(d => d.status === 'approved').length;
+
+            document.getElementById('quickPending').textContent = pending;
+            document.getElementById('quickProcess').textContent = process;
+            document.getElementById('quickDone').textContent = approved;
+        }
+
+        function renderRecentDocuments() {
+            const tbody = document.getElementById('recentDocsTable');
+            let recentDocs = [];
+            
+            if (currentUser.roleKey === 'staff') {
+                recentDocs = documents.filter(d => d.requesterId === currentUser.roleKey || d.requester === currentUser.name).slice(0, 5);
+            } else {
+                recentDocs = documents.filter(d => d.currentLevel === currentUser.roleKey || d.status === 'approved').slice(0, 5);
+            }
+            
+            if (recentDocs.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="py-8 text-center text-slate-500">Belum ada dokumen</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = recentDocs.map(doc => `
+                <tr class="table-row-hover border-b border-slate-700/30">
+                    <td class="py-4 px-5">
+                        <div>
+                            <p class="font-medium text-white">${doc.id}</p>
+                            <p class="text-sm text-slate-500 truncate max-w-xs">${doc.title}</p>
+                        </div>
+                    </td>
+                    <td class="py-4 px-5">
+                        <span class="status-${doc.status} px-3 py-1 rounded-full text-xs font-medium">${getStatusText(doc.status)}</span>
+                    </td>
+                    <td class="py-4 px-5">
+                        <span class="${doc.slaStatus === 'late' ? 'text-red-400' : doc.slaStatus === 'warning' ? 'text-amber-400' : 'text-emerald-400'} text-sm font-medium">
+                            ${doc.slaRemaining < 0 ? `${Math.abs(doc.slaRemaining)}h terlambat` : doc.slaRemaining === 0 ? 'Hari ini' : `${doc.slaRemaining}h lagi`}
+                        </span>
+                    </td>
+                    <td class="py-4 px-5">
+                        <button onclick="openDocDetail('${doc.id}')" class="text-emerald-400 hover:text-emerald-300 text-sm font-medium transition-colors">
+                            Detail
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function renderDocumentsTable() {
+            const tbody = document.getElementById('documentsTable');
+            
+            tbody.innerHTML = documents.map(doc => `
+                <tr class="table-row-hover border-b border-slate-700/30">
+                    <td class="py-4 px-5 font-mono text-sm text-slate-300">${doc.id}</td>
+                    <td class="py-4 px-5 text-white">${doc.title}</td>
+                    <td class="py-4 px-5">
+                        <span class="text-slate-400 capitalize">${doc.type}</span>
+                    </td>
+                    <td class="py-4 px-5 text-slate-400">${doc.requester}</td>
+                    <td class="py-4 px-5">
+                        <span class="status-${doc.status} px-3 py-1 rounded-full text-xs font-medium">${getStatusText(doc.status)}</span>
+                    </td>
+                    <td class="py-4 px-5">
+                        <span class="${doc.slaStatus === 'late' ? 'text-red-400' : doc.slaStatus === 'warning' ? 'text-amber-400' : 'text-emerald-400'} text-sm font-medium">
+                            ${doc.slaRemaining < 0 ? `${Math.abs(doc.slaRemaining)}h terlambat` : doc.slaRemaining === 0 ? 'Hari ini' : `${doc.slaRemaining}h lagi`}
+                        </span>
+                    </td>
+                    <td class="py-4 px-5">
+                        <div class="flex items-center gap-2">
+                            <button onclick="openDocDetail('${doc.id}')" class="p-2 text-slate-400 hover:text-emerald-400 transition-colors" title="Detail">
+                                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                </svg>
+                            </button>
+                            ${canTakeAction(doc) ? `
+                                <button onclick="approveDoc('${doc.id}')" class="p-2 text-slate-400 hover:text-emerald-400 transition-colors" title="Setujui">
+                                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
+                                    </svg>
+                                </button>
+                                <button onclick="rejectDoc('${doc.id}')" class="p-2 text-slate-400 hover:text-red-400 transition-colors" title="Revisi">
+                                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3"/>
+                                    </svg>
+                                </button>
+                            ` : ''}
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function renderMyDocuments() {
+            const container = document.getElementById('myDocsGrid');
+            const myDocs = documents.filter(d => d.requesterId === currentUser.roleKey || d.requester === currentUser.name);
+            
+            if (myDocs.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full glass-card rounded-xl p-12 text-center">
+                        <svg class="w-16 h-16 mx-auto text-slate-600 mb-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/>
+                        </svg>
+                        <p class="text-slate-400 mb-4">Anda belum memiliki dokumen</p>
+                        <button onclick="openUploadModal()" class="btn-primary px-6 py-2 rounded-lg text-white font-medium">
+                            Upload Dokumen Pertama
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = myDocs.map(doc => `
+                <div class="glass-card rounded-xl p-5 hover:border-emerald-500/30 transition-all cursor-pointer" onclick="openDocDetail('${doc.id}')">
+                    <div class="flex items-start justify-between mb-3">
+                        <span class="status-${doc.status} px-2 py-1 rounded-full text-xs font-medium">${getStatusText(doc.status)}</span>
+                        <span class="text-xs text-slate-500">${doc.createdAt}</span>
+                    </div>
+                    <h4 class="font-medium text-white mb-2 line-clamp-2">${doc.title}</h4>
+                    <p class="text-xs text-slate-500 mb-3 capitalize">${doc.type}</p>
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs text-slate-500">${doc.id}</span>
+                        <span class="${doc.slaStatus === 'late' ? 'text-red-400' : doc.slaStatus === 'warning' ? 'text-amber-400' : 'text-emerald-400'} text-xs font-medium">
+                            ${doc.slaRemaining < 0 ? 'Terlambat' : doc.slaRemaining === 0 ? 'Hari ini' : `${doc.slaRemaining}h lagi`}
+                        </span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderApprovals() {
+            const container = document.getElementById('approvalsList');
+            const pendingApprovals = documents.filter(d => d.currentLevel === currentUser.roleKey && d.status !== 'approved');
+            
+            if (pendingApprovals.length === 0) {
+                container.innerHTML = `
+                    <div class="glass-card rounded-xl p-12 text-center">
+                        <svg class="w-16 h-16 mx-auto text-slate-600 mb-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <p class="text-slate-400">Tidak ada dokumen yang menunggu persetujuan Anda</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = pendingApprovals.map(doc => `
+                <div class="glass-card rounded-xl p-5">
+                    <div class="flex items-start justify-between mb-4">
+                        <div>
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="font-mono text-sm text-slate-500">${doc.id}</span>
+                                ${doc.priority === 'urgent' ? '<span class="text-xs bg-red-500/20 text-red-400 px-2 py-0.5 rounded-full">Urgent</span>' : doc.priority === 'high' ? '<span class="text-xs bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded-full">Prioritas Tinggi</span>' : ''}
+                            </div>
+                            <h4 class="font-medium text-white">${doc.title}</h4>
+                        </div>
+                        <span class="${doc.slaStatus === 'late' ? 'text-red-400' : doc.slaStatus === 'warning' ? 'text-amber-400' : 'text-emerald-400'} text-sm font-medium">
+                            ${doc.slaRemaining < 0 ? `${Math.abs(doc.slaRemaining)}h terlambat` : `${doc.slaRemaining}h tersisa`}
+                        </span>
+                    </div>
+                    <div class="flex items-center gap-4 mb-4 text-sm text-slate-400">
+                        <span>Diajukan oleh: <span class="text-white">${doc.requester}</span></span>
+                        <span>Tipe: <span class="text-white capitalize">${doc.type}</span></span>
+                    </div>
+                    ${doc.description ? `<p class="text-sm text-slate-400 mb-4">${doc.description}</p>` : ''}
+                    <div class="flex gap-3">
+                        <button onclick="openDocDetail('${doc.id}')" class="flex-1 py-2 rounded-lg bg-slate-700/50 text-slate-300 text-sm font-medium hover:bg-slate-700 transition-all">
+                            Lihat Detail
+                        </button>
+                        <button onclick="rejectDoc('${doc.id}')" class="flex-1 py-2 rounded-lg bg-red-500/20 text-red-400 text-sm font-medium hover:bg-red-500/30 transition-all">
+                            Minta Revisi
+                        </button>
+                        <button onclick="approveDoc('${doc.id}')" class="flex-1 btn-primary py-2 rounded-lg text-white text-sm font-medium">
+                            Setujui
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderActivityTimeline() {
+            const container = document.getElementById('activityTimeline');
+            
+            container.innerHTML = activities.map(act => `
+                <div class="flex gap-4">
+                    <div class="flex-shrink-0">
+                        <div class="w-10 h-10 rounded-full ${act.type === 'approved' ? 'bg-emerald-500/20' : act.type === 'revision' ? 'bg-red-500/20' : 'bg-blue-500/20'} flex items-center justify-center">
+                            ${act.type === 'approved' ? '<svg class="w-5 h-5 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>' : act.type === 'revision' ? '<svg class="w-5 h-5 text-red-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3"/></svg>' : '<svg class="w-5 h-5 text-blue-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>'}
+                        </div>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm text-white"><span class="font-medium">${act.user}</span> ${act.type === 'approved' ? 'menyetujui' : act.type === 'revision' ? 'meminta revisi' : 'mengajukan'} dokumen</p>
+                        <p class="text-xs text-slate-500 mt-1">${act.doc} - ${act.title}</p>
+                        <p class="text-xs text-slate-600 mt-1">${act.time}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderNotifications() {
+            const container = document.getElementById('notifList');
+            const unreadCount = notifications.filter(n => !n.read).length;
+            
+            document.getElementById('notifBadge').style.display = unreadCount > 0 ? 'block' : 'none';
+            
+            container.innerHTML = notifications.map(notif => `
+                <div class="p-4 ${notif.read ? 'bg-transparent' : 'bg-emerald-500/5'} hover:bg-slate-700/30 transition-colors cursor-pointer" onclick="markNotifRead(${notif.id})">
+                    <div class="flex items-start gap-3">
+                        <div class="w-2 h-2 mt-2 rounded-full ${notif.read ? 'bg-transparent' : 'bg-emerald-400'}"></div>
+                        <div>
+                            <p class="text-sm font-medium text-white">${notif.title}</p>
+                            <p class="text-xs text-slate-400 mt-1">${notif.message}</p>
+                            <p class="text-xs text-slate-600 mt-1">${notif.time}</p>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function markNotifRead(id) {
+            const notif = notifications.find(n => n.id === id);
+            if (notif) {
+                notif.read = true;
+                renderNotifications();
+            }
+        }
+
+        function markAllRead() {
+            notifications.forEach(n => n.read = true);
+            renderNotifications();
+            showToast('Semua notifikasi telah ditandai dibaca', 'success');
+        }
+
+        function renderSLAProgress() {
+            const ontime = documents.filter(d => d.slaStatus === 'ontime' || d.status === 'approved').length;
+            const late = documents.filter(d => d.slaStatus === 'late').length;
+            const total = documents.length;
+            const percent = total > 0 ? Math.round((ontime / total) * 100) : 0;
+            
+            document.getElementById('slaPercent').textContent = percent + '%';
+            document.getElementById('slaOnTime').textContent = ontime + ' dokumen';
+            document.getElementById('slaLate').textContent = late + ' dokumen';
+            
+            const ring = document.getElementById('slaRing');
+            const circumference = 2 * Math.PI * 40;
+            const offset = circumference - (percent / 100) * circumference;
+            setTimeout(() => {
+                ring.style.strokeDashoffset = offset;
+            }, 300);
+        }
+
+        function renderQuickActions() {
+            const container = document.getElementById('quickActionsContent');
+            
+            const actions = {
+                staff: [
+                    { label: 'Upload Dokumen Baru', icon: '<path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>', action: 'openUploadModal()' },
+                    { label: 'Lihat Dokumen Saya', icon: '<path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/>', action: "showSection('myDocuments')" },
+                    { label: 'Pantau Status', icon: '<path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>', action: "showSection('workflow')" }
+                ],
+                kepala: [
+                    { label: 'Review Dokumen', icon: '<path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>', action: "showSection('approvals')" },
+                    { label: 'Lihat Semua Dokumen', icon: '<path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/>', action: "showSection('documents')" }
+                ],
+                manager: [
+                    { label: 'Persetujuan Final', icon: '<path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>', action: "showSection('approvals')" },
+                    { label: 'Laporan SLA', icon: '<path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/>', action: "showSection('workflow')" }
+                ]
+            };
+            
+            container.innerHTML = actions[currentUser.roleKey].map(act => `
+                <button onclick="${act.action}" class="w-full flex items-center gap-3 p-3 rounded-xl bg-slate-800/50 hover:bg-slate-700/50 transition-all text-left">
+                    <svg class="w-5 h-5 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">${act.icon}</svg>
+                    <span class="text-sm text-slate-300">${act.label}</span>
+                </button>
+            `).join('');
+        }
+
+        function renderWorkflowPosition() {
+            const container = document.getElementById('userWorkflowPosition');
+            const roleLabels = {
+                staff: { label: 'Staff Bisnis', color: 'blue', prev: null, next: 'Kepala Divisi' },
+                kepala: { label: 'Kepala Divisi', color: 'amber', prev: 'Staff Bisnis', next: 'Manager Umum' },
+                manager: { label: 'Manager Umum', color: 'emerald', prev: 'Kepala Divisi', next: 'Selesai' }
+            };
+            
+            const roleInfo = roleLabels[currentUser.roleKey];
+            
+            container.innerHTML = `
+                <div class="flex items-center gap-2 text-slate-500">
+                    <div class="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-xs">1</div>
+                    <span class="text-sm">${roleInfo.prev || 'MULAI'}</span>
+                </div>
+                <svg class="w-6 h-6 text-slate-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/>
+                </svg>
+                <div class="flex items-center gap-2 text-${roleInfo.color}-400">
+                    <div class="w-10 h-10 rounded-full bg-${roleInfo.color}-500/20 flex items-center justify-center text-sm font-bold border-2 border-${roleInfo.color}-500">
+                        ${currentUser.roleKey === 'staff' ? '2' : currentUser.roleKey === 'kepala' ? '2' : '3'}
+                    </div>
+                    <span class="font-medium">${roleInfo.label}</span>
+                    <span class="text-xs bg-${roleInfo.color}-500/20 px-2 py-0.5 rounded-full">Anda di sini</span>
+                </div>
+                <svg class="w-6 h-6 text-slate-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/>
+                </svg>
+                <div class="flex items-center gap-2 text-slate-500">
+                    <div class="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-xs">?</div>
+                    <span class="text-sm">${roleInfo.next}</span>
+                </div>
+            `;
+        }
+
+        // ===== HELPER FUNCTIONS =====
+        function getStatusText(status) {
+            const statusMap = { pending: 'Menunggu', process: 'Dalam Proses', approved: 'Disetujui', revision: 'Revisi' };
+            return statusMap[status] || status;
+        }
+
+        function canTakeAction(doc) {
+            if (currentUser.roleKey === 'staff') return false;
+            if (currentUser.roleKey === 'kepala' && doc.currentLevel === 'kepala') return true;
+            if (currentUser.roleKey === 'manager' && doc.currentLevel === 'manager') return true;
+            return false;
+        }
+
+        // ===== NAVIGATION =====
+        function showSection(section) {
+            currentSection = section;
+            
+            document.querySelectorAll('[id^="section"]').forEach(el => el.classList.add('hidden'));
+            
+            const sectionEl = document.getElementById('section' + section.charAt(0).toUpperCase() + section.slice(1));
+            if (sectionEl) sectionEl.classList.remove('hidden');
+            
+            document.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('active'));
+            event?.target?.closest('.sidebar-item')?.classList.add('active');
+            
+            const titles = {
+                overview: 'Overview',
+                documents: 'Daftar Dokumen',
+                myDocuments: 'Dokumen Saya',
+                approvals: 'Persetujuan',
+                workflow: 'Alur Kerja'
+            };
+            document.getElementById('pageTitle').textContent = titles[section] || 'Dashboard';
+            
+            document.getElementById('sidebar').classList.remove('open');
+        }
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+        }
+
+        function toggleNotifications() {
+            document.getElementById('notifPanel').classList.toggle('hidden');
+        }
+
+        document.addEventListener('click', (e) => {
+            const panel = document.getElementById('notifPanel');
+            const btn = e.target.closest('[onclick="toggleNotifications()"]');
+            if (!panel.contains(e.target) && !btn) {
+                panel.classList.add('hidden');
+            }
+        });
+
+        // ===== FILE UPLOAD FUNCTIONS =====
+        function openUploadModal() {
+            if (currentUser.roleKey !== 'staff') {
+                showToast('Hanya Staff Bisnis yang dapat mengupload dokumen', 'error');
+                return;
+            }
+            document.getElementById('uploadModal').classList.remove('hidden');
+        }
+
+        function closeUploadModal() {
+            document.getElementById('uploadModal').classList.add('hidden');
+            resetUploadForm();
+        }
+
+        function resetUploadForm() {
+            uploadedFiles = [];
+            document.getElementById('fileInput').value = '';
+            document.getElementById('docTitle').value = '';
+            document.getElementById('docType').value = '';
+            document.getElementById('docDescription').value = '';
+            document.getElementById('uploadPlaceholder').classList.remove('hidden');
+            document.getElementById('fileList').classList.add('hidden');
+            document.getElementById('fileList').innerHTML = '';
+            document.getElementById('submitBtn').disabled = true;
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.currentTarget.classList.add('dragover');
+        }
+
+        function handleDragLeave(e) {
+            e.currentTarget.classList.remove('dragover');
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            e.currentTarget.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            processFiles(files);
+        }
+
+        function handleFileSelect(e) {
+            const files = e.target.files;
+            processFiles(files);
+        }
+
+        function processFiles(files) {
+            const maxSize = 10 * 1024 * 1024; // 10MB
+            const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'image/png', 'image/jpeg'];
+            
+            for (let file of files) {
+                if (file.size > maxSize) {
+                    showToast(`File ${file.name} melebihi batas 10MB`, 'error');
+                    continue;
+                }
+                if (!allowedTypes.includes(file.type)) {
+                    showToast(`Tipe file ${file.name} tidak didukung`, 'error');
+                    continue;
+                }
+                uploadedFiles.push(file);
+            }
+            
+            updateFileList();
+        }
+
+        function updateFileList() {
+            const placeholder = document.getElementById('uploadPlaceholder');
+            const fileList = document.getElementById('fileList');
+            
+            if (uploadedFiles.length > 0) {
+                placeholder.classList.add('hidden');
+                fileList.classList.remove('hidden');
+                
+                fileList.innerHTML = uploadedFiles.map((file, index) => `
+                    <div class="file-item flex items-center justify-between p-3 bg-slate-800/50 rounded-lg">
+                        <div class="flex items-center gap-3">
+                            <svg class="w-8 h-8 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/>
+                            </svg>
+                            <div class="text-left">
+                                <p class="text-sm text-white truncate max-w-xs">${file.name}</p>
+                                <p class="text-xs text-slate-500">${formatFileSize(file.size)}</p>
+                            </div>
+                        </div>
+                        <button onclick="removeFile(${index})" class="p-2 text-slate-400 hover:text-red-400 transition-colors">
+                            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                        </button>
+                    </div>
+                `).join('');
+            } else {
+                placeholder.classList.remove('hidden');
+                fileList.classList.add('hidden');
+            }
+            
+            validateForm();
+        }
+
+        function removeFile(index) {
+            uploadedFiles.splice(index, 1);
+            updateFileList();
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function validateForm() {
+            const title = document.getElementById('docTitle').value.trim();
+            const type = document.getElementById('docType').value;
+            const hasFiles = uploadedFiles.length > 0;
+            
+            document.getElementById('submitBtn').disabled = !(title && type && hasFiles);
+        }
+
+        // Add input listeners for validation
+        document.addEventListener('DOMContentLoaded', () => {
+            const titleInput = document.getElementById('docTitle');
+            const typeSelect = document.getElementById('docType');
+            
+            if (titleInput) titleInput.addEventListener('input', validateForm);
+            if (typeSelect) typeSelect.addEventListener('change', validateForm);
+        });
+
+        function submitDocument(event) {
+            event.preventDefault();
+            
+            const title = document.getElementById('docTitle').value.trim();
+            const type = document.getElementById('docType').value;
+            const description = document.getElementById('docDescription').value.trim();
+            const priority = document.querySelector('input[name="priority"]:checked').value;
+            
+            const newDoc = {
+                id: `DOC-2025-${String(documents.length + 1).padStart(3, '0')}`,
+                title: title,
+                type: type,
+                requester: currentUser.name,
+                requesterId: currentUser.roleKey,
+                status: 'pending',
+                currentLevel: 'kepala',
+                createdAt: new Date().toISOString().split('T')[0],
+                slaDeadline: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+                slaRemaining: 3,
+                slaStatus: 'ontime',
+                priority: priority,
+                description: description,
+                files: uploadedFiles.map(f => ({ name: f.name, size: formatFileSize(f.size) })),
+                history: [
+                    { action: 'created', by: currentUser.name, at: new Date().toLocaleString('id-ID'), note: 'Dokumen dibuat dan diajukan' }
+                ]
+            };
+            
+            documents.unshift(newDoc);
+            
+            closeUploadModal();
+            renderStats();
+            renderRecentDocuments();
+            renderDocumentsTable();
+            renderMyDocuments();
+            renderSLAProgress();
+            
+            showToast('Dokumen berhasil diupload dan diajukan!', 'success');
+            
+            // Add notification for approvers
+            notifications.unshift({
+                id: notifications.length + 1,
+                title: 'Dokumen Baru Diterima',
+                message: `${title} membutuhkan persetujuan Anda`,
+                time: 'Baru saja',
+                read: false
+            });
+        }
+
+        // ===== DOCUMENT ACTIONS =====
+        function openDocDetail(docId) {
+            const doc = documents.find(d => d.id === docId);
+            if (!doc) return;
+            
+            const modal = document.getElementById('docModal');
+            const content = document.getElementById('docModalContent');
+            
+            content.innerHTML = `
+                <div class="space-y-6">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <p class="text-xs text-slate-500 uppercase tracking-wider">No. Dokumen</p>
+                            <p class="text-white font-mono">${doc.id}</p>
+                        </div>
+                        <div>
+                            <p class="text-xs text-slate-500 uppercase tracking-wider">Status</p>
+                            <span class="status-${doc.status} px-3 py-1 rounded-full text-xs font-medium">${getStatusText(doc.status)}</span>
+                        </div>
+                        <div>
+                            <p class="text-xs text-slate-500 uppercase tracking-wider">Judul</p>
+                            <p class="text-white">${doc.title}</p>
+                        </div>
+                        <div>
+                            <p class="text-xs text-slate-500 uppercase tracking-wider">Tipe</p>
+                            <p class="text-white capitalize">${doc.type}</p>
+                        </div>
+                        <div>
+                            <p class="text-xs text-slate-500 uppercase tracking-wider">Pemohon</p>
+                            <p class="text-white">${doc.requester}</p>
+                        </div>
+                        <div>
+                            <p class="text-xs text-slate-500 uppercase tracking-wider">Tanggal Pengajuan</p>
+                            <p class="text-white">${doc.createdAt}</p>
+                        </div>
+                        <div>
+                            <p class="text-xs text-slate-500 uppercase tracking-wider">Batas SLA</p>
+                            <p class="${doc.slaStatus === 'late' ? 'text-red-400' : 'text-white'}">${doc.slaDeadline}</p>
+                        </div>
+                        <div>
+                            <p class="text-xs text-slate-500 uppercase tracking-wider">Prioritas</p>
+                            <p class="${doc.priority === 'urgent' ? 'text-red-400' : doc.priority === 'high' ? 'text-amber-400' : 'text-white'} capitalize">${doc.priority}</p>
+                        </div>
+                    </div>
+                    
+                    ${doc.description ? `
+                    <div>
+                        <p class="text-xs text-slate-500 uppercase tracking-wider mb-2">Deskripsi</p>
+                        <p class="text-slate-300 text-sm">${doc.description}</p>
+                    </div>
+                    ` : ''}
+                    
+                    ${doc.files && doc.files.length > 0 ? `
+                    <div>
+                        <p class="text-xs text-slate-500 uppercase tracking-wider mb-2">File Lampiran</p>
+                        <div class="space-y-2">
+                            ${doc.files.map(f => `
+                            <div class="flex items-center gap-3 p-3 bg-slate-800/50 rounded-lg">
+                                <svg class="w-5 h-5 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/>
+                                </svg>
+                                <div>
+                                    <p class="text-sm text-white">${f.name}</p>
+                                    <p class="text-xs text-slate-500">${f.size}</p>
+                                </div>
+                            </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                    ` : ''}
+                    
+                    <div>
+                        <p class="text-xs text-slate-500 uppercase tracking-wider mb-2">Riwayat Dokumen</p>
+                        <div class="space-y-3">
+                            ${doc.history.map(h => `
+                            <div class="flex items-start gap-3 p-3 rounded-lg bg-slate-800/30">
+                                <div class="w-8 h-8 rounded-full ${h.action === 'approved' ? 'bg-emerald-500/20' : h.action === 'revision' ? 'bg-red-500/20' : 'bg-blue-500/20'} flex items-center justify-center">
+                                    ${h.action === 'approved' ? '<svg class="w-4 h-4 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>' : h.action === 'revision' ? '<svg class="w-4 h-4 text-red-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3"/></svg>' : '<svg class="w-4 h-4 text-blue-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>'}
+                                </div>
+                                <div>
+                                    <p class="text-sm text-white">${h.by}</p>
+                                    <p class="text-xs text-slate-400">${h.note}</p>
+                                    <p class="text-xs text-slate-600">${h.at}</p>
+                                </div>
+                            </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                    
+                    ${canTakeAction(doc) ? `
+                    <div class="flex gap-3 pt-4 border-t border-slate-700/50">
+                        <button onclick="rejectDoc('${doc.id}'); closeDocModal();" class="flex-1 py-3 rounded-xl bg-red-500/20 text-red-400 font-semibold hover:bg-red-500/30 transition-all">
+                            Minta Revisi
+                        </button>
+                        <button onclick="approveDoc('${doc.id}'); closeDocModal();" class="flex-1 btn-primary py-3 rounded-xl text-white font-semibold">
+                            Setujui
+                        </button>
+                    </div>
+                    ` : ''}
+                </div>
+            `;
+            
+            modal.classList.remove('hidden');
+        }
+
+        function closeDocModal() {
+            document.getElementById('docModal').classList.add('hidden');
+        }
+
+        function approveDoc(docId) {
+            const doc = documents.find(d => d.id === docId);
+            if (!doc) return;
+            
+            if (doc.currentLevel === 'kepala') {
+                doc.currentLevel = 'manager';
+                doc.status = 'process';
+                doc.history.push({
+                    action: 'approved',
+                    by: currentUser.name,
+                    at: new Date().toLocaleString('id-ID'),
+                    note: 'Disetujui, diteruskan ke Manager Umum'
+                });
+            } else if (doc.currentLevel === 'manager') {
+                doc.currentLevel = 'done';
+                doc.status = 'approved';
+                doc.history.push({
+                    action: 'approved',
+                    by: currentUser.name,
+                    at: new Date().toLocaleString('id-ID'),
+                    note: 'Disetujui - Final'
+                });
+            }
+            
+            renderStats();
+            renderRecentDocuments();
+            renderDocumentsTable();
+            renderSLAProgress();
+            if (currentUser.roleKey === 'staff') {
+                renderMyDocuments();
+            } else {
+                renderApprovals();
+            }
+            
+            showToast('Dokumen berhasil disetujui!', 'success');
+        }
+
+        function rejectDoc(docId) {
+            const doc = documents.find(d => d.id === docId);
+            if (!doc) return;
+            
+            doc.currentLevel = 'staff';
+            doc.status = 'revision';
+            doc.history.push({
+                action: 'revision',
+                by: currentUser.name,
+                at: new Date().toLocaleString('id-ID'),
+                note: 'Diminta revisi'
+            });
+            
+            renderStats();
+            renderRecentDocuments();
+            renderDocumentsTable();
+            renderSLAProgress();
+            if (currentUser.roleKey === 'staff') {
+                renderMyDocuments();
+            } else {
+                renderApprovals();
+            }
+            
+            showToast('Permintaan revisi telah dikirim', 'warning');
+        }
+
+        function filterDocuments() {
+            const search = document.getElementById('docSearch').value.toLowerCase();
+            const status = document.getElementById('docStatusFilter').value;
+            const type = document.getElementById('docTypeFilter').value;
+            
+            let filtered = documents.filter(doc => {
+                const matchSearch = doc.title.toLowerCase().includes(search) || doc.id.toLowerCase().includes(search);
+                const matchStatus = !status || doc.status === status;
+                const matchType = !type || doc.type === type;
+                return matchSearch && matchStatus && matchType;
+            });
+            
+            const tbody = document.getElementById('documentsTable');
+            
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="py-8 text-center text-slate-500">Tidak ada dokumen ditemukan</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = filtered.map(doc => `
+                <tr class="table-row-hover border-b border-slate-700/30">
+                    <td class="py-4 px-5 font-mono text-sm text-slate-300">${doc.id}</td>
+                    <td class="py-4 px-5 text-white">${doc.title}</td>
+                    <td class="py-4 px-5"><span class="text-slate-400 capitalize">${doc.type}</span></td>
+                    <td class="py-4 px-5 text-slate-400">${doc.requester}</td>
+                    <td class="py-4 px-5"><span class="status-${doc.status} px-3 py-1 rounded-full text-xs font-medium">${getStatusText(doc.status)}</span></td>
+                    <td class="py-4 px-5">
+                        <span class="${doc.slaStatus === 'late' ? 'text-red-400' : doc.slaStatus === 'warning' ? 'text-amber-400' : 'text-emerald-400'} text-sm font-medium">
+                            ${doc.slaRemaining < 0 ? `${Math.abs(doc.slaRemaining)}h terlambat` : doc.slaRemaining === 0 ? 'Hari ini' : `${doc.slaRemaining}h lagi`}
+                        </span>
+                    </td>
+                    <td class="py-4 px-5">
+                        <div class="flex items-center gap-2">
+                            <button onclick="openDocDetail('${doc.id}')" class="p-2 text-slate-400 hover:text-emerald-400 transition-colors" title="Detail">
+                                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                </svg>
+                            </button>
+                            ${canTakeAction(doc) ? `
+                                <button onclick="approveDoc('${doc.id}')" class="p-2 text-slate-400 hover:text-emerald-400 transition-colors" title="Setujui">
+                                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
+                                </button>
+                                <button onclick="rejectDoc('${doc.id}')" class="p-2 text-slate-400 hover:text-red-400 transition-colors" title="Revisi">
+                                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3"/></svg>
+                                </button>
+                            ` : ''}
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Close modals on escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeDocModal();
+                closeUploadModal();
+                closeLogoutModal();
+            }
+        });
+    </script>
+</body>
+</html>

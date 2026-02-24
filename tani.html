@@ -1,0 +1,1029 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TaniMakmur - Platform Pertanian Terintegrasi Lengkap</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'soil': '#8B5A2B',
+                        'soil-dark': '#5D3A1A',
+                        'leaf': '#4A7C59',
+                        'leaf-light': '#7FB069',
+                        'harvest': '#E8A838',
+                        'rice': '#F5F5DC',
+                        'fresh': '#E8F5E9',
+                        'sprout': '#C5E1A5'
+                    },
+                    fontFamily: {
+                        'serif': ['Playfair Display', 'serif'],
+                        'sans': ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .pattern-field {
+            background-image: 
+                linear-gradient(45deg, rgba(139, 90, 43, 0.03) 25%, transparent 25%),
+                linear-gradient(-45deg, rgba(139, 90, 43, 0.03) 25%, transparent 25%),
+                linear-gradient(45deg, transparent 75%, rgba(139, 90, 43, 0.03) 75%),
+                linear-gradient(-45deg, transparent 75%, rgba(139, 90, 43, 0.03) 75%);
+            background-size: 20px 20px;
+        }
+        .chat-bubble {
+            position: relative;
+            max-width: 80%;
+            padding: 1rem;
+            border-radius: 1rem;
+            margin-bottom: 1rem;
+            animation: fadeIn 0.3s ease-in;
+        }
+        .chat-bubble.sent {
+            background: linear-gradient(135deg, #4A7C59 0%, #2d5a3d 100%);
+            color: white;
+            margin-left: auto;
+            border-bottom-right-radius: 0.25rem;
+        }
+        .chat-bubble.received {
+            background: #F3F4F6;
+            color: #1F2937;
+            margin-right: auto;
+            border-bottom-left-radius: 0.25rem;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .modal-enter {
+            animation: modalSlide 0.3s ease-out;
+        }
+        @keyframes modalSlide {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .step-active {
+            background: #4A7C59 !important;
+            border-color: #4A7C59 !important;
+            color: white !important;
+        }
+        .step-completed {
+            background: #7FB069 !important;
+            border-color: #7FB069 !important;
+            color: white !important;
+        }
+        .payment-selected {
+            border-color: #4A7C59 !important;
+            background: #f0fdf4 !important;
+        }
+        .tab-active {
+            border-bottom: 3px solid #4A7C59;
+            color: #4A7C59;
+            font-weight: 600;
+        }
+        .grain-texture {
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+        }
+        .hover-grow { transition: all 0.3s ease; }
+        .hover-grow:hover { transform: translateY(-5px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
+    </style>
+</head>
+<body class="font-sans text-gray-800 bg-stone-50">
+
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 bg-white/95 backdrop-blur-md border-b border-stone-200 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-20 items-center">
+                <div class="flex items-center space-x-3 cursor-pointer" onclick="showDashboard()">
+                    <div class="w-12 h-12 bg-gradient-to-br from-leaf to-soil rounded-full flex items-center justify-center text-white text-2xl shadow-lg">
+                        <i class="fas fa-seedling"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-serif font-bold text-soil-dark">TaniMakmur</h1>
+                        <p class="text-xs text-leaf font-medium">Solusi Pertanian Modern</p>
+                    </div>
+                </div>
+                <div class="hidden md:flex space-x-8">
+                    <a href="#edukasi" class="text-gray-700 hover:text-leaf font-medium transition flex items-center gap-2">
+                        <i class="fas fa-graduation-cap text-sm"></i> Edukasi
+                    </a>
+                    <a href="#produk" class="text-gray-700 hover:text-leaf font-medium transition flex items-center gap-2">
+                        <i class="fas fa-store text-sm"></i> Belanja
+                    </a>
+                    <a href="#perawatan" class="text-gray-700 hover:text-leaf font-medium transition flex items-center gap-2">
+                        <i class="fas fa-calendar-check text-sm"></i> Jadwal
+                    </a>
+                    <a href="#komunitas" class="text-gray-700 hover:text-leaf font-medium transition flex items-center gap-2">
+                        <i class="fas fa-comments text-sm"></i> Konsultasi
+                    </a>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button onclick="openCart()" class="relative p-2 text-gray-600 hover:text-leaf transition group">
+                        <i class="fas fa-shopping-cart text-xl group-hover:scale-110 transition"></i>
+                        <span id="cartBadge" class="absolute -top-1 -right-1 bg-harvest text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold animate-pulse">0</span>
+                    </button>
+                    <div id="userSection" class="hidden md:flex items-center space-x-3">
+                        <button onclick="openLoginModal()" class="bg-leaf text-white px-6 py-2 rounded-full hover:bg-leaf-light transition font-medium shadow-lg hover:shadow-xl">
+                            Masuk
+                        </button>
+                    </div>
+                    <div id="loggedInSection" class="hidden items-center space-x-3">
+                        <div class="text-right hidden lg:block">
+                            <p class="text-sm font-semibold text-soil-dark">Pak Tani</p>
+                            <p class="text-xs text-gray-500">Petani Level 3</p>
+                        </div>
+                        <div class="relative group">
+                            <img src="https://i.pravatar.cc/150?img=68" class="w-10 h-10 rounded-full border-2 border-leaf cursor-pointer" onclick="toggleUserMenu()">
+                            <div id="userMenu" class="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-stone-200 hidden py-2 z-50">
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-stone-50"><i class="fas fa-user mr-2"></i> Profil</a>
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-stone-50"><i class="fas fa-clipboard-list mr-2"></i> Pesanan Saya</a>
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-stone-50"><i class="fas fa-heart mr-2"></i> Favorit</a>
+                                <div class="border-t border-stone-200 my-1"></div>
+                                <a href="#" onclick="logout()" class="block px-4 py-2 text-sm text-red-600 hover:bg-stone-50"><i class="fas fa-sign-out-alt mr-2"></i> Keluar</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="pt-20">
+        
+        <!-- Hero Section -->
+        <section class="relative py-20 lg:py-32 overflow-hidden grain-texture bg-gradient-to-b from-fresh/30 to-white">
+            <div class="absolute top-0 right-0 w-1/2 h-full opacity-10 bg-[url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80')] bg-cover bg-center"></div>
+            
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+                <div class="grid lg:grid-cols-2 gap-12 items-center">
+                    <div class="space-y-8">
+                        <div class="inline-flex items-center space-x-2 bg-white/80 backdrop-blur px-4 py-2 rounded-full border border-leaf/20 shadow-sm animate-pulse">
+                            <span class="w-2 h-2 bg-leaf rounded-full"></span>
+                            <span class="text-sm font-medium text-leaf">Platform Pertanian #1 di Indonesia</span>
+                        </div>
+                        <h1 class="text-5xl lg:text-6xl font-serif font-bold text-soil-dark leading-tight">
+                            Panen Berlimpah <br>
+                            <span class="text-leaf italic">Masa Depan Cerah</span>
+                        </h1>
+                        <p class="text-lg text-gray-600 leading-relaxed max-w-lg">
+                            Dari edukasi pertanian modern, penyediaan alat & pupuk berkualitas, hingga pendampingan panen. Semua kebutuhan petani dalam satu platform terintegrasi.
+                        </p>
+                        <div class="flex flex-wrap gap-4">
+                            <button onclick="scrollToSection('produk')" class="bg-soil text-white px-8 py-4 rounded-full font-semibold hover:bg-soil-dark transition shadow-lg hover:shadow-xl flex items-center space-x-2 group">
+                                <span>Mulai Belanja</span>
+                                <i class="fas fa-arrow-right group-hover:translate-x-1 transition"></i>
+                            </button>
+                            <button onclick="openRegisterModal()" class="bg-white text-soil-dark border-2 border-soil/20 px-8 py-4 rounded-full font-semibold hover:border-leaf hover:text-leaf transition flex items-center space-x-2">
+                                <i class="fas fa-user-plus"></i>
+                                <span>Daftar Sekarang</span>
+                            </button>
+                        </div>
+                        <div class="flex items-center space-x-6 pt-4">
+                            <div class="flex -space-x-3">
+                                <img src="https://i.pravatar.cc/150?img=1" class="w-10 h-10 rounded-full border-2 border-white" alt="User">
+                                <img src="https://i.pravatar.cc/150?img=2" class="w-10 h-10 rounded-full border-2 border-white" alt="User">
+                                <img src="https://i.pravatar.cc/150?img=3" class="w-10 h-10 rounded-full border-2 border-white" alt="User">
+                                <div class="w-10 h-10 rounded-full border-2 border-white bg-leaf flex items-center justify-center text-white text-xs font-bold">+2k</div>
+                            </div>
+                            <p class="text-sm text-gray-600"><strong>10,000+</strong> Petani Aktif</p>
+                        </div>
+                    </div>
+                    <div class="relative">
+                        <div class="absolute inset-0 bg-leaf/20 rounded-3xl transform rotate-3"></div>
+                        <img src="https://images.unsplash.com/photo-1625246333195-78d9c38ad449?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" 
+                             alt="Modern Farming" 
+                             class="relative rounded-3xl shadow-2xl w-full object-cover h-[500px]">
+                        <div class="absolute -bottom-6 -left-6 bg-white p-4 rounded-2xl shadow-xl">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-12 h-12 bg-harvest/20 rounded-full flex items-center justify-center text-harvest">
+                                    <i class="fas fa-chart-line text-xl"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-500">Produktivitas Naik</p>
+                                    <p class="text-xl font-bold text-soil-dark">+45%</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quick Stats -->
+        <section class="py-10 bg-white border-y border-stone-200">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+                    <div>
+                        <p class="text-3xl font-bold text-leaf">500+</p>
+                        <p class="text-sm text-gray-600 mt-1">Produk Tersedia</p>
+                    </div>
+                    <div>
+                        <p class="text-3xl font-bold text-harvest">50+</p>
+                        <p class="text-sm text-gray-600 mt-1">Ahli Pertanian</p>
+                    </div>
+                    <div>
+                        <p class="text-3xl font-bold text-soil">24/7</p>
+                        <p class="text-sm text-gray-600 mt-1">Dukungan CS</p>
+                    </div>
+                    <div>
+                        <p class="text-3xl font-bold text-leaf-light">100%</p>
+                        <p class="text-sm text-gray-600 mt-1">Garansi Produk</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Education Hub -->
+        <section id="edukasi" class="py-20 bg-white pattern-field">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                    <span class="text-leaf font-semibold tracking-wider uppercase text-sm">Pusat Edukasi</span>
+                    <h2 class="text-4xl font-serif font-bold text-soil-dark mt-2">Ilmu Pertanian Modern</h2>
+                    <p class="text-gray-600 mt-4 max-w-2xl mx-auto">Tingkatkan pengetahuan Anda dari pratanam hingga pascapanen</p>
+                </div>
+
+                <!-- Edukasi Tabs -->
+                <div class="flex justify-center space-x-8 mb-12 border-b border-stone-200">
+                    <button onclick="switchEduTab('video')" id="tab-video" class="pb-4 tab-active transition-all">
+                        <i class="fas fa-video mr-2"></i>Video Kursus
+                    </button>
+                    <button onclick="switchEduTab('artikel')" id="tab-artikel" class="pb-4 text-gray-500 hover:text-leaf transition-all">
+                        <i class="fas fa-book-open mr-2"></i>Artikel
+                    </button>
+                    <button onclick="switchEduTab('webinar')" id="tab-webinar" class="pb-4 text-gray-500 hover:text-leaf transition-all">
+                        <i class="fas fa-users mr-2"></i>Webinar Live
+                    </button>
+                </div>
+
+                <!-- Video Content -->
+                <div id="content-video" class="grid md:grid-cols-3 gap-8">
+                    <div class="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover-grow border border-stone-100 cursor-pointer" onclick="openCourseDetail('Persiapan Lahan Optimal', 'pratanam')">
+                        <div class="relative h-48 overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1530836369250-ef72a3f5cda8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
+                            <div class="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
+                                <i class="fas fa-play-circle text-5xl text-white"></i>
+                            </div>
+                            <div class="absolute top-4 left-4 bg-leaf text-white text-xs px-3 py-1 rounded-full">Pratanam</div>
+                            <div class="absolute bottom-4 right-4 bg-black/70 text-white text-xs px-2 py-1 rounded">45:20</div>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold text-soil-dark mb-2">Persiapan Lahan Optimal</h3>
+                            <p class="text-gray-600 text-sm mb-4">Teknik pengolahan tanah, pengaturan pH, dan pemilihan bibit unggul.</p>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-2">
+                                    <img src="https://i.pravatar.cc/150?img=33" class="w-8 h-8 rounded-full">
+                                    <span class="text-xs text-gray-600">Dr. Ahmad</span>
+                                </div>
+                                <span class="text-harvest text-sm font-semibold"><i class="fas fa-star mr-1"></i>4.9</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover-grow border border-stone-100 cursor-pointer" onclick="openCourseDetail('Manajemen Pemupukan', 'perawatan')">
+                        <div class="relative h-48 overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1464226184884-fa280b87c399?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
+                            <div class="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
+                                <i class="fas fa-play-circle text-5xl text-white"></i>
+                            </div>
+                            <div class="absolute top-4 left-4 bg-harvest text-white text-xs px-3 py-1 rounded-full">Perawatan</div>
+                            <div class="absolute bottom-4 right-4 bg-black/70 text-white text-xs px-2 py-1 rounded">60:15</div>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold text-soil-dark mb-2">Manajemen Pemupukan</h3>
+                            <p class="text-gray-600 text-sm mb-4">Panduan lengkap jenis pupuk organik & kimia, dosis tepat.</p>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-2">
+                                    <img src="https://i.pravatar.cc/150?img=34" class="w-8 h-8 rounded-full">
+                                    <span class="text-xs text-gray-600">Prof. Siti</span>
+                                </div>
+                                <span class="text-harvest text-sm font-semibold"><i class="fas fa-star mr-1"></i>4.8</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover-grow border border-stone-100 cursor-pointer" onclick="openCourseDetail('Teknik Panen Modern', 'pascapanen')">
+                        <div class="relative h-48 overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1595855759920-86582396756a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
+                            <div class="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
+                                <i class="fas fa-play-circle text-5xl text-white"></i>
+                            </div>
+                            <div class="absolute top-4 left-4 bg-soil text-white text-xs px-3 py-1 rounded-full">Pascapanen</div>
+                            <div class="absolute bottom-4 right-4 bg-black/70 text-white text-xs px-2 py-1 rounded">50:00</div>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold text-soil-dark mb-2">Teknik Panen Modern</h3>
+                            <p class="text-gray-600 text-sm mb-4">Waktu panen ideal, penanganan hasil, dan strategi penyimpanan.</p>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-2">
+                                    <img src="https://i.pravatar.cc/150?img=35" class="w-8 h-8 rounded-full">
+                                    <span class="text-xs text-gray-600">Pak Budi</span>
+                                </div>
+                                <span class="text-harvest text-sm font-semibold"><i class="fas fa-star mr-1"></i>5.0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Artikel Content (Hidden) -->
+                <div id="content-artikel" class="hidden grid md:grid-cols-2 gap-8">
+                    <div class="bg-white p-6 rounded-2xl shadow-md border border-stone-100 flex gap-4 hover:shadow-lg transition cursor-pointer">
+                        <img src="https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" class="w-32 h-32 object-cover rounded-xl">
+                        <div>
+                            <span class="text-xs text-leaf font-semibold">Hama & Penyakit</span>
+                            <h3 class="font-bold text-soil-dark mt-1 mb-2">Mengenal Wereng Batang Coklat dan Cara Mengendalikannya</h3>
+                            <p class="text-sm text-gray-600 line-clamp-2">Wereng batang coklat (WBC) menjadi salah satu hama paling merusak tanaman padi di Indonesia...</p>
+                            <div class="mt-3 flex items-center text-xs text-gray-500">
+                                <i class="far fa-clock mr-1"></i> 5 menit baca
+                                <span class="mx-2">•</span>
+                                <i class="far fa-calendar mr-1"></i> 2 hari lalu
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl shadow-md border border-stone-100 flex gap-4 hover:shadow-lg transition cursor-pointer">
+                        <img src="https://images.unsplash.com/photo-1592419044706-39796d40f98c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" class="w-32 h-32 object-cover rounded-xl">
+                        <div>
+                            <span class="text-xs text-leaf font-semibold">Teknologi</span>
+                            <h3 class="font-bold text-soil-dark mt-1 mb-2">Pemanfaatan IoT dalam Monitoring Lahan Pertanian</h3>
+                            <p class="text-sm text-gray-600 line-clamp-2">Sensor kelembaban dan suhu tanah kini bisa dipantau langsung dari smartphone petani...</p>
+                            <div class="mt-3 flex items-center text-xs text-gray-500">
+                                <i class="far fa-clock mr-1"></i> 8 menit baca
+                                <span class="mx-2">•</span>
+                                <i class="far fa-calendar mr-1"></i> 1 minggu lalu
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Webinar Content (Hidden) -->
+                <div id="content-webinar" class="hidden space-y-4">
+                    <div class="bg-gradient-to-r from-leaf/10 to-harvest/10 p-6 rounded-2xl border border-leaf/20 flex items-center justify-between">
+                        <div class="flex items-center gap-4">
+                            <div class="bg-red-500 text-white px-3 py-1 rounded-lg text-xs font-bold animate-pulse">LIVE</div>
+                            <div>
+                                <h3 class="font-bold text-soil-dark">Webinar: Strategi Panen Raya 2024</h3>
+                                <p class="text-sm text-gray-600">Bersama Dr. Ir. Hasanuddin, M.P. • Hari ini, 19:00 WIB</p>
+                            </div>
+                        </div>
+                        <button onclick="openRegisterWebinar()" class="bg-leaf text-white px-6 py-2 rounded-full hover:bg-leaf-light transition">Daftar</button>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl border border-stone-200 flex items-center justify-between opacity-75">
+                        <div class="flex items-center gap-4">
+                            <div class="bg-gray-200 text-gray-600 px-3 py-1 rounded-lg text-xs font-bold">SELESAI</div>
+                            <div>
+                                <h3 class="font-bold text-soil-dark">Rekaman: Teknik Pengendalian Hama Terpadu</h3>
+                                <p class="text-sm text-gray-600">Sudah 1.2k x ditonton</p>
+                            </div>
+                        </div>
+                        <button class="border border-leaf text-leaf px-6 py-2 rounded-full hover:bg-leaf hover:text-white transition">Tonton Rekaman</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Product Marketplace -->
+        <section id="produk" class="py-20 bg-stone-50">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex flex-col md:flex-row justify-between items-end mb-12">
+                    <div>
+                        <span class="text-harvest font-semibold tracking-wider uppercase text-sm">Marketplace</span>
+                        <h2 class="text-4xl font-serif font-bold text-soil-dark mt-2">Kebutuhan Pertanian</h2>
+                    </div>
+                    <div class="flex space-x-2 mt-4 md:mt-0 bg-white p-1 rounded-full shadow-sm border border-stone-200">
+                        <button onclick="filterProduct('all')" class="filter-btn px-4 py-2 rounded-full text-sm font-medium bg-leaf text-white transition" data-filter="all">Semua</button>
+                        <button onclick="filterProduct('alat')" class="filter-btn px-4 py-2 rounded-full text-sm font-medium text-gray-600 hover:bg-stone-100 transition" data-filter="alat">Alat</button>
+                        <button onclick="filterProduct('pupuk')" class="filter-btn px-4 py-2 rounded-full text-sm font-medium text-gray-600 hover:bg-stone-100 transition" data-filter="pupuk">Pupuk</button>
+                        <button onclick="filterProduct('bibit')" class="filter-btn px-4 py-2 rounded-full text-sm font-medium text-gray-600 hover:bg-stone-100 transition" data-filter="bibit">Bibit</button>
+                        <button onclick="filterProduct('pestisida')" class="filter-btn px-4 py-2 rounded-full text-sm font-medium text-gray-600 hover:bg-stone-100 transition" data-filter="pestisida">Pestisida</button>
+                    </div>
+                </div>
+
+                <div class="grid md:grid-cols-4 gap-6" id="productGrid">
+                    <!-- Products will be rendered by JS -->
+                </div>
+
+                <div class="mt-12 text-center">
+                    <button onclick="loadMoreProducts()" class="bg-white border-2 border-leaf text-leaf px-8 py-3 rounded-full font-semibold hover:bg-leaf hover:text-white transition">
+                        Lihat Lebih Banyak <i class="fas fa-chevron-down ml-2"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Care Schedule Interactive -->
+        <section id="perawatan" class="py-20 bg-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                    <span class="text-leaf font-semibold tracking-wider uppercase text-sm">Manajemen Perawatan</span>
+                    <h2 class="text-4xl font-serif font-bold text-soil-dark mt-2">Jadwal Perawatan Tanaman</h2>
+                    <p class="text-gray-600 mt-4">Atur dan pantau jadwal perawatan tanaman Anda</p>
+                </div>
+
+                <div class="bg-white rounded-3xl shadow-xl border border-stone-200 overflow-hidden">
+                    <div class="bg-leaf p-6 text-white flex justify-between items-center">
+                        <div>
+                            <h3 class="text-xl font-bold">Lahan Sawah A - Padi Inpari 32</h3>
+                            <p class="text-green-100 text-sm mt-1">Umur: 35 HST (Hari Setelah Tanam)</p>
+                        </div>
+                        <button onclick="openAddScheduleModal()" class="bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg transition flex items-center gap-2">
+                            <i class="fas fa-plus"></i> Tambah Jadwal
+                        </button>
+                    </div>
+                    
+                    <div class="p-6">
+                        <div class="flex items-center justify-between mb-6">
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full bg-green-500"></span>
+                                <span class="text-sm text-gray-600">Selesai</span>
+                                <span class="w-3 h-3 rounded-full bg-yellow-500 ml-4"></span>
+                                <span class="text-sm text-gray-600">Berlangsung</span>
+                                <span class="w-3 h-3 rounded-full bg-gray-300 ml-4"></span>
+                                <span class="text-sm text-gray-600">Mendatang</span>
+                            </div>
+                            <select class="border border-stone-300 rounded-lg px-3 py-1 text-sm focus:outline-none focus:border-leaf">
+                                <option>Semua Kegiatan</option>
+                                <option>Pemupukan</option>
+                                <option>Penyiraman</option>
+                                <option>Pengendalian Hama</option>
+                            </select>
+                        </div>
+
+                        <div class="space-y-4" id="scheduleList">
+                            <!-- Schedule items will be rendered by JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Weather Widget -->
+                <div class="mt-8 grid md:grid-cols-3 gap-6">
+                    <div class="bg-gradient-to-br from-blue-400 to-blue-600 rounded-2xl p-6 text-white">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-blue-100 text-sm">Cuaca Hari Ini</p>
+                                <h4 class="text-2xl font-bold mt-1">Cerah Berawan</h4>
+                                <p class="text-3xl font-bold mt-2">28°C</p>
+                            </div>
+                            <i class="fas fa-cloud-sun text-4xl opacity-80"></i>
+                        </div>
+                        <div class="mt-4 flex justify-between text-sm text-blue-100">
+                            <span><i class="fas fa-tint mr-1"></i> Kelembaban 65%</span>
+                            <span><i class="fas fa-wind mr-1"></i> Angin 12km/j</span>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-2xl p-6 border border-stone-200 shadow-md">
+                        <h4 class="font-bold text-soil-dark mb-4">Rekomendasi Hari Ini</h4>
+                        <ul class="space-y-2 text-sm">
+                            <li class="flex items-center gap-2 text-gray-700">
+                                <i class="fas fa-check-circle text-green-500"></i>
+                                Cocok untuk penyemprotan pestisida
+                            </li>
+                            <li class="flex items-center gap-2 text-gray-700">
+                                <i class="fas fa-check-circle text-green-500"></i>
+                                Waktu ideal pemupukan: 06:00-08:00
+                            </li>
+                            <li class="flex items-center gap-2 text-gray-700">
+                                <i class="fas fa-times-circle text-red-400"></i>
+                                Hindari penyiraman siang hari
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-harvest/10 rounded-2xl p-6 border border-harvest/20">
+                        <h4 class="font-bold text-soil-dark mb-2">Prediksi Panen</h4>
+                        <p class="text-3xl font-bold text-harvest">45 Hari Lagi</p>
+                        <p class="text-sm text-gray-600 mt-2">Estimasi hasil: 8 ton/hektar</p>
+                        <div class="mt-4 bg-white rounded-lg p-3">
+                            <div class="flex justify-between text-sm mb-1">
+                                <span>Progress</span>
+                                <span class="font-bold text-leaf">65%</span>
+                            </div>
+                            <div class="w-full bg-stone-200 rounded-full h-2">
+                                <div class="bg-leaf h-2 rounded-full" style="width: 65%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Community & Chat -->
+        <section id="komunitas" class="py-20 bg-stone-50">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid lg:grid-cols-3 gap-8">
+                    <!-- Forum Komunitas -->
+                    <div class="lg:col-span-2">
+                        <h3 class="text-3xl font-serif font-bold text-soil-dark mb-6">Forum Komunitas</h3>
+                        <div class="bg-white rounded-2xl shadow-lg border border-stone-200 overflow-hidden">
+                            <div class="p-4 border-b border-stone-200 bg-stone-50 flex gap-2">
+                                <button onclick="switchForumTab('terbaru')" id="forum-terbaru" class="px-4 py-2 rounded-lg text-sm font-medium bg-leaf text-white transition">Terbaru</button>
+                                <button onclick="switchForumTab('populer')" id="forum-populer" class="px-4 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-stone-200 transition">Populer</button>
+                                <button onclick="switchForumTab('saya')" id="forum-saya" class="px-4 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-stone-200 transition">Diskusi Saya</button>
+                                <button onclick="openNewThreadModal()" class="ml-auto bg-harvest text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-harvest/90 transition">
+                                    <i class="fas fa-plus mr-1"></i> Topik Baru
+                                </button>
+                            </div>
+                            
+                            <div class="divide-y divide-stone-100" id="forumList">
+                                <!-- Forum threads rendered by JS -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Live Chat Support -->
+                    <div>
+                        <h3 class="text-3xl font-serif font-bold text-soil-dark mb-6">Konsultasi Ahli</h3>
+                        <div class="bg-white border-2 border-stone-200 rounded-2xl overflow-hidden shadow-lg">
+                            <div class="bg-leaf p-4">
+                                <div class="flex items-center justify-between mb-4">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="relative">
+                                            <img src="https://i.pravatar.cc/150?img=60" class="w-10 h-10 rounded-full border-2 border-white">
+                                            <span class="absolute bottom-0 right-0 w-3 h-3 bg-green-400 border-2 border-white rounded-full animate-pulse"></span>
+                                        </div>
+                                        <div>
+                                            <h4 class="text-white font-semibold">Dr. Ir. Budi Santoso</h4>
+                                            <p class="text-green-100 text-xs">Ahli Agronomi • Online</p>
+                                        </div>
+                                    </div>
+                                    <button class="text-white hover:bg-white/20 p-2 rounded-full transition">
+                                        <i class="fas fa-ellipsis-v"></i>
+                                    </button>
+                                </div>
+                                <div class="bg-white/10 rounded-lg p-2 text-center">
+                                    <p class="text-xs text-white">Estimasi balasan: <span class="font-bold">2 menit</span></p>
+                                </div>
+                            </div>
+                            
+                            <div class="h-96 overflow-y-auto p-4 bg-stone-50 space-y-3" id="chatContainer">
+                                <!-- Chat messages rendered by JS -->
+                            </div>
+
+                            <div class="p-4 bg-white border-t border-stone-200">
+                                <div class="flex space-x-2 mb-2">
+                                    <button class="p-2 text-gray-400 hover:text-leaf transition rounded-full hover:bg-stone-100">
+                                        <i class="fas fa-image"></i>
+                                    </button>
+                                    <button class="p-2 text-gray-400 hover:text-leaf transition rounded-full hover:bg-stone-100">
+                                        <i class="fas fa-microphone"></i>
+                                    </button>
+                                </div>
+                                <div class="flex space-x-2">
+                                    <input type="text" id="chatInput" placeholder="Ketik pesan..." 
+                                           class="flex-1 bg-stone-100 rounded-full px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-leaf"
+                                           onkeypress="handleChatKeypress(event)">
+                                    <button onclick="sendMessage()" class="p-3 bg-leaf text-white rounded-full hover:bg-leaf-light transition shadow-md">
+                                        <i class="fas fa-paper-plane"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Quick Questions -->
+                        <div class="mt-4 bg-white p-4 rounded-xl border border-stone-200">
+                            <p class="text-sm font-semibold text-gray-700 mb-2">Pertanyaan Cepat:</p>
+                            <div class="flex flex-wrap gap-2">
+                                <button onclick="sendQuickQuestion('Bagaimana cara mengatasi daun menguning?')" class="text-xs bg-stone-100 hover:bg-leaf/10 text-gray-700 px-3 py-1 rounded-full transition">Daun menguning?</button>
+                                <button onclick="sendQuickQuestion('Kapan waktu terbaik panen padi?')" class="text-xs bg-stone-100 hover:bg-leaf/10 text-gray-700 px-3 py-1 rounded-full transition">Waktu panen?</button>
+                                <button onclick="sendQuickQuestion('Apakah perlu pupuk tambahan saat ini?')" class="text-xs bg-stone-100 hover:bg-leaf/10 text-gray-700 px-3 py-1 rounded-full transition">Pupuk tambahan?</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Full Payment & Checkout Section -->
+        <section class="py-20 bg-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                    <span class="text-leaf font-semibold tracking-wider uppercase text-sm">Sistem Pembayaran</span>
+                    <h2 class="text-4xl font-serif font-bold text-soil-dark mt-2">Checkout Aman & Fleksibel</h2>
+                </div>
+
+                <div class="grid lg:grid-cols-3 gap-8">
+                    <!-- Progress Stepper -->
+                    <div class="lg:col-span-3 mb-8">
+                        <div class="flex items-center justify-center space-x-4">
+                            <div class="flex items-center">
+                                <div id="step1" class="w-10 h-10 rounded-full bg-leaf text-white flex items-center justify-center font-bold step-active transition-all">1</div>
+                                <span class="ml-2 font-medium text-leaf">Keranjang</span>
+                            </div>
+                            <div class="w-20 h-1 bg-stone-200 rounded">
+                                <div id="progress1" class="h-full bg-leaf rounded transition-all duration-500" style="width: 0%"></div>
+                            </div>
+                            <div class="flex items-center">
+                                <div id="step2" class="w-10 h-10 rounded-full border-2 border-stone-300 text-stone-400 flex items-center justify-center font-bold transition-all">2</div>
+                                <span class="ml-2 font-medium text-stone-400" id="label2">Pengiriman</span>
+                            </div>
+                            <div class="w-20 h-1 bg-stone-200 rounded">
+                                <div id="progress2" class="h-full bg-leaf rounded transition-all duration-500" style="width: 0%"></div>
+                            </div>
+                            <div class="flex items-center">
+                                <div id="step3" class="w-10 h-10 rounded-full border-2 border-stone-300 text-stone-400 flex items-center justify-center font-bold transition-all">3</div>
+                                <span class="ml-2 font-medium text-stone-400" id="label3">Pembayaran</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Main Checkout Area -->
+                    <div class="lg:col-span-2 space-y-6" id="checkoutContainer">
+                        <!-- Step 1: Cart (Default) -->
+                        <div id="checkout-cart" class="bg-white rounded-2xl shadow-lg border border-stone-200 p-6">
+                            <h3 class="text-xl font-bold text-soil-dark mb-6 flex items-center gap-2">
+                                <i class="fas fa-shopping-cart text-leaf"></i> Keranjang Belanja
+                            </h3>
+                            <div id="cartItems" class="space-y-4">
+                                <!-- Cart items rendered by JS -->
+                            </div>
+                            <div class="mt-6 pt-6 border-t border-stone-200">
+                                <div class="flex justify-between items-center mb-4">
+                                    <span class="text-gray-600">Subtotal</span>
+                                    <span class="font-semibold" id="cartSubtotal">Rp 0</span>
+                                </div>
+                                <button onclick="goToStep(2)" class="w-full bg-leaf text-white py-3 rounded-xl font-bold hover:bg-leaf-light transition">
+                                    Lanjut ke Pengiriman <i class="fas fa-arrow-right ml-2"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Step 2: Shipping (Hidden) -->
+                        <div id="checkout-shipping" class="hidden bg-white rounded-2xl shadow-lg border border-stone-200 p-6">
+                            <h3 class="text-xl font-bold text-soil-dark mb-6 flex items-center gap-2">
+                                <i class="fas fa-truck text-leaf"></i> Informasi Pengiriman
+                            </h3>
+                            <form id="shippingForm" class="space-y-4">
+                                <div class="grid md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap</label>
+                                        <input type="text" required class="w-full border border-stone-300 rounded-lg px-4 py-2 focus:outline-none focus:border-leaf" placeholder="Nama penerima">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Nomor Telepon</label>
+                                        <input type="tel" required class="w-full border border-stone-300 rounded-lg px-4 py-2 focus:outline-none focus:border-leaf" placeholder="08xxxxxxxxxx">
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Alamat Lengkap</label>
+                                    <textarea required rows="3" class="w-full border border-stone-300 rounded-lg px-4 py-2 focus:outline-none focus:border-leaf" placeholder="Jl. Kebon Jeruk No. 123, RT 01/RW 02"></textarea>
+                                </div>
+                                <div class="grid md:grid-cols-3 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Provinsi</label>
+                                        <select required class="w-full border border-stone-300 rounded-lg px-4 py-2 focus:outline-none focus:border-leaf">
+                                            <option value="">Pilih Provinsi</option>
+                                            <option>Jawa Barat</option>
+                                            <option>Jawa Tengah</option>
+                                            <option>Jawa Timur</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Kota/Kabupaten</label>
+                                        <select required class="w-full border border-stone-300 rounded-lg px-4 py-2 focus:outline-none focus:border-leaf">
+                                            <option value="">Pilih Kota</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Kode Pos</label>
+                                        <input type="text" required class="w-full border border-stone-300 rounded-lg px-4 py-2 focus:outline-none focus:border-leaf" placeholder="40123">
+                                    </div>
+                                </div>
+                                
+                                <div class="mt-6">
+                                    <label class="block text-sm font-medium text-gray-700 mb-3">Pilih Kurir</label>
+                                    <div class="grid md:grid-cols-3 gap-4">
+                                        <label class="border-2 border-leaf bg-leaf/5 rounded-xl p-4 cursor-pointer relative">
+                                            <input type="radio" name="kurir" value="jne" class="absolute top-4 right-4" checked>
+                                            <div class="font-bold text-soil-dark">JNE Reguler</div>
+                                            <div class="text-sm text-gray-600 mt-1">2-3 hari</div>
+                                            <div class="text-leaf font-bold mt-2">Rp 25.000</div>
+                                        </label>
+                                        <label class="border-2 border-stone-200 rounded-xl p-4 cursor-pointer hover:border-leaf/50 transition relative">
+                                            <input type="radio" name="kurir" value="jnt" class="absolute top-4 right-4">
+                                            <div class="font-bold text-soil-dark">J&T Express</div>
+                                            <div class="text-sm text-gray-600 mt-1">2-3 hari</div>
+                                            <div class="text-leaf font-bold mt-2">Rp 23.000</div>
+                                        </label>
+                                        <label class="border-2 border-stone-200 rounded-xl p-4 cursor-pointer hover:border-leaf/50 transition relative">
+                                            <input type="radio" name="kurir" value="sicepat" class="absolute top-4 right-4">
+                                            <div class="font-bold text-soil-dark">SiCepat</div>
+                                            <div class="text-sm text-gray-600 mt-1">1-2 hari</div>
+                                            <div class="text-leaf font-bold mt-2">Rp 28.000</div>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="flex gap-4 mt-6">
+                                    <button type="button" onclick="goToStep(1)" class="flex-1 border border-stone-300 text-gray-700 py-3 rounded-xl font-bold hover:bg-stone-50 transition">
+                                        <i class="fas fa-arrow-left mr-2"></i> Kembali
+                                    </button>
+                                    <button type="button" onclick="validateShipping()" class="flex-1 bg-leaf text-white py-3 rounded-xl font-bold hover:bg-leaf-light transition">
+                                        Lanjut ke Pembayaran <i class="fas fa-arrow-right ml-2"></i>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Step 3: Payment (Hidden) -->
+                        <div id="checkout-payment" class="hidden bg-white rounded-2xl shadow-lg border border-stone-200 p-6">
+                            <h3 class="text-xl font-bold text-soil-dark mb-6 flex items-center gap-2">
+                                <i class="fas fa-credit-card text-leaf"></i> Metode Pembayaran
+                            </h3>
+                            
+                            <div class="space-y-4 mb-8">
+                                <!-- Bank Transfer -->
+                                <div onclick="selectPayment('bank')" id="pay-bank" class="payment-option border-2 border-stone-200 rounded-xl p-4 cursor-pointer transition hover:border-leaf/50">
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center space-x-4">
+                                            <div class="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center">
+                                                <i class="fas fa-university text-2xl text-blue-600"></i>
+                                            </div>
+                                            <div>
+                                                <h4 class="font-bold text-soil-dark">Transfer Bank</h4>
+                                                <p class="text-xs text-gray-600">BCA, Mandiri, BNI, BRI</p>
+                                            </div>
+                                        </div>
+                                        <div class="payment-check hidden w-6 h-6 rounded-full bg-leaf flex items-center justify-center">
+                                            <i class="fas fa-check text-white text-xs"></i>
+                                        </div>
+                                    </div>
+                                    <div id="bank-details" class="hidden mt-4 pl-16 space-y-2">
+                                        <label class="flex items-center gap-3 p-3 border rounded-lg hover:bg-stone-50 cursor-pointer">
+                                            <input type="radio" name="bank" value="bca" class="text-leaf">
+                                            <span class="font-bold text-blue-600">BCA</span>
+                                            <span class="text-sm text-gray-600 ml-auto">Dicek Otomatis</span>
+                                        </label>
+                                        <label class="flex items-center gap-3 p-3 border rounded-lg hover:bg-stone-50 cursor-pointer">
+                                            <input type="radio" name="bank" value="mandiri" class="text-leaf">
+                                            <span class="font-bold text-blue-800">Mandiri</span>
+                                            <span class="text-sm text-gray-600 ml-auto">Dicek Otomatis</span>
+                                        </label>
+                                        <label class="flex items-center gap-3 p-3 border rounded-lg hover:bg-stone-50 cursor-pointer">
+                                            <input type="radio" name="bank" value="bni" class="text-leaf">
+                                            <span class="font-bold text-orange-600">BNI</span>
+                                            <span class="text-sm text-gray-600 ml-auto">Dicek Otomatis</span>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <!-- E-Wallet -->
+                                <div onclick="selectPayment('ewallet')" id="pay-ewallet" class="payment-option border-2 border-stone-200 rounded-xl p-4 cursor-pointer transition hover:border-leaf/50">
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center space-x-4">
+                                            <div class="w-12 h-12 bg-purple-50 rounded-lg flex items-center justify-center">
+                                                <i class="fas fa-wallet text-2xl text-purple-600"></i>
+                                            </div>
+                                            <div>
+                                                <h4 class="font-bold text-soil-dark">E-Wallet</h4>
+                                                <p class="text-xs text-gray-600">GoPay, OVO, DANA, LinkAja</p>
+                                            </div>
+                                        </div>
+                                        <div class="payment-check hidden w-6 h-6 rounded-full bg-leaf flex items-center justify-center">
+                                            <i class="fas fa-check text-white text-xs"></i>
+                                        </div>
+                                    </div>
+                                    <div id="ewallet-details" class="hidden mt-4 pl-16 grid grid-cols-4 gap-2">
+                                        <button class="p-2 border rounded hover:bg-blue-50 text-xs font-bold text-blue-600">GoPay</button>
+                                        <button class="p-2 border rounded hover:bg-purple-50 text-xs font-bold text-purple-600">OVO</button>
+                                        <button class="p-2 border rounded hover:bg-blue-50 text-xs font-bold text-blue-800">DANA</button>
+                                        <button class="p-2 border rounded hover:bg-red-50 text-xs font-bold text-red-600">LinkAja</button>
+                                    </div>
+                                </div>
+
+                                <!-- Credit Card -->
+                                <div onclick="selectPayment('cc')" id="pay-cc" class="payment-option border-2 border-stone-200 rounded-xl p-4 cursor-pointer transition hover:border-leaf/50">
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center space-x-4">
+                                            <div class="w-12 h-12 bg-gray-50 rounded-lg flex items-center justify-center">
+                                                <i class="fas fa-credit-card text-2xl text-gray-600"></i>
+                                            </div>
+                                            <div>
+                                                <h4 class="font-bold text-soil-dark">Kartu Kredit</h4>
+                                                <p class="text-xs text-gray-600">Visa, Mastercard, JCB</p>
+                                            </div>
+                                        </div>
+                                        <div class="payment-check hidden w-6 h-6 rounded-full bg-leaf flex items-center justify-center">
+                                            <i class="fas fa-check text-white text-xs"></i>
+                                        </div>
+                                    </div>
+                                    <div id="cc-details" class="hidden mt-4 pl-16 space-y-3">
+                                        <input type="text" placeholder="Nomor Kartu" class="w-full border rounded-lg px-4 py-2">
+                                        <div class="grid grid-cols-2 gap-3">
+                                            <input type="text" placeholder="MM/YY" class="border rounded-lg px-4 py-2">
+                                            <input type="text" placeholder="CVV" class="border rounded-lg px-4 py-2">
+                                        </div>
+                                        <input type="text" placeholder="Nama di Kartu" class="w-full border rounded-lg px-4 py-2">
+                                    </div>
+                                </div>
+
+                                <!-- PayLater -->
+                                <div onclick="selectPayment('paylater')" id="pay-paylater" class="payment-option border-2 border-stone-200 rounded-xl p-4 cursor-pointer transition hover:border-leaf/50">
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center space-x-4">
+                                            <div class="w-12 h-12 bg-green-50 rounded-lg flex items-center justify-center">
+                                                <i class="fas fa-hand-holding-usd text-2xl text-green-600"></i>
+                                            </div>
+                                            <div>
+                                                <h4 class="font-bold text-soil-dark">TaniPayLater</h4>
+                                                <p class="text-xs text-gray-600">Cicilan 0% 3-12 bulan</p>
+                                            </div>
+                                        </div>
+                                        <div class="payment-check hidden w-6 h-6 rounded-full bg-leaf flex items-center justify-center">
+                                            <i class="fas fa-check text-white text-xs"></i>
+                                        </div>
+                                    </div>
+                                    <div id="paylater-details" class="hidden mt-4 pl-16 bg-green-50 p-4 rounded-lg">
+                                        <p class="text-sm text-green-800 mb-2">Limit tersedia: <strong>Rp 5.000.000</strong></p>
+                                        <select class="w-full border border-green-300 rounded-lg px-3 py-2 bg-white">
+                                            <option>Cicilan 3x (Rp 120.833/bulan)</option>
+                                            <option>Cicilan 6x (Rp 60.416/bulan)</option>
+                                            <option>Cicilan 12x (Rp 30.208/bulan)</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flex gap-4">
+                                <button onclick="goToStep(2)" class="flex-1 border border-stone-300 text-gray-700 py-3 rounded-xl font-bold hover:bg-stone-50 transition">
+                                    <i class="fas fa-arrow-left mr-2"></i> Kembali
+                                </button>
+                                <button onclick="processPayment()" class="flex-1 bg-soil text-white py-3 rounded-xl font-bold hover:bg-soil-dark transition shadow-lg">
+                                    Bayar Sekarang <i class="fas fa-lock ml-2"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Success State (Hidden) -->
+                        <div id="checkout-success" class="hidden bg-white rounded-2xl shadow-lg border border-stone-200 p-8 text-center">
+                            <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <i class="fas fa-check text-4xl text-green-600"></i>
+                            </div>
+                            <h3 class="text-2xl font-bold text-soil-dark mb-2">Pembayaran Berhasil!</h3>
+                            <p class="text-gray-600 mb-6">Pesanan Anda sedang diproses. Nomor invoice: <span class="font-bold text-leaf">#TM-2024-00123</span></p>
+                            <div class="bg-stone-50 rounded-xl p-4 mb-6 text-left max-w-md mx-auto">
+                                <div class="flex justify-between mb-2">
+                                    <span class="text-gray-600">Metode</span>
+                                    <span class="font-medium" id="successMethod">Transfer Bank BCA</span>
+                                </div>
+                                <div class="flex justify-between mb-2">
+                                    <span class="text-gray-600">Total</span>
+                                    <span class="font-bold text-soil-dark" id="successTotal">Rp 362.500</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Estimasi Tiba</span>
+                                    <span class="font-medium">3-5 Hari Kerja</span>
+                                </div>
+                            </div>
+                            <div class="flex gap-4 justify-center">
+                                <button onclick="showDashboard()" class="bg-leaf text-white px-8 py-3 rounded-xl font-bold hover:bg-leaf-light transition">
+                                    Lihat Pesanan Saya
+                                </button>
+                                <button onclick="location.reload()" class="border border-stone-300 text-gray-700 px-8 py-3 rounded-xl font-bold hover:bg-stone-50 transition">
+                                    Kembali Berbelanja
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Order Summary Sidebar -->
+                    <div class="lg:col-span-1">
+                        <div class="bg-white rounded-2xl shadow-lg p-6 border border-stone-200 sticky top-24">
+                            <h3 class="text-lg font-bold text-soil-dark mb-4">Ringkasan Pesanan</h3>
+                            <div id="orderSummary" class="space-y-3 mb-4 max-h-60 overflow-y-auto">
+                                <!-- Dynamic summary -->
+                            </div>
+                            <div class="border-t border-stone-200 pt-4 space-y-2">
+                                <div class="flex justify-between text-sm">
+                                    <span class="text-gray-600">Subtotal</span>
+                                    <span class="font-medium" id="summarySubtotal">Rp 0</span>
+                                </div>
+                                <div class="flex justify-between text-sm">
+                                    <span class="text-gray-600">Ongkir</span>
+                                    <span class="font-medium" id="summaryOngkir">Rp 25.000</span>
+                                </div>
+                                <div class="flex justify-between text-sm text-green-600">
+                                    <span>Diskon (10%)</span>
+                                    <span id="summaryDiskon">-Rp 0</span>
+                                </div>
+                                <div class="flex justify-between text-lg font-bold text-soil-dark pt-2 border-t border-stone-200">
+                                    <span>Total</span>
+                                    <span id="summaryTotal">Rp 0</span>
+                                </div>
+                            </div>
+                            <div class="mt-4 flex items-center justify-center space-x-2 text-xs text-gray-500">
+                                <i class="fas fa-shield-alt text-leaf"></i>
+                                <span>Pembayaran 100% Aman</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- MODALS -->
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="fixed inset-0 bg-black/50 hidden z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl max-w-md w-full p-8 modal-enter shadow-2xl">
+            <div class="text-center mb-6">
+                <div class="w-16 h-16 bg-leaf/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-user-circle text-3xl text-leaf"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-soil-dark">Selamat Datang Kembali</h3>
+                <p class="text-gray-600 text-sm mt-1">Masuk untuk melanjutkan aktivitas pertanian Anda</p>
+            </div>
+            <form onsubmit="handleLogin(event)" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Email / No. Telepon</label>
+                    <div class="relative">
+                        <i class="fas fa-envelope absolute left-3 top-3 text-gray-400"></i>
+                        <input type="text" required class="w-full border border-stone-300 rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/20" placeholder="nama@email.com">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Kata Sandi</label>
+                    <div class="relative">
+                        <i class="fas fa-lock absolute left-3 top-3 text-gray-400"></i>
+                        <input type="password" required class="w-full border border-stone-300 rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/20" placeholder="••••••••">
+                    </div>
+                </div>
+                <div class="flex justify-between items-center text-sm">
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="checkbox" class="rounded text-leaf focus:ring-leaf">
+                        <span class="text-gray-600">Ingat saya</span>
+                    </label>
+                    <a href="#" class="text-leaf hover:underline">Lupa password?</a>
+                </div>
+                <button type="submit" class="w-full bg-leaf text-white py-3 rounded-xl font-bold hover:bg-leaf-light transition shadow-lg">
+                    Masuk
+                </button>
+            </form>
+            <div class="mt-6 text-center">
+                <p class="text-sm text-gray-600">Belum punya akun? <button onclick="switchToRegister()" class="text-leaf font-semibold hover:underline">Daftar sekarang</button></p>
+            </div>
+            <button onclick="closeModal('loginModal')" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div id="registerModal" class="fixed inset-0 bg-black/50 hidden z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl max-w-lg w-full p-8 modal-enter shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div class="text-center mb-6">
+                <div class="w-16 h-16 bg-harvest/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-seedling text-3xl text-harvest"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-soil-dark">Gabung Komunitas TaniMakmur</h3>
+                <p class="text-gray-600 text-sm mt-1">Daftar gratis dan akses semua fitur pertanian modern</p>
+            </div>
+            <form onsubmit="handleRegister(event)" class="space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Nama Depan</label>
+                        <input type="text" required class="w-full border border-stone-300 rounded-lg px-4 py-2 focus:outline-none focus:border-leaf" placeholder="John">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Nama Belakang</label>
+                        <input type="text" required class="w-full border border-stone-300 rounded-lg px-4 py-2 focus:outline-none focus:border-leaf" placeholder="Doe">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                    <input type="email" required class="w-full border border-stone-300 rounded-lg px-4 py-2 focus:outline-none focus:border-leaf" placeholder="nama@email.com">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">No. Telepon (WA)</label>
+                    <input type="tel" required class="w-full border border-stone-300 rounded-lg px-4 py-2 focus:outline-none focus:border-leaf" placeholder="08xxxxxxxxxx">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Jenis Petani</label>
+                    <select required class="w-full border border-stone-300 rounded-lg px-4 py-2 focus:outline-none focus:border-leaf">
+                        <option value="">Pilih Kategori</option>
+                        <option>Petani Padi</option>
+                        <option>Petani Sayur</option>
+                        <option>Petani Buah</option>
+                        <option>Petani Jagung</option>
+                        <option>Petani Kopi/Kakao</option>
+                        <option>Lainnya</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Luas Lahan (Hektar)</label>
+                    <input type="number" step="0.1" class="w-full border border-stone-300 rounded-lg px-4 py-2 focus:outline-none focus:border-leaf" placeholder="Contoh: 2.5">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Kata Sandi</label>
+                    <input type="password" required class="w-full border border-stone-300 rounded-lg px-4 py-2 focus:outline-none focus:border-leaf" placeholder="Minimal 8 karakter">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Konfirmasi Kata Sandi</label>
+                    <input type="password" required class="w-full border border-stone-300 rounded-lg
