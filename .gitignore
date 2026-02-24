@@ -1,46 +1,125 @@
-# Dependencies
-node_modules/
-vendor/
+# ==========================
+# Laravel
+# ==========================
+/vendor/
+/node_modules/
+/.env
+/.env.local
+/.env.*.local
+.env.production
+.env.testing
+.phpunit.result.cache
+Homestead.json
+Homestead.yaml
+auth.json
+npm-debug.log
+yarn-error.log
 
-# Build outputs
+# Laravel IDE Helper
+*.ide-helper.php
+*.ide-helper.json
+/_ide_helper.php
+/_ide_helper_models.php
+
+# ==========================
+# Node.js / React / Vite
+# ==========================
+node_modules/
+npm-debug.log
+yarn-error.log
+yarn.lock
+package-lock.json
 dist/
 build/
+.next/
+out/
+
+# ==========================
+# General Build & Logs
+# ==========================
 *.log
+logs/
+coverage/
+.nyc_output/
+*.lcov
 
-# Environment files
-.env
-.env.local
-.env.*.local
-
-# IDE
+# ==========================
+# IDE & Editors
+# ==========================
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
-
-# OS
 .DS_Store
 Thumbs.db
+*.sublime-project
+*.sublime-workspace
 
-# Logs
-logs/
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
+# ==========================
+# OS Files
+# ==========================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
 
-# Testing
-coverage/
-.nyc_output/
-
-# Temporary files
+# ==========================
+# Temporary Files
+# ==========================
 tmp/
 temp/
+.cache/
+.tmp/
 
-# ZIP files (appears to be backups)
+# ==========================
+# Storage & Cache (Laravel)
+# ==========================
+storage/*.key
+storage/logs/*
+storage/framework/cache/*
+storage/framework/sessions/*
+storage/framework/views/*
+bootstrap/cache/*
+
+# ==========================
+# Public Assets (Generated)
+# ==========================
+public/hot
+public/storage
+public/mix-manifest.json
+public/build
+
+# ==========================
+# Backup Files
+# ==========================
 *.zip
+*.rar
+*.tar
+*.gz
+*.bak
 
-# Package lock files (optional - uncomment if needed)
-# package-lock.json
-# yarn.lock
+# ==========================
+# Database (SQLite)
+# ==========================
+*.db
+*.sqlite
+*.sqlite3
+
+# ==========================
+# Uploads & User Content
+# ==========================
+public/uploads/*
+!public/uploads/.gitignore
+storage/app/public/*
+!storage/app/public/.gitignore
+
+# ==========================
+# Testing
+# ==========================
+.phpunit.result.cache
+.phpunit.cache/
+.php_cs.cache
